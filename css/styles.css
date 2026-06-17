@@ -1,0 +1,309 @@
+/* CSS Avanzado - Estilos Estructurales y de Animación Nocturna */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-black: #020205;
+    --text-light: #f0f0f5;
+    --accent-orange: #ff7b00;
+    --caba-glow: radial-gradient(circle at center, rgba(240, 150, 60, 0.25) 0%, rgba(2,2,5,0) 70%);
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--bg-black);
+    color: var(--text-light);
+    overflow-x: hidden;
+}
+
+/* Contenedores del Scrollytelling */
+.scrolly-section {
+    position: relative;
+    width: 100%;
+}
+
+.sticky-container {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 1;
+    overflow: hidden;
+    background-color: var(--bg-black);
+}
+
+.scroll-text-wrapper {
+    position: relative;
+    padding: 0 10%;
+    z-index: 2;
+    pointer-events: none; /* Permite interactuar con mapas al pasar el mouse por los costados */
+}
+
+/* Bloques de Texto (Steps) */
+.step {
+    min-height: 80vh;
+    margin-bottom: 30vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 450px;
+    pointer-events: auto; /* Reactiva interacción para el cuadro de texto si es necesario */
+}
+
+.step:first-child {
+    padding-top: 20vh;
+}
+
+.step:last-child {
+    margin-bottom: 20vh;
+}
+
+.step p {
+    background: rgba(10, 10, 18, 0.85);
+    padding: 25px 30px;
+    border-radius: 12px;
+    font-size: 1.15rem;
+    line-height: 1.6;
+    border-left: 4px solid var(--accent-orange);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.step h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0px;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    background: rgba(10, 10, 18, 0.85);
+    padding: 15px 30px 5px 30px;
+    border-radius: 12px 12px 0 0;
+    display: inline-block;
+    width: fit-content;
+}
+
+.step h2 + p {
+    border-radius: 0 12px 12px 12px;
+}
+
+.step-center {
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+    min-height: 100vh;
+}
+
+.step-center h1 {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    letter-spacing: -1px;
+}
+
+.step-center p.subtitle {
+    font-size: 1.3rem;
+    color: #a0a0ba;
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+
+/* Fondos y Cielos */
+.sky-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: background 0.5s ease, filter 0.5s ease;
+}
+
+.black-sky {
+    background: #000000;
+}
+
+/* Animación de estrellas nativas en CSS */
+.css-star {
+    position: absolute;
+    background-color: #fff;
+    border-radius: 50%;
+    animation: twinkle 3s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+/* Silueta Abuelo */
+.silhouette-wrapper {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 35vh;
+    display: flex;
+    justify-content: center;
+}
+
+.silhouette-abuelo {
+    height: 100%;
+    width: auto;
+}
+
+/* Escena 2: Viaje en auto */
+.road-simulation {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1) 50%, transparent);
+}
+
+.orion-constellation {
+    position: absolute;
+    width: 300px;
+    height: 400px;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.star {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 12px #fff;
+}
+
+.star.betelgeuse { width: 8px; height: 8px; background-color: #ffa550; box-shadow: 0 0 15px #ffa550; }
+.star.rigel { width: 8px; height: 8px; background-color: #a0c0ff; box-shadow: 0 0 15px #a0c0ff; }
+
+.orion-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Escena 3: Contaminación lumínica */
+.light-pollution-glow {
+    position: absolute;
+    bottom: -50%;
+    left: -25%;
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(circle at bottom center, rgba(230, 120, 40, 0) 0%, rgba(2,2,5,0) 70%);
+    transition: background 0.8s ease;
+    pointer-events: none;
+}
+
+.bortle-indicator {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    padding: 10px 20px;
+    background: rgba(10,10,15,0.8);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255,255,255,0.1);
+    letter-spacing: 1px;
+}
+
+/* Integración de Flourish e Iframes */
+.flourish-embed-wrapper {
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+    background-color: #040408;
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.flourish-embed-wrapper.half-height {
+    height: 60%;
+}
+
+/* Escena 5: Ciudades */
+.city-overlay-title {
+    position: absolute;
+    top: 10%;
+    right: 10%;
+    font-size: 6rem;
+    font-weight: 900;
+    color: rgba(255,255,255,0.03);
+    text-transform: uppercase;
+    user-select: none;
+}
+
+/* Escena 7: Cierre Global */
+.global-grid-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    padding: 20px;
+    background: linear-gradient(to top, #000, transparent);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.global-grid-container.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.global-card {
+    background: rgba(15, 15, 25, 0.6);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+}
+
+.global-card h4 {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+}
+
+.mini-sky {
+    width: 100%;
+    height: 80px;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+.mini-sky.ny { background: #2b2520; box-shadow: inset 0 -20px 30px rgba(230,100,40,0.3); }
+.mini-sky.atacama { background: #010103; }
+.mini-sky.tokio { background: #332525; box-shadow: inset 0 -20px 30px rgba(240,50,50,0.2); }
+.mini-sky.gaiman-today { background: #080812; box-shadow: inset 0 -20px 30px rgba(255,255,255,0.05); }
+
+.final-quote {
+    font-size: 1.4rem !important;
+    border-left: none !important;
+    border-top: 3px solid var(--accent-orange);
+    border-bottom: 3px solid var(--accent-orange);
+    padding: 40px !important;
+}
+
+.scroll-indicator {
+    margin-top: 40px;
+    animation: bounce 2s infinite;
+    color: #888;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
