@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
     
     // ==========================================
@@ -125,3 +124,54 @@ document.addEventListener("DOMContentLoaded", () => {
     }, opcionesE5);
 
     disparadoresE5.forEach(d => observadorE5.observe(d));
+
+    // ==========================================
+    // LÓGICA ESCENA 6 (Viaje final + Grilla)
+    // ==========================================
+    const fondoViajeFinal = document.getElementById("fondo-viaje-final");
+    const textoViaje = document.querySelector(".texto-centrado-viaje");
+    const grillaFinal = document.getElementById("grilla-final");
+    const graficoFlourish = document.getElementById("grafico-flourish");
+    const disparadoresE6 = document.querySelectorAll(".disparador-viaje");
+
+    // Estado inicial: foto "inicio" de fondo y texto visible
+    if (fondoViajeFinal) fondoViajeFinal.className = "fondo-pantalla-completa-viaje viaje-inicio";
+    if (textoViaje) textoViaje.classList.add("activo-viaje");
+
+    const opcionesE6 = {
+        root: null,
+        rootMargin: "-30% 0px -50% 0px",
+        threshold: 0
+    };
+
+    const observadorE6 = new IntersectionObserver((entradas) => {
+        entradas.forEach(entrada => {
+            if (entrada.isIntersecting) {
+                const paso = entrada.target.getAttribute("data-viaje");
+
+                // El texto centrado solo se muestra en el paso "inicio"
+                if (textoViaje) {
+                    textoViaje.classList.toggle("activo-viaje", paso === "inicio");
+                }
+
+                // La grilla se muestra en "grilla" y se desliza afuera en "grafico"
+                if (grillaFinal) {
+                    grillaFinal.classList.toggle("activo-grilla", paso === "grilla");
+                    grillaFinal.classList.toggle("salida-grilla", paso === "grafico");
+                }
+
+                // El gráfico de Flourish solo se muestra en el paso "grafico"
+                if (graficoFlourish) {
+                    graficoFlourish.classList.toggle("activo-grafico", paso === "grafico");
+                }
+
+                // El fondo dinámico cambia de foto en los pasos "inicio" y "foto1"-"foto4"
+                if (fondoViajeFinal && paso !== "grilla" && paso !== "grafico") {
+                    fondoViajeFinal.className = "fondo-pantalla-completa-viaje";
+                    fondoViajeFinal.classList.add(`viaje-${paso}`);
+                }
+            }
+        });
+    }, opcionesE6);
+
+    disparadoresE6.forEach(d => observadorE6.observe(d));

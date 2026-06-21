@@ -144,6 +144,7 @@ body {
 }
 
 /* Clases para las imágenes de fondo (manteniendo tu ruta relativa correcta) */
+.foto{background-image: url("../fotos/inicio.png");}
 .foto1 { background-image: url("../fotos/E1F1.png"); }
 .foto2 { background-image: url("../fotos/E1F3.jpg"); }
 .foto3 { background-image: url("../fotos/E1F2.jpg"); }
@@ -369,6 +370,159 @@ body {
 
 /* Disparadores de scroll */
 .disparador-unificado {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    pointer-events: none;
+}
+
+
+/* ==========================================================================
+   8. ESCENA 6 (Viaje en busca de los cielos + Grilla final)
+   ========================================================================== */
+
+.escena-scroll-viaje {
+    position: relative;
+    height: 1000vh; /* sticky (100vh) + 7 pasos de 100vh (texto inicial + 4 fotos + grilla + gráfico) + margen de sobra */
+    width: 100%;
+}
+
+.contenedor-fijo-viaje {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #050508;
+}
+
+/* Fondo dinámico a pantalla completa (foto inicio + ráfaga E5F1-E5F4) */
+.fondo-pantalla-completa-viaje {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 1;
+}
+
+.viaje-inicio { background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url("../fotos/inicio.png"); }
+.viaje-foto1 { background-image: url("../fotos/E5F1.jfif"); }
+.viaje-foto2 { background-image: url("../fotos/E5F2.jfif"); }
+.viaje-foto3 { background-image: url("../fotos/E5F3.jfif"); }
+.viaje-foto4 { background-image: url("../fotos/E5F4.jpg"); }
+
+/* Texto centrado que solo se ve durante el paso "inicio" */
+.texto-centrado-viaje {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.6s ease-in-out;
+    pointer-events: none;
+}
+
+.texto-centrado-viaje.activo-viaje {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.texto-centrado-viaje p {
+    max-width: 750px;
+    text-align: center;
+    font-size: 1.5rem;
+    line-height: 1.7;
+    color: #f8fafc;
+    text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.9);
+}
+
+/* Grilla final con las 4 fotos ocupando toda la pantalla */
+.grilla-fotos-final {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    z-index: 3;
+    opacity: 0;
+    transform: translateX(0);
+    pointer-events: none;
+    transition: opacity 0.8s ease-in-out, transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.grilla-fotos-final.activo-grilla {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* Cuando entra el gráfico, la grilla se desliza hacia afuera por el costado */
+.grilla-fotos-final.salida-grilla {
+    opacity: 1;
+    transform: translateX(-100%);
+    pointer-events: none;
+}
+
+.celda-grilla {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.foto-grilla-1 { background-image: url("../fotos/E5F1.jfif"); }
+.foto-grilla-2 { background-image: url("../fotos/E5F2.jfif"); }
+.foto-grilla-3 { background-image: url("../fotos/E5F3.jfif"); }
+.foto-grilla-4 { background-image: url("../fotos/E5F4.jpg"); }
+
+/* Gráfico de Flourish: entra desde el costado y ocupa toda la pantalla */
+.grafico-flourish-final {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0b0c10;
+    padding: 50px;
+    opacity: 0;
+    transform: translateX(100%);
+    pointer-events: none;
+    transition: opacity 0.8s ease-in-out, transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.grafico-flourish-final.activo-grafico {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.grafico-flourish-final .flourish-embed {
+    width: 100%;
+    max-width: 1100px;
+}
+
+/* Disparadores de scroll de la escena 6 */
+.disparador-viaje {
     height: 100vh;
     width: 100%;
     position: relative;
