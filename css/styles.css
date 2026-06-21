@@ -32,7 +32,7 @@ body {
 }
 
 /* ==========================================================================
-   4. PERSONALIZACIÓN DE LA ESCENA 1
+   4.  ESCENA 1/inicio
    ========================================================================== */
 #escena-1 {
     background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)), url("../fotos/inicio.png");
@@ -70,7 +70,7 @@ body {
     text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
 }
 /* ==========================================================================
-   5. ESCENA 2: SPLIT SCREEN (3/4 IMAGEN, 1/4 TEXTO)
+   5. ESCENA 2
    ========================================================================= */
 
 .escena-scroll-largo {
@@ -158,7 +158,7 @@ body {
     margin-bottom: 10vh; /* Espacio de amortiguación */
 }
 /* ==========================================================================
-   6. ESCENA 3: EFECTO RAFAGA / STOP-MOTION
+   6. ESCENA 3
    ========================================================================= */
 
 .escena-scroll-rafaga {
@@ -197,12 +197,9 @@ body {
 }
 
 /* ==========================================================================
-   7. ESCENA 4: CORTE PROFUNDO Y EFECTO COSTADOS
+   7. ESCENA 4
    ========================================================================= */
 
-/* ==========================================================================
-   7. ESCENA 4: CORTE PROFUNDO Y EFECTO COSTADOS (REPARADO)
-   ========================================================================= */
 
 .escena-corte-profundo {
     position: relative;
@@ -276,6 +273,102 @@ body {
 }
 
 .disparador-corte {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    pointer-events: none;
+}
+
+
+
+/* ==========================================================================
+   7. ESCENA 5
+   ========================================================================= */
+
+.escena-scroll-unificada {
+    position: relative;
+    height: 700vh; /* Espacio de scroll para los 3 textos + el mapa */
+    width: 100%;
+}
+
+/* Fija el fondo y el contenido durante el scroll */
+.contenedor-fijo-unificado {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: flex-start; /* CAMBIADO: Empuja el contenedor del texto a la izquierda de la pantalla */
+    align-items: center;        /* Centra el contenido verticalmente */
+    overflow: hidden;
+}
+
+/* La imagen de fondo real ocupando el 100% */
+.fondo-pantalla-completa {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1;
+}
+
+.foto-investigacion {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url("../fotos/E4F1.png");
+}
+
+/* Contenedor donde van apareciendo las cosas */
+.contenido-flotante {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 700px; /* Reducido un toque para que el texto a la izquierda quede más estilizado */
+    padding: 60px;    /* Aumentado a 60px para que el texto no toque el borde físico de la pantalla */
+    display: flex;
+    justify-content: flex-start; /* CAMBIADO: Alinea los elementos internos a la izquierda de este bloque */
+    align-items: center;
+}
+
+/* Estilo para los bloques de texto flotantes */
+.parrafo-unificado {
+    position: absolute;
+    opacity: 0;
+    transform: scale(0.95); /* Sutil efecto de escala al aparecer */
+    transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+    pointer-events: none;
+    text-align: left; /* CAMBIADO: Alinea el texto en sí a la izquierda (no centrado) */
+    width: 100%;
+}
+
+.parrafo-unificado p {
+    font-size: 1.4rem;
+    line-height: 1.7;
+    color: #f8fafc;
+    text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.9);
+}
+
+/* Clase activa para mostrar el texto o mapa actual */
+.parrafo-unificado.activo-unificado {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+/* Caja especial flotante para el mapa de Flourish al final */
+.contenedor-mapa-flotante {
+    width: 50%; /* CAMBIADO: Ponemos 100% para que use todo el ancho del max-width (700px) y no se rompa el diseño del mapa */
+    background: rgba(15, 23, 42, 0.85); /* Fondo oscuro semitransparente detrás del mapa */
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+}
+
+/* Disparadores de scroll */
+.disparador-unificado {
     height: 100vh;
     width: 100%;
     position: relative;

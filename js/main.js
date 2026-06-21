@@ -95,3 +95,33 @@ document.addEventListener("DOMContentLoaded", () => {
     }, opcionesE4);
 
     disparadoresE4.forEach(d => observadorE4.observe(d));
+   // ==========================================
+    // LÓGICA ESCENA 5 (Pantalla Completa Unificada)
+    // ==========================================
+    const disparadoresE5 = document.querySelectorAll(".disparador-unificado");
+    const parrafosUnificados = document.querySelectorAll(".parrafo-unificado");
+
+    const opcionesE5 = {
+        root: null,
+        rootMargin: "-30% 0px -50% 0px",
+        threshold: 0
+    };
+
+    const observadorE5 = new IntersectionObserver((entradas) => {
+        entradas.forEach(entrada => {
+            if (entrada.isIntersecting) {
+                const pasoU = entrada.target.getAttribute("data-paso-u");
+                
+                // Recorremos y activamos solo el elemento que corresponde
+                parrafosUnificados.forEach(parrafo => {
+                    if (parrafo.getAttribute("data-unificado") === pasoU) {
+                        parrafo.classList.add("activo-unificado");
+                    } else {
+                        parrafo.classList.remove("activo-unificado");
+                    }
+                });
+            }
+        });
+    }, opcionesE5);
+
+    disparadoresE5.forEach(d => observadorE5.observe(d));
