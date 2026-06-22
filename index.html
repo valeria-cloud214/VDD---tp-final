@@ -3,195 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Las Constelaciones de mi Infancia - Scrollytelling</title>
+    <title>Mi Scrollytelling Básico</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-
-    <!-- ESCENA 1: PORTADA / FLASHBACK -->
-    <section id="escena1" class="scrolly-section">
-        <div class="sticky-container">
-            <div class="sky-background black-sky" id="sky-escena1">
-                <!-- Estrellas generadas por JS -->
-                <div class="silhouette-wrapper">
-                    <!-- Silueta simplificada SVG del abuelo mirando el cielo -->
-                    <svg class="silhouette-abuelo" viewBox="0 0 100 100" preserveAspectRatio="xMidYMax meet">
-                        <path d="M50,75 C45,75 40,78 38,83 C36,88 35,94 35,100 L65,100 C65,94 64,88 62,83 C60,78 55,75 50,75 Z" fill="#05050a" />
-                        <circle cx="50" cy="62" r="6" fill="#05050a" />
-                        <path d="M47,68 C47,68 45,73 50,73 C55,73 53,68 53,68 Z" fill="#05050a" />
-                    </svg>
-                </div>
+    <!-- SECCION 1 -->
+    <section class="scrolly-section">
+        <div id="portada" class="sticky-container fondo-portada">
+            </div>
+        <div id="escena1-abu-abrazo" >
+            <div class="scroll-text-wrapper">
+                <article class="step">
+                    <p>Este es el primer texto de la historia. El fondo de la portada se queda quieto atrás.</p>
+                </article>
+                <article class="step">
+                    <p>Cuando seguís bajando, aparece este segundo texto, pero la imagen de fondo sigue siendo la misma.</p>
+                </article>
             </div>
         </div>
+    </section>
+
+    <section class="scrolly-section">
+        <div class="sticky-container fondo-viaje">
+        </div>
+        
         <div class="scroll-text-wrapper">
-            <article class="step step-center">
-                <h1>Las constelaciones de mi infancia</h1>
-                <p class="subtitle">Tras el rastro de las estrellas que la ciudad nos obligó a olvidar.</p>
-                <div class="scroll-indicator">Scrolleá para empezar el viaje ↓</div>
+            <article class="step">
+                <p>¡Acá empieza la Escena 2! Notá cómo el fondo cambió de golpe a la foto del viaje.</p>
             </article>
-            <article class="step" data-step="flashback-1">
-                <p>"Me presento, soy Jorge. Podría decir muchas cosas sobre mí, pero hay una sola que me define: a mi vida la marcaron las estrellas."</p>
-            </article>
-            <article class="step" data-step="flashback-2">
-                <p>"Nací en Gaiman, una pequeña localidad del interior de la provincia de Chubut. Me crié con mi amada abuela; ella fue quien me inculcó este amor por las historias que cuentan los cielos. Todas las noches, antes de ir a dormir, mirábamos por la ventana y me revelaba los secretos de alguna constelación."</p>
-            </article>
-            <article class="step" data-step="flashback-3">
-                <p>"Un día, mis papás me dijeron que por cuestiones de la vida nos mudábamos a Buenos Aires. Yo estaba destruido; no quería alejarme de ella. La última noche, mi abuela me abrazó y me dio un refugio: me dijo que cuando la extrañara, mirara a Orión. Que no importaba en qué lugar del mundo estuviera, Orión siempre iba a estar ahí para mí."</p>
+            <article class="step">
+                <p>Este es el último texto de prueba. Todo se mueve de manera fluida.</p>
             </article>
         </div>
     </section>
 
-    <!-- ESCENA 2: EL VIAJE A CABA (SCROLLMATION) -->
-    <section id="escena2" class="scrolly-section">
-        <div class="sticky-container">
-            <div class="sky-background" id="sky-viaje">
-                <!-- Constelación de Orión Interactiva mediante CSS -->
-                <div class="orion-constellation" id="orion-viaje">
-                    <div class="star betelgeuse" style="top: 30%; left: 40%;"></div>
-                    <div class="star rigel" style="top: 70%; left: 60%;"></div>
-                    <div class="star belt-1" style="top: 50%; left: 48.5%;"></div>
-                    <div class="star belt-2" style="top: 50%; left: 50%;"></div>
-                    <div class="star belt-3" style="top: 50%; left: 51.5%;"></div>
-                    <!-- Líneas imaginarias de la constelación -->
-                    <svg class="orion-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
-                        <line x1="40" y1="30" x2="48.5" y2="50" stroke="rgba(255,255,255,0.15)" stroke-width="0.5" />
-                        <line x1="60" y1="70" x2="51.5" y2="50" stroke="rgba(255,255,255,0.15)" stroke-width="0.5" />
-                        <line x1="48.5" y1="50" x2="51.5" y2="50" stroke="rgba(255,255,255,0.3)" stroke-width="0.8" />
-                    </svg>
-                </div>
-                <div class="road-simulation"></div>
-            </div>
-        </div>
-        <div class="scroll-text-wrapper">
-            <article class="step" data-step="viaje-1">
-                <p>"Emprendimos nuestro viaje a la gran ciudad. El auto avanzaba devorando kilómetros de asfalto y oscuridad..."</p>
-            </article>
-            <article class="step" data-step="viaje-2">
-                <p>"Cuando llegué, efectivamente Orión estaba ahí, tal como me lo prometió mi abuela. Pero ya no se veía igual..."</p>
-            </article>
-            <article class="step" data-step="viaje-3">
-                <p>"Estaba más borrosa. El cielo de Buenos Aires era distinto: brillaban tanto los edificios y las luces que parecía que se robaban el brillo del universo."</p>
-            </article>
-        </div>
-    </section>
-
-    <!-- ESCENA 3: LA EXPLICACIÓN CIENTÍFICA -->
-    <section id="escena3" class="scrolly-section">
-        <div class="sticky-container">
-            <div class="sky-background" id="sky-cientifico">
-                <div class="stars-fixed"></div>
-                <div class="light-pollution-glow" id="glow-cientifico"></div>
-                <div class="bortle-indicator" id="bortle-label">Escala Bortle: 1</div>
-            </div>
-        </div>
-        <div class="scroll-text-wrapper">
-            <article class="step" data-step="ciencia-1">
-                <p>Fueron pasando los años y mientras el cielo se apagaba crecían mis ganas de entender qué estaba pasando, quién se estaba robando las estrellas. En honor a mi abuela decidí estudiar astronomía.</p>
-            </article>
-            <article class="step" data-step="ciencia-2">
-                <p>Logré entender que era la <strong>contaminación lumínica</strong> la verdadera ladrona de estrellas. Lo que pasa es que todo el exceso de luz artificial proveniente de los edificios y carteles comerciales crea una neblina brillante que impide ver los astros.</p>
-            </article>
-            <article class="step" data-step="ciencia-3">
-                <p>No es que las estrellas desaparecieron ni se apagaron. <strong>Siguen ahí.</strong> Pero mientras la población crece y aumentan las luces artificiales, la neblina se vuelve más intensa. Ahí es cuando los cielos se lavan por completo.</p>
-            </article>
-        </div>
-    </section>
-
-    <!-- ESCENA 4: EL MAPA DE ARGENTINA (ZOOM IN) -->
-    <section id="escena4" class="scrolly-section">
-        <div class="sticky-container" id="container-mapa">
-            <div class="flourish-embed-wrapper" id="mapa-argentina-vector">
-                <!-- Reemplazar src con el link real de publicación embebida de Flourish -->
-                <iframe src="https://flo.uri.sh/visualisation/1234567/embed" frameborder="0" scrolling="no" style="width:100%;height:100%;" class="flourish-iframe-lazy"></iframe>
-            </div>
-        </div>
-        <div class="scroll-text-wrapper">
-            <article class="step" data-step="mapa-1">
-                <p>"Como parte de mis estudios, decidí entender qué estaba pasando en los cielos argentinos. ¿Solo en la Capital Federal se estaban apagando las luces del universo?"</p>
-            </article>
-            <article class="step" data-step="mapa-2">
-                <p>"Investigué la contaminación lumínica a lo largo y ancho de todo el país. Mi objetivo era claro: descubrir si en algún rincón aún quedaba un cielo tan hermoso como el de mi infancia."</p>
-            </article>
-        </div>
-    </section>
-
-    <!-- ESCENA 5: EL VIAJE - COMPARACIÓN DE CIUDADES -->
-    <section id="escena5" class="scrolly-section">
-        <div class="sticky-container">
-            <div class="sky-background" id="sky-comparativa">
-                <div class="dynamic-constellations" id="constelaciones-ciudades"></div>
-                <div class="city-overlay-title" id="city-active-name">CABA</div>
-            </div>
-        </div>
-        <div class="scroll-text-wrapper">
-            <article class="step" data-city="caba">
-                <h2>Buenos Aires (CABA)</h2>
-                <p>"Arranqué mi viaje por casa. En Capital, el cielo es un lienzo grisáceo lavado. Las Tres Marías luchan por ser vistas frente a millones de lúmenes artificiales."</p>
-            </article>
-            <article class="step" data-city="junin">
-                <h2>Junín / Firmat</h2>
-                <p>"Seguí viaje hacia el polo pampeano y santafesino. En Junín y Firmat encontré un cielo intermedio: los centros comerciales y las industrias metalmecánicas generan un halo concentrado, pero en las afueras la noche empieza a recuperar su derecho."</p>
-            </article>
-            <article class="step" data-city="ushuaia">
-                <h2>Ushuaia</h2>
-                <p>"Terminé en el extremo sur. En Ushuaia ocurre un fenómeno asombroso: a pesar de no ser una megaciudad, su fuerte polo industrial tecnológico y el efecto espejo de la nieve (albedo) intensifican la neblina brillante sobre el canal Beagle."</p>
-            </article>
-        </div>
-    </section>
-
-    <!-- ESCENA 6: POBLACIÓN vs INDUSTRIALIZACIÓN -->
-    <section id="escena6" class="scrolly-section">
-        <div class="sticky-container">
-            <div class="flourish-embed-wrapper">
-                <!-- Gráfico de Dispersión Cuadrante de Flourish Embebido -->
-                <iframe src="https://flo.uri.sh/visualisation/2345678/embed" frameborder="0" scrolling="no" style="width:100%;height:100%;" class="flourish-iframe-lazy"></iframe>
-            </div>
-        </div>
-        <div class="scroll-text-wrapper">
-            <article class="step" data-step="data-1">
-                <p>"Como ya había aprendido en los libros, la población es fundamental para estimar la degradación del cielo nocturno. Pero necesitaba comprobar empíricamente si esa relación era estrictamente lineal."</p>
-            </article>
-            <article class="step" data-step="data-2">
-                <p>"¿A mayor cantidad de habitantes, proporcionalmente menos estrellas? Al cruzar los datos de población con el Índice de Industrialización Nocturna, la respuesta nos sorprendió."</p>
-            </article>
-            <article class="step" data-step="data-3">
-                <p>"Existen anomalías como Añelo en Neuquén: un pueblo chico en habitantes, pero con un cielo industrializado al extremo por las antorchas y reflectores continuos de Vaca Muerta."</p>
-            </article>
-        </div>
-    </section>
-
-    <!-- ESCENA 7: CONCLUSIÓN MUNDIAL Y CIERRE -->
-    <section id="escena7" class="scrolly-section">
-        <div class="sticky-container">
-            <div class="sky-background" id="sky-global">
-                <div class="flourish-embed-wrapper half-height" id="wrapper-slope">
-                    <!-- Slopegraph Flourish (2006 vs 2024) -->
-                    <iframe src="https://flo.uri.sh/visualisation/3456789/embed" frameborder="0" scrolling="no" style="width:100%;height:100%;" class="flourish-iframe-lazy"></iframe>
-                </div>
-                <div class="global-grid-container" id="grid-global">
-                    <div class="global-card"><h4>Nueva York</h4><div class="mini-sky ny"></div></div>
-                    <div class="global-card"><h4>Atacama</h4><div class="mini-sky atacama"></div></div>
-                    <div class="global-card"><h4>Tokio</h4><div class="mini-sky tokio"></div></div>
-                    <div class="global-card"><h4>Gaiman (Hoy)</h4><div class="mini-sky gaiman-today"></div></div>
-                </div>
-            </div>
-        </div>
-        <div class="scroll-text-wrapper">
-            <article class="step" data-step="global-1">
-                <p>"La intriga pudo conmigo y decidí expandir el modelo a todo el mundo. Comprobé que el drama que viví al mudarme de chico se replica globalmente año tras año."</p>
-            </article>
-            <article class="step" data-step="global-2">
-                <p>"Los cielos cambian y las perspectivas se invierten: en el hemisferio norte vi a Orión de cabeza, en otros lados de costado. Pero siempre estuvo ahí de fondo, resistiendo junto a la contaminación."</p>
-            </article>
-            <article class="step" data-step="global-3">
-                <p>"Y como no podía ser de otra forma, necesitaba regresar al origen. Volví a Gaiman. Sabía perfectamente que debido al crecimiento global el cielo no sería idéntico al de mi infancia..."</p>
-            </article>
-            <article class="step" data-step="global-4" class="step-center">
-                <p class="final-quote">"Pero al mirar por la ventana, recordé las palabras de mi abuela. Las luces del mundo pueden intentar taparlo, pero los santuarios y el refugio de Orión siguen ahí arriba, esperando a que volvamos a encender la oscuridad."</p>
-            </article>
-        </div>
-    </section>
-
-    <script src="script.js"></script>
 </body>
 </html>
