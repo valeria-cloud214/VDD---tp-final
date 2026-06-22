@@ -532,9 +532,9 @@ body {
 /* Todas las imágenes ocupan toda la pantalla */
 
 #cielo-estrellas{
-    position:absolute;
-    inset:0;
-
+    width:75%;
+    height:100vh;
+    position:relative;
     overflow:hidden;
 }
 
@@ -542,16 +542,74 @@ body {
     position:absolute;
 
     left:0;
-    top:50%;
+    top:0;
 
-    height:100vh;
+    height:100%;
     width:auto;
-
-    transform:translateY(-50%);
 
     opacity:0;
 
     transition:opacity 1.2s ease;
+}
+
+.contenedor-fijo-viaje{
+    display:flex;
+    flex-direction:row;
+}
+
+#panel-ciudad{
+    width:25%;
+    height:100%;
+
+    background-color:#0f172a;
+    border-left:2px solid #ffd166;
+
+    position:relative;
+
+    display:flex;
+    align-items:center;
+
+    padding:30px;
+
+    overflow:hidden;
+}
+
+.info-ciudad{
+    position:absolute;
+
+    width:calc(100% - 60px);
+
+    opacity:0;
+    transform:translateY(30px);
+
+    transition:
+        opacity 0.8s ease,
+        transform 0.8s ease;
+
+    pointer-events:none;
+}
+
+.info-ciudad.activa{
+    opacity:1;
+    transform:translateY(0);
+}
+
+.info-ciudad h2{
+    color:#ffd166;
+    font-size:2rem;
+    margin-bottom:20px;
+}
+
+.info-ciudad .dato{
+    color:#94a3b8;
+    font-size:1rem;
+    margin-bottom:20px;
+}
+
+.info-ciudad p{
+    font-size:1.2rem;
+    line-height:1.6;
+    color:#f8fafc;
 }
 
 /* Estado inicial */

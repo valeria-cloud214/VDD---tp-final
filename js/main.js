@@ -183,6 +183,26 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
 
                 }
+                const textosCiudad = document.querySelectorAll(".info-ciudad");
+
+                textosCiudad.forEach(texto => {
+                    texto.classList.remove("activa");
+                });
+                if(paso === "bsas"){
+                    cielo.className = "cielo-bsas";
+                    document.querySelector(".bsas-info").classList.add("activa");
+                }
+
+                if(paso === "firmat"){
+                    cielo.className = "cielo-firmat";
+                    document.querySelector(".firmat-info").classList.add("activa");
+                }
+
+                if(paso === "junin"){
+                    cielo.className = "cielo-junin";
+                    document.querySelector(".junin-info").classList.add("activa");
+                }
+
             }
         });
     }, opcionesE6);

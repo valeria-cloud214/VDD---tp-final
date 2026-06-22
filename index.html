@@ -155,50 +155,69 @@
             
         </section>
 
-        <section id="escena-6" class="escena-scroll-viaje">
+    <section id="escena-6" class="escena-scroll-viaje">
 
-            <div class="contenedor-fijo-viaje">
+        <!-- CONTENIDO FIJO -->
+        <div class="contenedor-fijo-viaje">
 
                 <div class="fondo-pantalla-completa-viaje" id="fondo-viaje-final"></div>
 
                 <div class="texto-centrado-viaje">
                     <p>Ahora ya tenía la teoría, el papel no me era suficiente. Como un buen amante de las estrellas necesitaba verlo con mis propios ojos. Así fue como emprendí un viaje en busca de los mejores cielos Argentinos. Arranqué por comodidad en capital, seguí por Firmat, Junín para terminar en Ushuaia.</p>
                 </div>
+        </div>        
 
-                
+
+        <div class="contenedor-fijo-viaje">
+
+            <!-- CIELO A LA IZQUIERDA -->
+            <div id="cielo-estrellas">
+
+                <img class="escena-ciudad bsas" src="fotos/bsas.png" alt="bsas">
+                <img class="escena-ciudad firmat" src="fotos/firmat.png" alt="firmat">
+                <img class="escena-ciudad junin" src="fotos/junin.png" alt="junin">
 
             </div>
 
-            <div class="disparador-viaje" data-viaje="inicio"></div>
-
-            <div class="contenedor-fijo-viaje">
-                <div id="cielo-estrellas">
-
-                    <img class="escena-ciudad bsas" src="fotos/bsas.png", alt="bsas">
-                    <img class="escena-ciudad firmat" src="fotos/firmat.png", alt="firmat">
-                    <img class="escena-ciudad junin" src="fotos/junin.png", alt="junin">
-
-                    <img class="capa vialactea" src="vialactea.png", alt="via lactea">
-                    <img class="capa nebulosa" src="nebulosa.png", alt="nebulosa">
-                    <img class="capa estrellas" src="estrellas-extra.png", alt="estrellas">
-                    <img class="capa halo" src="halo-urbano.png", alt="halo">
-
+            <!-- TEXTO A LA DERECHA -->
+            <div id="panel-ciudad">
+                        <div class="info-ciudad bsas-info">
+                            <h2>Buenos Aires</h2>
+                            <p class="dato">Magnitud límite: 4.1</p>
+                            <p>
+                                Todavía podía encontrar a Orión, pero el resto del cielo parecía haberse desvanecido.
+                                Apenas unas pocas estrellas lograban atravesar el brillo de la ciudad.
+                            </p>
+                        </div>      
+                <div class="info-ciudad firmat-info">
+                    <h2>Firmat</h2>
+                    <p class="dato">Magnitud límite: 5.4</p>
+                    <p>
+                        Al alejarme de la gran ciudad comenzaron a reaparecer estrellas que llevaba años sin ver.
+                        El cielo recuperaba profundidad.
+                    </p>
                 </div>
+
+                <div class="info-ciudad junin-info">
+                    <h2>Junín de los Andes</h2>
+                    <p class="dato">Magnitud límite: 6.3</p>
+                    <p>
+                        Por primera vez en mucho tiempo sentí que estaba mirando el mismo cielo de mi infancia.
+                        La Vía Láctea volvía a ser visible.
+                    </p>
+                </div>
+
             </div>
 
-            <div class="disparador-viaje" data-viaje="inicio"></div>
+        </div>
 
-            <div class="disparador-viaje" data-viaje="bsas"></div>
+        <!-- DISPARADORES -->
+        <div class="disparador-viaje" data-viaje="inicio"></div>
+        <div class="disparador-viaje" data-viaje="bsas"></div>
+        <div class="disparador-viaje" data-viaje="firmat"></div>
+        <div class="disparador-viaje" data-viaje="junin"></div>
 
-            <div class="disparador-viaje" data-viaje="firmat"></div>
-
-            <div class="disparador-viaje" data-viaje="junin"></div>
-
-            <div class="disparador-viaje" data-viaje="grilla"></div>
-
-            <div class="disparador-viaje" data-viaje="grafico"></div>
-
-        </section>
+    </section>
 
         <section id="escena-7" class="escena">
             <div class="contenido-escena">
