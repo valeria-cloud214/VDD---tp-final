@@ -3,39 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Scrollytelling Básico</title>
+    <title>Las Constelaciones de mi Infancia - Scrollytelling</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- SECCION 1 -->
-    <section class="scrolly-section">
-        <div id="portada" class="sticky-container fondo-portada">
+<body>
+    <main>
+     <section id="escena-1" class="escena">
+            <div class="contenido-escena">
+                <h1 class="titulo-principal">Las constelaciones de mi infancia</h1>
+                <p class="subtitulo">Tras el rastro de las estrellas que la ciudad nos obligó a olvidar.</p>
             </div>
-        <div id="escena1-abu-abrazo" >
-            <div class="scroll-text-wrapper">
-                <article class="step">
-                    <p>Este es el primer texto de la historia. El fondo de la portada se queda quieto atrás.</p>
-                </article>
-                <article class="step">
-                    <p>Cuando seguís bajando, aparece este segundo texto, pero la imagen de fondo sigue siendo la misma.</p>
-                </article>
+        </section>
+
+       <section id="escena-2" class="escena-scroll-largo">
+            
+            <div class="contenedor-fijo-split">
+                
+                <div class="bloque-imagen">
+                    <div class="fondo-dinamico" id="fondo-jorge"></div>
+                </div>
+                
+                <div class="bloque-texto">
+                    
+                    <div class="parrafo-historia" data-parrafo="1">
+                        <p>Me presento, soy Jorge. Podría decir muchas cosas sobre mí, pero hay una sola que me define: a mi vida la marcaron las estrellas.</p>
+                        <p>Nací en una pequeña localidad del interior. Me crié con mi amada abuela; ella fue quien me inculcó este amor por las historias que cuentan los cielos.</p>
+                    </div>
+                    <div class="parrafo-historia " data-parrafo="2">
+                        <p>Todas las noches mirábamos por la ventana y me revelaba los secretos de alguna constelación.</p>
+                    </div>
+
+                    <div class="parrafo-historia" data-parrafo="3">
+                        <p>Un día, mis papás me dijeron que por cuestiones de la vida nos mudábamos a Buenos Aires. Yo estaba destruido; no quería alejarme de ella.</p>
+                    </div>
+
+                    <div class="parrafo-historia" data-parrafo="4">
+                        <p>La última noche, mi abuela me abrazó y me dijo que cuando la extrañara, mirara a Orión. Que no importaba dónde estuviera, Orión siempre iba a estar ahí para mí, al igual que su amor.</p>
+                    </div>
+
+                </div>
+
             </div>
-        </div>
-    </section>
 
-    <section class="scrolly-section">
-        <div class="sticky-container fondo-viaje">
-        </div>
-        
-        <div class="scroll-text-wrapper">
-            <article class="step">
-                <p>¡Acá empieza la Escena 2! Notá cómo el fondo cambió de golpe a la foto del viaje.</p>
-            </article>
-            <article class="step">
-                <p>Este es el último texto de prueba. Todo se mueve de manera fluida.</p>
-            </article>
-        </div>
-    </section>
+            <div class="disparador" data-foto="1"></div>
+            <div class="disparador" data-foto="2"></div>
+            <div class="disparador" data-foto="3"></div>
+            <div class="disparador" data-foto="4"></div>
+            
+        </section>
+            
 
+        <section id="escena-3" class="escena-scroll-rafaga">
+            
+            <div class="contenedor-fijo-split">
+                
+                <div class="bloque-imagen">
+                    <div class="fondo-dinamico" id="fondo-viaje"></div>
+                </div>
+                
+                <div class="bloque-texto">
+                    <div class="texto-fijo-rafaga">
+                        <p>Emprendimos el viaje en la oscuridad de la madrugada. Durante horas pegué la frente contra el vidrio frío del auto, mirando hacia arriba.</p>
+                        <br>
+                        <p>Y efectivamente, ahí estaba Orión, escoltándome en el camino tal como me lo había prometido mi abuela. Me quedé mirándola fijamente hasta que el cielo empezó a aclararse y el amanecer ocultó las estrellas.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="disparador-rafaga" data-foto="1"></div>
+            <div class="disparador-rafaga" data-foto="2"></div>
+            <div class="disparador-rafaga" data-foto="3"></div>
+            <div class="disparador-rafaga" data-foto="4"></div>
+            <div class="disparador-rafaga" data-foto="5"></div>
+            
+        </section>
+
+        <section id="escena-4" class="escena-corte-profundo">
+            
+            <div class="paso-corte activo-corte" data-paso="1">
+                <div class="contenedor-fijo-split">
+                    <div class="bloque-imagen">
+                        <div class="fondo-corte foto-gris"></div>
+                    </div>
+                    <div class="bloque-texto">
+                        <div class="texto-impacto">
+                            <p>Esa primera noche en Buenos Aires busqué el cielo con desesperación. No se veía igual. El fondo ya no era negro azabache, sino un gris borroso. Pero haciendo fuerza con los ojos, logré distinguirla. Costaba, pero Orión seguía ahí. Mi abuela no había mentido.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="paso-corte" data-paso="2">
+                <div class="contenedor-fijo-split">
+                    <div class="bloque-imagen bloque-entra-izq">
+                        <div class="fondo-corte foto-vacia"></div>
+                    </div>
+                    <div class="bloque-texto bloque-entra-der">
+                        <div class="texto-impacto">
+                            <p>Pasó el tiempo. Me convertí en adulto, pasaron los años, cambiaron los gobiernos, la ciudad creció y se expandió hacia arriba. Cada tanto, en las noches nostálgicas, volvía a ese mismo lugar donde vi la constelación por primera vez en la ciudad.</p>
+                            <br>
+                            <p>Hasta que una noche miré hacia arriba y ya no había nada, el cielo estaba completamente vacío. <strong>La ciudad finalmente se había robado todo el brillo.</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="disparador-corte" data-corte="1"></div>
+            <div class="disparador-corte" data-corte="2"></div>
+
+        </section>
+
+       <section id="escena-5" class="escena-scroll-unificada">
+            
+            <div class="contenedor-fijo-unificado">
+                
+                <div class="fondo-pantalla-completa foto-investigacion"></div>
+                
+                <div class="contenido-flotante">
+                    
+                    <div class="parrafo-unificado activo-unificado" data-unificado="1">
+                        <p>Fueron pasando los años y, mientras el cielo de la ciudad se apagaba, crecía en mí una obsesión: necesitaba entender qué estaba pasando. Necesitaba saber quién se estaba robando las estrellas.</p>
+                    </div>
+
+                    <div class="parrafo-unificado" data-unificado="2">
+                        <p>En honor a mi abuela, y a aquella promesa en la ventana, decidí convertir la nostalgia en ciencia: estudié Astronomía.</p>
+                    </div>
+
+                    <div class="parrafo-unificado" data-unificado="3">
+                        <p>Como parte de mi investigación, me propuse mapear los cielos argentinos. ¿Era Buenos Aires una excepción o el país entero se estaba quedando a oscuras?</p>
+                    </div>
+
+                    <div class="parrafo-unificado contenedor-mapa-flotante" data-unificado="4">
+                        <div class="flourish-embed flourish-map" data-src="visualisation/29399923">
+                            <script src="https://public.flourish.studio/resources/embed.js"></script>
+                            <noscript>
+                                <img src="https://public.flourish.studio/visualisation/29399923/thumbnail" width="100%" alt="map visualization" />
+                            </noscript>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="disparador-unificado" data-paso-u="1"></div>
+            <div class="disparador-unificado" data-paso-u="2"></div>
+            <div class="disparador-unificado" data-paso-u="3"></div>
+            <div class="disparador-unificado" data-paso-u="4"></div>
+            
+        </section>
+
+        <section id="escena-6" class="escena-scroll-viaje">
+
+            <div class="contenedor-fijo-viaje">
+
+                <div class="fondo-pantalla-completa-viaje" id="fondo-viaje-final"></div>
+
+                <div class="texto-centrado-viaje">
+                    <p>Ahora ya tenía la teoría, el papel no me era suficiente. Como un buen amante de las estrellas necesitaba verlo con mis propios ojos. Así fue como emprendí un viaje en busca de los mejores cielos Argentinos. Arranqué por comodidad en capital, seguí por Firmat, Junín para terminar en Ushuaia.</p>
+                </div>
+
+                <div class="grilla-fotos-final" id="grilla-final">
+                    <div class="celda-grilla foto-grilla-1"></div>
+                    <div class="celda-grilla foto-grilla-2"></div>
+                    <div class="celda-grilla foto-grilla-3"></div>
+                    <div class="celda-grilla foto-grilla-4"></div>
+                </div>
+
+                <div class="grafico-flourish-final" id="grafico-flourish">
+                    <div class="flourish-embed flourish-chart" data-src="visualisation/29401950">
+                        <script src="https://public.flourish.studio/resources/embed.js"></script>
+                        <noscript>
+                            <img src="https://public.flourish.studio/visualisation/29401950/thumbnail" width="100%" alt="chart visualization" />
+                        </noscript>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="disparador-viaje" data-viaje="inicio"></div>
+            <div class="disparador-viaje" data-viaje="foto1"></div>
+            <div class="disparador-viaje" data-viaje="foto2"></div>
+            <div class="disparador-viaje" data-viaje="foto3"></div>
+            <div class="disparador-viaje" data-viaje="foto4"></div>
+            <div class="disparador-viaje" data-viaje="grilla"></div>
+            <div class="disparador-viaje" data-viaje="grafico"></div>
+
+        </section>
+
+        <section id="escena-7" class="escena">
+            <div class="contenido-escena">
+                <h2>Escena 7</h2>
+                <p>Fin del trayecto. ¡Gracias por scrollear!</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="js/main.js"></script>
 </body>
 </html>

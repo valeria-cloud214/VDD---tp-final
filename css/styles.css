@@ -1,17 +1,530 @@
 /* ==========================================================================
-   CEREBRO DE ESTILOS - IMPORTACIÓN DE MÓDULOS
+   1. IMPORTAR FUENTES DESDE GOOGLE FONTS
    ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Nunito:wght@300;400;600&display=swap');
 
-@import url('base.css');
-@import url('scrolly.css');
-@import url('fondos.css');
-
-/* Limpieza básica para que no haya márgenes raros */
-body, html {
+/* ==========================================================================
+   2. ESTILOS GENERALES Y RESET
+   ========================================================================== */
+* {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: #000;
-    color: #fff;
+    box-sizing: border-box;
 }
 
+body {
+    /* Aplicamos Nunito como fuente base para todo el sitio */
+    font-family: 'Nunito', sans-serif;
+    background-color: #0b0c10;
+    color: #ffffff;
+    overflow-x: hidden;
+}
+
+/* ==========================================================================
+   3. ESTRUCTURA DEL SCROLL
+   ========================================================================== */
+.escena {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    padding: 60px; /* Margen de seguridad para que el texto no toque el borde de la pantalla */
+    position: relative;
+}
+
+/* ==========================================================================
+   4.  ESCENA 1/inicio
+   ========================================================================== */
+#escena-1 {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)), url("../fotos/inicio.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    /* TRUCO FLEXBOX: Alinea el contenido abajo (flex-end) y a la izquierda (flex-start) */
+    justify-content: flex-start; 
+    align-items: flex-end;      
+}
+
+/* Contenedor del texto en la Escena 1 */
+#escena-1 .contenido-escena {
+    max-width: 650px; /* Achicamos el ancho para que el bloque de texto quede estilizado en la esquina */
+    text-align: left; /* Alineamos el texto a la izquierda */
+}
+
+/* Estilos de los textos para chicos */
+.titulo-principal {
+    font-family: 'Quicksand', sans-serif; /* Fuente mágica/redondeada para el título */
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 15px;
+    color: #ffffff;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8); /* Sombra para que resalte más sobre las estrellas */
+}
+
+.subtitulo {
+    font-size: 1.4rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #ffd166; /* Un amarillo estelar clarito, súper amigable y llamativo para niños */
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
+}
+/* ==========================================================================
+   5. ESCENA 2
+   ========================================================================= */
+
+.escena-scroll-largo {
+    position: relative;
+    height: 600vh; /* Espacio total para el scroll de las 4 partes */
+    width: 100%;
+}
+
+/* Contenedor que bloquea la pantalla completa */
+.contenedor-fijo-split {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex; /* Alinea imagen y texto de costado */
+    overflow: hidden;
+    background-color: #050508;
+}
+
+/* BLOQUE IZQUIERDO: Ocupa 3/4 partes (75%) */
+.bloque-imagen {
+    width: 75%;
+    height: 100%;
+    position: relative;
+}
+
+.fondo-dinamico {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: background-image 0.8s ease-in-out;
+}
+
+/* BLOQUE DERECHO: Ocupa 1/4 parte (25%) */
+.bloque-texto {
+    width: 25%;
+    height: 100%;
+    background-color: #0f172a; /* Fondo sólido oscuro para que se lea perfecto */
+    border-left: 2px solid #ffd166; /* Línea divisoria estelar */
+    position: relative;
+    display: flex;
+    align-items: center; /* Centra el texto verticalmente */
+    padding: 30px;
+}
+
+/* Estilo base de los párrafos (Ocultos por defecto) */
+.parrafo-historia {
+    position: absolute;
+    left: 30px;
+    right: 30px;
+    opacity: 0;
+    transform: translateY(20px); /* Ligero efecto de subida al aparecer */
+    transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+    pointer-events: none;
+}
+
+.parrafo-historia p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: #f8fafc;
+}
+
+/* Clase activa: Hace aparecer el texto correspondiente */
+.parrafo-historia.activo {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Clases para las imágenes de fondo (manteniendo tu ruta relativa correcta) */
+.foto{background-image: url("../fotos/inicio.png");}
+.foto1 { background-image: url("../fotos/E1F1.png"); }
+.foto2 { background-image: url("../fotos/E1F3.jpg"); }
+.foto3 { background-image: url("../fotos/E1F2.jpg"); }
+.foto4 { background-image: url("../fotos/E1F4.jpg"); }
+
+/* Disparadores de scroll invisibles */
+.disparador {
+    height: 90vh; /* Un poco menos de la pantalla completa para evitar solapamientos */
+    width: 100%;
+    position: relative;
+    pointer-events: none;
+    margin-bottom: 10vh; /* Espacio de amortiguación */
+}
+/* ==========================================================================
+   6. ESCENA 3
+   ========================================================================= */
+
+.escena-scroll-rafaga {
+    position: relative;
+    height: 400vh; /* Menos altura total para que el viaje pase más rápido */
+    width: 100%;
+}
+
+/* Reutilizamos el contenedor split (3/4 y 1/4) que ya definimos en la Escena 2 */
+
+/* Estilos específicos para las fotos de la Escena 3 */
+#fondo-viaje {
+    /* Transición ultra rápida (0.2 segundos) para simular animación de una única foto */
+    transition: background-image 0.2s ease-in-out; 
+}
+
+.e2-foto1 { background-image: url("../fotos/E2F1.png"); }
+.e2-foto2 { background-image: url("../fotos/E2F2.png"); }
+.e2-foto3 { background-image: url("../fotos/E2F3.png"); }
+.e2-foto4 { background-image: url("../fotos/E2F4.png"); }
+.e2-foto5 { background-image: url("../fotos/E2F5.png"); }
+
+/* Estilo para el texto que no se mueve */
+.texto-fijo-rafaga p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: #f8fafc;
+}
+
+/* Disparadores de ráfaga: más cortos para acelerar el ritmo del scroll */
+.disparador-rafaga {
+    height: 50vh; 
+    width: 100%;
+    position: relative;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   7. ESCENA 4
+   ========================================================================= */
+
+
+.escena-corte-profundo {
+    position: relative;
+    height: 400vh; /* Espacio para el scroll interno */
+    width: 100%;
+    background-color: #050508;
+    z-index: 5; /* Evita que se monte de forma extraña con la escena anterior */
+}
+
+/* Los pasos ocupan toda la pantalla pero respetan el flujo del scroll */
+.paso-corte {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease-in-out; /* Suaviza el cambio entre las sub-escenas */
+}
+
+/* Clase que activa cada parte del quiebre */
+.paso-corte.activo-corte {
+    opacity: 1;
+    visibility: visible;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Fotos de fondo completas y perfectas sin deformación */
+.fondo-corte {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.foto-gris { background-image: url("../fotos/E3F1.png"); }
+.foto-vacia { background-image: url("../fotos/E3F2.png"); }
+
+/* --- EFECTO ENTRADA DE COSTADOS LIMPIO --- */
+
+/* La imagen de la segunda parte viene desde la izquierda */
+.bloque-entra-izq {
+    transform: translateX(-100%);
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* El texto de la segunda parte viene desde la derecha */
+.bloque-entra-der {
+    transform: translateX(100%);
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    border-left: 2px solid #ef4444;
+}
+
+/* Cuando la Parte B está activa, ambos bloques se deslizan a su posición original (0) */
+.activo-corte .bloque-entra-izq { transform: translateX(0); }
+.activo-corte .bloque-entra-der { transform: translateX(0); }
+
+/* Estilo de los textos */
+.texto-impacto p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: #f8fafc;
+}
+.texto-impacto strong {
+    color: #ef4444;
+}
+
+.disparador-corte {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    pointer-events: none;
+}
+
+
+
+/* ==========================================================================
+   7. ESCENA 5
+   ========================================================================= */
+
+.escena-scroll-unificada {
+    position: relative;
+    height: 700vh; /* Espacio de scroll para los 3 textos + el mapa */
+    width: 100%;
+}
+
+/* Fija el fondo y el contenido durante el scroll */
+.contenedor-fijo-unificado {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: flex-start; /* CAMBIADO: Empuja el contenedor del texto a la izquierda de la pantalla */
+    align-items: center;        /* Centra el contenido verticalmente */
+    overflow: hidden;
+}
+
+/* La imagen de fondo real ocupando el 100% */
+.fondo-pantalla-completa {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1;
+}
+
+.foto-investigacion {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url("../fotos/E4F1.png");
+}
+
+/* Contenedor donde van apareciendo las cosas */
+.contenido-flotante {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 700px; /* Reducido un toque para que el texto a la izquierda quede más estilizado */
+    padding: 60px;    /* Aumentado a 60px para que el texto no toque el borde físico de la pantalla */
+    display: flex;
+    justify-content: flex-start; /* CAMBIADO: Alinea los elementos internos a la izquierda de este bloque */
+    align-items: center;
+}
+
+/* Estilo para los bloques de texto flotantes */
+.parrafo-unificado {
+    position: absolute;
+    opacity: 0;
+    transform: scale(0.95); /* Sutil efecto de escala al aparecer */
+    transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+    pointer-events: none;
+    text-align: left; /* CAMBIADO: Alinea el texto en sí a la izquierda (no centrado) */
+    width: 100%;
+}
+
+.parrafo-unificado p {
+    font-size: 1.4rem;
+    line-height: 1.7;
+    color: #f8fafc;
+    text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.9);
+}
+
+/* Clase activa para mostrar el texto o mapa actual */
+.parrafo-unificado.activo-unificado {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+/* Caja especial flotante para el mapa de Flourish al final */
+.contenedor-mapa-flotante {
+    width: 50%; /* CAMBIADO: Ponemos 100% para que use todo el ancho del max-width (700px) y no se rompa el diseño del mapa */
+    background: rgba(15, 23, 42, 0.85); /* Fondo oscuro semitransparente detrás del mapa */
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+}
+
+/* Disparadores de scroll */
+.disparador-unificado {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    pointer-events: none;
+}
+
+
+/* ==========================================================================
+   8. ESCENA 6 (Viaje en busca de los cielos + Grilla final)
+   ========================================================================== */
+
+.escena-scroll-viaje {
+    position: relative;
+    height: 1000vh; /* sticky (100vh) + 7 pasos de 100vh (texto inicial + 4 fotos + grilla + gráfico) + margen de sobra */
+    width: 100%;
+}
+
+.contenedor-fijo-viaje {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #050508;
+}
+
+/* Fondo dinámico a pantalla completa (foto inicio + ráfaga E5F1-E5F4) */
+.fondo-pantalla-completa-viaje {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 1;
+}
+
+.viaje-inicio { background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url("../fotos/inicio.png"); }
+.viaje-foto1 { background-image: url("../fotos/E5F1.jfif"); }
+.viaje-foto2 { background-image: url("../fotos/E5F2.jfif"); }
+.viaje-foto3 { background-image: url("../fotos/E5F3.jfif"); }
+.viaje-foto4 { background-image: url("../fotos/E5F4.jpg"); }
+
+/* Texto centrado que solo se ve durante el paso "inicio" */
+.texto-centrado-viaje {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.6s ease-in-out;
+    pointer-events: none;
+}
+
+.texto-centrado-viaje.activo-viaje {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.texto-centrado-viaje p {
+    max-width: 750px;
+    text-align: center;
+    font-size: 1.5rem;
+    line-height: 1.7;
+    color: #f8fafc;
+    text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.9);
+}
+
+/* Grilla final con las 4 fotos ocupando toda la pantalla */
+.grilla-fotos-final {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    z-index: 3;
+    opacity: 0;
+    transform: translateX(0);
+    pointer-events: none;
+    transition: opacity 0.8s ease-in-out, transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.grilla-fotos-final.activo-grilla {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* Cuando entra el gráfico, la grilla se desliza hacia afuera por el costado */
+.grilla-fotos-final.salida-grilla {
+    opacity: 1;
+    transform: translateX(-100%);
+    pointer-events: none;
+}
+
+.celda-grilla {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.foto-grilla-1 { background-image: url("../fotos/E5F1.jfif"); }
+.foto-grilla-2 { background-image: url("../fotos/E5F2.jfif"); }
+.foto-grilla-3 { background-image: url("../fotos/E5F3.jfif"); }
+.foto-grilla-4 { background-image: url("../fotos/E5F4.jpg"); }
+
+/* Gráfico de Flourish: entra desde el costado y ocupa toda la pantalla */
+.grafico-flourish-final {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0b0c10;
+    padding: 50px;
+    opacity: 0;
+    transform: translateX(100%);
+    pointer-events: none;
+    transition: opacity 0.8s ease-in-out, transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.grafico-flourish-final.activo-grafico {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.grafico-flourish-final .flourish-embed {
+    width: 100%;
+    max-width: 1100px;
+}
+
+/* Disparadores de scroll de la escena 6 */
+.disparador-viaje {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    pointer-events: none;
+}
