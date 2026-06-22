@@ -166,9 +166,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 // El fondo dinámico cambia de foto en los pasos "inicio" y "foto1"-"foto4"
-                if (fondoViajeFinal && paso !== "grilla" && paso !== "grafico") {
-                    fondoViajeFinal.className = "fondo-pantalla-completa-viaje";
-                    fondoViajeFinal.classList.add(`viaje-${paso}`);
+                const cielo = document.getElementById("cielo-estrellas");
+
+                if(cielo){
+
+                    if(paso === "bsas"){
+                        cielo.className = "cielo-bsas";
+                    }
+
+                    if(paso === "firmat"){
+                        cielo.className = "cielo-firmat";
+                    }
+
+                    if(paso === "junin"){
+                        cielo.className = "cielo-junin";
+                    }
+
                 }
             }
         });

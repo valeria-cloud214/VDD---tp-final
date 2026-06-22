@@ -528,3 +528,42 @@ body {
     position: relative;
     pointer-events: none;
 }
+
+/* Todas las imágenes ocupan toda la pantalla */
+
+#cielo-estrellas{
+    position:absolute;
+    inset:0;
+
+    overflow:hidden;
+}
+
+.escena-ciudad{
+    position:absolute;
+
+    left:0;
+    top:50%;
+
+    height:100vh;
+    width:auto;
+
+    transform:translateY(-50%);
+
+    opacity:0;
+
+    transition:opacity 1.2s ease;
+}
+
+/* Estado inicial */
+
+.cielo-bsas .bsas{
+    opacity:1;
+}
+
+.cielo-firmat .firmat{
+    opacity:1;
+}
+
+.cielo-junin .junin{
+    opacity:1;
+}
