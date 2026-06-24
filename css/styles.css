@@ -625,3 +625,364 @@ body {
 .cielo-junin .junin{
     opacity:1;
 }
+
+/* ==========================================================================
+   ESCENA 6A — Slide de transición datos
+   ========================================================================== */
+
+   .foto-transicion-datos {
+    background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("../fotos/E6F1.png");
+}
+
+/* Disparadores propios de 6a */
+.disparador-unificado-6a {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   ESCENA 6B — Scatter Plot (mismo formato que viaje ciudades)
+   ========================================================================== */
+
+   #cielo-scatter {
+    width: 75%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background-color: #050508;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+#cielo-scatter .flourish-embed {
+    width: 100%;
+    height: 100%;
+}
+
+#panel-scatter-ciudad {
+    width: 25%;
+    height: 100%;
+    background-color: #0f172a;
+    border-left: 2px solid #ffd166;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 30px;
+    overflow: hidden;
+}
+
+
+/* ==========================================================================
+   ESCENA 6C — Transición puente
+   ========================================================================== */
+
+   .foto-puente-pizarron {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0,0,0,0.3)), 
+                      url("../fotos/E6F1.png");
+}
+
+.contenido-centrado {
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center;
+    max-width: 100% !important;
+}
+
+.contenido-centrado .parrafo-unificado {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.disparador-unificado-6c {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   ESCENA 7 — El Pizarrón
+   ========================================================================== */
+
+   .escena-pizarron {
+    position: relative;
+    height: 600vh;
+    width: 100%;
+}
+
+.contenedor-fijo-pizarron {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Imagen del aula de fondo */
+.fondo-aula-img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: url("../fotos/pizarron.png");
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
+}
+
+/* Marco del pizarrón — construido en CSS */
+.pizarron-marco {
+    position: relative;
+    z-index: 2;
+    width: 44%;
+    height: 58vh;
+    background: #1e3d2a;
+    border: 10px solid #3d2b14;
+    border-radius: 4px;
+    box-shadow: 
+        0 0 0 3px #2a1f0e,
+        0 8px 32px rgba(0,0,0,0.8),
+        inset 0 0 60px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Textura sutil de tiza en el fondo del pizarrón */
+.pizarron-marco::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.08;
+    pointer-events: none;
+}
+
+/* Bandeja de tiza abajo del pizarrón */
+.pizarron-marco::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 14px;
+    background: #2a1e0e;
+    border-top: 2px solid #3d2b14;
+}
+
+/* Cada bloque de texto dentro del pizarrón */
+.texto-pizarron {
+    position: absolute;
+    width: 80%;
+    text-align: center;
+    z-index: 3;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    pointer-events: none;
+    padding: 20px;
+}
+
+.texto-pizarron.activo-pizarron {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Tipografía estilo tiza */
+.texto-pizarron p {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.25rem;
+    line-height: 1.85;
+    color: rgba(240, 235, 210, 0.90);
+    text-shadow: 
+        0 0 12px rgba(240, 235, 210, 0.15),
+        1px 1px 0px rgba(0,0,0,0.3);
+    margin-bottom: 12px;
+    letter-spacing: 0.02em;
+}
+
+.texto-pizarron p:last-child {
+    margin-bottom: 0;
+}
+
+/* Telón */
+#telon {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: #050508;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.4s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+#telon.telon-activo {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.disparador-pizarron {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    pointer-events: none;
+}
+
+.disparador-telon {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    pointer-events: none;
+}
+
+
+/* ==========================================================================
+   ESCENA 8 — Transición post-telón
+   ========================================================================== */
+
+   .fondo-negro-puro {
+    background-color: #050508;
+    background-image: none;
+}
+
+.disparador-unificado-8t {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   ESCENA 8 — Grilla de 16 gráficos mundiales
+   ========================================================================== */
+
+.escena-mundo-scroll {
+    position: relative;
+    width: 100%;
+    background-color: #050508;
+    padding: 80px 60px 120px;
+}
+
+.contenedor-fijo-mundo-graficos {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.intro-graficos-mundo {
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.intro-graficos-mundo.activo-mg {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.intro-graficos-mundo p {
+    font-size: 1.3rem;
+    color: #94a3b8;
+    line-height: 1.6;
+}
+
+/* Grilla 4 columnas */
+.grilla-graficos-mundo {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.9s ease 0.2s, transform 0.9s ease 0.2s;
+}
+
+.grilla-graficos-mundo.activo-mg {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.celda-grafico-mundo {
+    background: #0f172a;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.06);
+    height: 200px;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.celda-grafico-mundo:hover {
+    border-color: rgba(255, 209, 102, 0.3);
+    transform: translateY(-3px);
+}
+
+.celda-grafico-mundo .flourish-embed {
+    width: 100%;
+    height: 100%;
+}
+
+/* Conclusión final */
+.conclusion-graficos-mundo {
+    text-align: center;
+    padding: 100px 20px 60px;   /* antes: 40px 20px */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.conclusion-graficos-mundo.activo-mg {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.conclusion-graficos-mundo p {
+    font-size: 1.5rem;
+    line-height: 1.7;
+    color: #f8fafc;
+    margin-bottom: 12px;
+}
+
+.conclusion-graficos-mundo strong {
+    color: #ffd166;
+}
+
+.disparador-mundo-graficos {
+    height: 60vh;
+    width: 100%;
+    position: relative;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   ESCENA 8 — Transición post-telón (reemplaza escena-scroll-unificada)
+   ========================================================================== */
+
+   .escena-transicion-mundo {
+    position: relative;
+    height: 250vh;
+    width: 100%;
+    background-color: #050508;
+}
+
+.escena-transicion-mundo .contenedor-fijo-unificado {
+    background-color: #050508;
+}
+
+.escena-transicion-mundo .fondo-negro-puro {
+    background-color: #050508;
+    background-image: none;
+}
