@@ -21,6 +21,38 @@ body {
 }
 
 /* ==========================================================================
+   2b. SISTEMA DE ZONAS: "cuento" (escenas 1-4) vs "datos" (escena 5 en más)
+   ========================================================================== */
+
+/* Zona cuento: cálida, redondeada, tono infantil (comportamiento actual) */
+.zona-cuento {
+    --acento: #ffd166;
+    --acento-suave: rgba(255, 209, 102, 0.35);
+    --radio-tarjeta: 20px;
+    --font-heading: 'Quicksand', sans-serif;
+}
+
+/* Zona datos: sobria, fría, tono de investigación/infografía */
+.zona-datos {
+    --acento: #38bdf8;
+    --acento-suave: rgba(56, 189, 248, 0.35);
+    --radio-tarjeta: 10px;
+    --font-heading: 'Nunito', sans-serif;
+}
+
+/* Tarjeta reutilizable para texto sobre foto: garantiza legibilidad sin
+   importar cuán clara sea la imagen de fondo */
+.tarjeta-texto {
+    background: rgba(8, 10, 16, 0.72);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radio-tarjeta, 16px);
+    padding: 34px 38px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+/* ==========================================================================
    3. ESTRUCTURA DEL SCROLL
    ========================================================================== */
 .escena {
@@ -66,16 +98,42 @@ body {
     font-size: 1.4rem;
     font-weight: 400;
     line-height: 1.5;
-    color: #ffd166; /* Un amarillo estelar clarito, súper amigable y llamativo para niños */
+    color: var(--acento); /* Un amarillo estelar clarito, súper amigable y llamativo para niños */
     text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
 }
+
+/* Escena de cierre (zona-datos): texto genérico h2/p dentro de .contenido-escena */
+#escena-final {
+    background-color: #050508;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#escena-final .contenido-escena {
+    max-width: 600px;
+}
+
+.contenido-escena h2 {
+    font-family: var(--font-heading, 'Nunito', sans-serif);
+    font-size: 2.2rem;
+    margin-bottom: 12px;
+    color: #ffffff;
+}
+
+.contenido-escena p {
+    font-size: 1.2rem;
+    color: #cbd5e1;
+    line-height: 1.6;
+}
+
 /* ==========================================================================
    5. ESCENA 2
    ========================================================================= */
 
 .escena-scroll-largo {
     position: relative;
-    height: 600vh; /* Espacio total para el scroll de las 4 partes */
+    height: 520vh; /* sticky (100vh) + 4 disparadores (100vh c/u) + buffer chico */
     width: 100%;
 }
 
@@ -112,7 +170,7 @@ body {
     width: 25%;
     height: 100%;
     background-color: #0f172a; /* Fondo sólido oscuro para que se lea perfecto */
-    border-left: 2px solid #ffd166; /* Línea divisoria estelar */
+    border-left: 2px solid var(--acento); /* Línea divisoria estelar */
     position: relative;
     display: flex;
     align-items: center; /* Centra el texto verticalmente */
@@ -144,7 +202,6 @@ body {
 }
 
 /* Clases para las imágenes de fondo (manteniendo tu ruta relativa correcta) */
-.foto{background-image: url("../fotos/inicio.png");}
 .foto1 { background-image: url("../fotos/E1F1.png"); }
 .foto2 { background-image: url("../fotos/E1F3.jpg"); }
 .foto3 { background-image: url("../fotos/E1F2.jpg"); }
@@ -164,7 +221,7 @@ body {
 
 .escena-scroll-rafaga {
     position: relative;
-    height: 400vh; /* Menos altura total para que el viaje pase más rápido */
+    height: 370vh; /* sticky (100vh) + 5 disparadores-rafaga (50vh c/u) + buffer chico */
     width: 100%;
 }
 
@@ -204,7 +261,7 @@ body {
 
 .escena-corte-profundo {
     position: relative;
-    height: 400vh; /* Espacio para el scroll interno */
+    height: 260vh; /* 2 disparadores-corte (100vh c/u) + buffer chico */
     width: 100%;
     background-color: #050508;
     z-index: 5; /* Evita que se monte de forma extraña con la escena anterior */
@@ -288,8 +345,15 @@ body {
 
 .escena-scroll-unificada {
     position: relative;
-    height: 700vh; /* Espacio de scroll para los 3 textos + el mapa */
+    height: 420vh; /* sticky (100vh) + 3 disparadores-unificado (100vh c/u) + buffer chico */
     width: 100%;
+}
+
+/* escena-6a y 6c reutilizan .escena-scroll-unificada pero solo tienen 2
+   disparadores cada una: achicamos su altura para que no quede scroll muerto */
+#escena-6a,
+#escena-6c {
+    height: 260vh; /* sticky (100vh) + 2 disparadores (100vh c/u) + buffer chico */
 }
 
 /* Fija el fondo y el contenido durante el scroll */
@@ -345,11 +409,20 @@ body {
     width: 100%;
 }
 
+.parrafo-unificado {
+    background: rgba(8, 10, 16, 0.72);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radio-tarjeta, 16px);
+    padding: 30px 34px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
 .parrafo-unificado p {
     font-size: 1.4rem;
     line-height: 1.7;
     color: #f8fafc;
-    text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.9);
 }
 
 /* Clase activa para mostrar el texto o mapa actual */
@@ -357,15 +430,6 @@ body {
     opacity: 1;
     transform: scale(1);
     pointer-events: auto;
-}
-
-/* Caja especial flotante para el mapa de Flourish al final */
-.contenedor-mapa-flotante {
-    width: 50%; /* CAMBIADO: Ponemos 100% para que use todo el ancho del max-width (700px) y no se rompa el diseño del mapa */
-    background: rgba(15, 23, 42, 0.85); /* Fondo oscuro semitransparente detrás del mapa */
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.7);
 }
 
 /* Disparadores de scroll */
@@ -376,6 +440,60 @@ body {
     pointer-events: none;
 }
 
+/* ==========================================================================
+   7b. BLOQUE DE VISUALIZACIÓN — patrón reutilizable: texto arriba (con
+   tarjeta), gráfico/mapa abajo en su propio bloque separado, sin foto de
+   fondo. Se usa para el primer mapa (escena-5b) y sirve de referencia para
+   futuras visualizaciones.
+   ========================================================================== */
+
+.bloque-visualizacion {
+    width: 100%;
+    background-color: #080a10;
+    padding: 110px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 44px;
+}
+
+.bloque-visualizacion-header {
+    max-width: 700px;
+    text-align: center;
+}
+
+.bloque-visualizacion-header .kicker {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--acento);
+    margin-bottom: 12px;
+}
+
+.bloque-visualizacion-header h2 {
+    font-family: var(--font-heading, 'Nunito', sans-serif);
+    font-size: 2.1rem;
+    color: #ffffff;
+    margin-bottom: 14px;
+}
+
+.bloque-visualizacion-header p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+}
+
+.bloque-visualizacion-viz {
+    width: 100%;
+    max-width: 1000px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
 
 /* ==========================================================================
    8. ESCENA 6 (Viaje en busca de los cielos + Grilla final)
@@ -383,7 +501,7 @@ body {
 
 .escena-scroll-viaje {
     position: relative;
-    height: 1000vh; /* sticky (100vh) + 7 pasos de 100vh (texto inicial + 4 fotos + grilla + gráfico) + margen de sobra */
+    height: 650vh; /* 2 bloques sticky (100vh c/u) + 4 disparadores-viaje (100vh c/u) + buffer chico */
     width: 100%;
 }
 
@@ -445,80 +563,13 @@ body {
     font-size: 1.5rem;
     line-height: 1.7;
     color: #f8fafc;
-    text-shadow: 2px 2px 15px rgba(0, 0, 0, 0.9);
-}
-
-/* Grilla final con las 4 fotos ocupando toda la pantalla */
-.grilla-fotos-final {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    z-index: 3;
-    opacity: 0;
-    transform: translateX(0);
-    pointer-events: none;
-    transition: opacity 0.8s ease-in-out, transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.grilla-fotos-final.activo-grilla {
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: auto;
-}
-
-/* Cuando entra el gráfico, la grilla se desliza hacia afuera por el costado */
-.grilla-fotos-final.salida-grilla {
-    opacity: 1;
-    transform: translateX(-100%);
-    pointer-events: none;
-}
-
-.celda-grilla {
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-.foto-grilla-1 { background-image: url("../fotos/E5F1.jfif"); }
-.foto-grilla-2 { background-image: url("../fotos/E5F2.jfif"); }
-.foto-grilla-3 { background-image: url("../fotos/E5F3.jfif"); }
-.foto-grilla-4 { background-image: url("../fotos/E5F4.jpg"); }
-
-/* Gráfico de Flourish: entra desde el costado y ocupa toda la pantalla */
-.grafico-flourish-final {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 4;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #0b0c10;
-    padding: 50px;
-    opacity: 0;
-    transform: translateX(100%);
-    pointer-events: none;
-    transition: opacity 0.8s ease-in-out, transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.grafico-flourish-final.activo-grafico {
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: auto;
-}
-
-.grafico-flourish-final .flourish-embed {
-    width: 100%;
-    max-width: 1100px;
+    background: rgba(8, 10, 16, 0.72);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radio-tarjeta, 16px);
+    padding: 30px 38px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
 }
 
 /* Disparadores de scroll de la escena 6 */
@@ -562,7 +613,7 @@ body {
     height:100%;
 
     background-color:#0f172a;
-    border-left:2px solid #ffd166;
+    border-left:2px solid var(--acento);
 
     position:relative;
 
@@ -595,15 +646,21 @@ body {
 }
 
 .info-ciudad h2{
-    color:#ffd166;
+    color:var(--acento);
     font-size:2rem;
-    margin-bottom:20px;
+    margin-bottom:16px;
 }
 
 .info-ciudad .dato{
-    color:#94a3b8;
-    font-size:1rem;
-    margin-bottom:20px;
+    display: inline-block;
+    color: var(--acento);
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    background: var(--acento-suave);
+    border-radius: 999px;
+    padding: 6px 14px;
+    margin-bottom: 18px;
 }
 
 .info-ciudad p{
@@ -642,39 +699,107 @@ body {
     pointer-events: none;
 }
 
-/* ==========================================================================
-   ESCENA 6B — Scatter Plot (mismo formato que viaje ciudades)
-   ========================================================================== */
 
-   #cielo-scatter {
-    width: 75%;
-    height: 100vh;
-    position: relative;
-    overflow: hidden;
-    background-color: #050508;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px;
+/*-----------------------------------------------------------------------------*/
+/*                                 Gráfico poblacion                           */
+/*-----------------------------------------------------------------------------*/
+/* 1. Le damos una altura mayor a 100vh para que el usuario PUEDA scrollear dentro de esta sección */
+/* El contenedor principal alinea las dos columnas */
+.seccion-grafico {
+  display: flex;
+  flex-direction: row-reverse;
+  position: relative;
+  width: 100%;
 }
 
-#cielo-scatter .flourish-embed {
-    width: 100%;
-    height: 100%;
+/* El gráfico ocupa la mitad izquierda y se queda fijo */
+#contenedor-svg {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  width: 90vw; 
+  height: 100vh;
+  z-index: 5;
+  
+  /* --- ESTAS TRES LÍNEAS CENTRAN EL CONTENIDO --- */
+  display: flex;
+  align-items: center;     /* Centrado vertical */
+  justify-content: center; /* Centrado horizontal */
 }
 
-#panel-scatter-ciudad {
-    width: 25%;
-    height: 100%;
-    background-color: #0f172a;
-    border-left: 2px solid #ffd166;
-    position: relative;
-    display: flex;
-    align-items: center;
-    padding: 30px;
-    overflow: hidden;
+/* Forzamos a que el contenedor interno de D3 no tenga márgenes raros */
+#my_dataviz {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
+/* Los ejes de D3 son texto SVG negro por defecto: invisibles sobre el fondo
+   oscuro del sitio. Los forzamos a un gris claro legible. */
+#my_dataviz .tick text {
+  fill: #e2e8f0;
+  font-size: 0.85rem;
+}
+
+#my_dataviz .domain,
+#my_dataviz .tick line {
+  stroke: #64748b;
+}
+
+/* La columna de textos ocupa la mitad derecha */
+.contenedor-textos {
+  width: 50vw; /* 50% del ancho de pantalla */
+  padding: 0 5%;
+  box-sizing: border-box;
+
+  /* --- SOLUCIÓN DE SUPERPOSICIÓN --- */
+  position: relative; 
+  z-index: 20; /* Un z-index alto garantiza que el texto SIEMPRE esté al frente */
+}
+
+/* Cada bloque de texto debe ser alto para que tome scroll pasar de uno a otro */
+.stepG {
+  display: flex;
+  flex-direction: column;
+  
+  /* 1. ELIMINAMOS height: 90vh para que no se estire artificialmente */
+  /* El alto ahora lo definirá el propio texto + tus 30px de padding */
+  
+  /* 2. CONTROL DE ESPACIADO DE SCROLL: Usa márgenes altos para separarlos */
+  /* 70vh arriba y abajo significa que habrá mucha distancia de scroll entre cajas */
+  margin: 70vh 0; 
+  
+  /* --- EFECTO DE FONDO (BACKGROUND): tarjeta oscura, igual al resto de la zona de datos --- */
+  background-color: rgba(8, 10, 16, 0.78);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: var(--radio-tarjeta, 10px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid transparent;
+
+  /* Transición suave */
+  opacity: 0.35;
+  transition: all 0.4s ease;
+}
+
+.stepG h3 {
+  color: var(--acento);
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+}
+
+.stepG p {
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+/* Estilo para resaltar el texto activo */
+.stepG.active {
+  opacity: 1;
+  border-left-color: var(--acento);
+}
 
 /* ==========================================================================
    ESCENA 6C — Transición puente
@@ -926,7 +1051,7 @@ body {
 }
 
 .celda-grafico-mundo:hover {
-    border-color: rgba(255, 209, 102, 0.3);
+    border-color: var(--acento-suave);
     transform: translateY(-3px);
 }
 
@@ -957,7 +1082,7 @@ body {
 }
 
 .conclusion-graficos-mundo strong {
-    color: #ffd166;
+    color: var(--acento);
 }
 
 .disparador-mundo-graficos {
@@ -973,7 +1098,7 @@ body {
 
    .escena-transicion-mundo {
     position: relative;
-    height: 250vh;
+    height: 220vh; /* sticky (100vh) + 1 disparador (100vh) + buffer chico */
     width: 100%;
     background-color: #050508;
 }

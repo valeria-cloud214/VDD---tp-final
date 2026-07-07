@@ -7,10 +7,10 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<body>
     <main>
+    <div class="zona-cuento">
      <section id="escena-1" class="escena">
-            <div class="contenido-escena">
+            <div class="contenido-escena tarjeta-texto">
                 <h1 class="titulo-principal">Las constelaciones de mi infancia</h1>
                 <p class="subtitulo">Tras el rastro de las estrellas que la ciudad nos obligó a olvidar.</p>
             </div>
@@ -114,7 +114,9 @@
             <div class="disparador-corte" data-corte="2"></div>
 
         </section>
+    </div>
 
+    <div class="zona-datos">
        <section id="escena-5" class="escena-scroll-unificada">
             
             <div class="contenedor-fijo-unificado">
@@ -135,15 +137,6 @@
                         <p>Como parte de mi investigación, me propuse mapear los cielos argentinos. ¿Era Buenos Aires una excepción o el país entero se estaba quedando a oscuras?</p>
                     </div>
 
-                    <div class="parrafo-unificado contenedor-mapa-flotante" data-unificado="4">
-                        <div class="flourish-embed flourish-map" data-src="visualisation/29399923">
-                            <script src="https://public.flourish.studio/resources/embed.js"></script>
-                            <noscript>
-                                <img src="https://public.flourish.studio/visualisation/29399923/thumbnail" width="100%" alt="map visualization" />
-                            </noscript>
-                        </div>
-                    </div>
-
                 </div>
 
             </div>
@@ -151,8 +144,23 @@
             <div class="disparador-unificado" data-paso-u="1"></div>
             <div class="disparador-unificado" data-paso-u="2"></div>
             <div class="disparador-unificado" data-paso-u="3"></div>
-            <div class="disparador-unificado" data-paso-u="4"></div>
-            
+
+        </section>
+
+        <section id="escena-5b" class="bloque-visualizacion">
+            <div class="bloque-visualizacion-header">
+                <p class="kicker">Primer vistazo a los datos</p>
+                <h2>El mapa de los cielos argentinos</h2>
+                <p>Un relevamiento de contaminación lumínica ciudad por ciudad, para responder la pregunta con números.</p>
+            </div>
+            <div class="bloque-visualizacion-viz">
+                <div class="flourish-embed flourish-map" data-src="visualisation/29399923">
+                    <script src="https://public.flourish.studio/resources/embed.js"></script>
+                    <noscript>
+                        <img src="https://public.flourish.studio/visualisation/29399923/thumbnail" width="100%" alt="map visualization" />
+                    </noscript>
+                </div>
+            </div>
         </section>
 
     <section id="escena-6" class="escena-scroll-viaje">
@@ -217,10 +225,8 @@
         <div class="disparador-viaje" data-viaje="firmat"></div>
         <div class="disparador-viaje" data-viaje="junin"></div>
 
-        <!-- =============================================
-     ESCENA 6A: SLIDE DE TRANSICIÓN (igual formato que "Ahora ya tenía la teoría")
-     ============================================= -->
-     <section id="escena-6a" class="escena-scroll-unificada">
+    </section>
+         <section id="escena-6a" class="escena-scroll-unificada">
     
         <div class="contenedor-fijo-unificado">
             
@@ -241,56 +247,52 @@
         <div class="disparador-unificado-6a" data-paso-6a="2"></div>
     
     </section>
-    
-<!-- =============================================
-     ESCENA 6B: SCATTER PLOT — POBLACIÓN vs INDUSTRIALIZACIÓN
-     ============================================= -->
-     <section id="escena-6b" class="escena-scroll-viaje">
 
-        <!-- CONTENEDOR FIJO CON EL GRÁFICO -->
-        <div class="contenedor-fijo-viaje">
-    
-            <div id="cielo-scatter">
-                <div class="flourish-embed flourish-scatter" data-src="visualisation/29401984">
-                    <script src="https://public.flourish.studio/resources/embed.js"></script>
-                    <noscript>
-                        <img src="https://public.flourish.studio/visualisation/29401984/thumbnail" width="100%" alt="scatter plot población vs industrialización" />
-                    </noscript>
-                </div>
-            </div>
-    
-            <div id="panel-scatter-ciudad">
-    
-                <div class="info-ciudad scatter-1-info">
-                    <p>Analicé 20 ciudades argentinas. Para cada una, tuve en cuenta cuánta gente vivía ahí y cuánta luz artificial emitían de noche hacia el cielo.</p>
-                    <p>La pregunta era simple: ¿a más gente, menos estrellas visibles?</p>
-                </div>
-                
-                <div class="info-ciudad scatter-2-info">
-                    <p>En líneas generales, sí. Las ciudades más grandes contaminan más lumínicamente. CABA está en el extremo: la más poblada del país es también la que más opaca el cielo nocturno.</p>
-                </div>
-                
-                <div class="info-ciudad scatter-3-info">
-                    <p>Pero San Rafael me llamó la atención. Una ciudad mediana, sin millones de habitantes, con un índice nocturno mucho más alto de lo esperado. La agroindustria y la energía de la región encienden el cielo aunque no haya tanta gente.</p>
-                </div>
-                
-                <div class="info-ciudad scatter-4-info">
-                    <p>Ahí entendí que no alcanzaba con contar personas. Lo que importa es lo que esas personas hacen de noche — y qué tan eficiente es la luz que usan.</p>
-                </div>
-    
-            </div>
-    
+    <div class="seccion-grafico">
+        <div id="contenedor-svg">
+            <div id="my_dataviz"></div>
         </div>
-    
-        <!-- DISPARADORES -->
-        <div class="disparador-viaje" data-viaje="scatter-1"></div>
-        <div class="disparador-viaje" data-viaje="scatter-2"></div>
-        <div class="disparador-viaje" data-viaje="scatter-3"></div>
-        <div class="disparador-viaje" data-viaje="scatter-4"></div>
-    
-    </section>
 
-    <!-- =============================================
+        <div class="contenedor-textos">
+            <div > <!-- id="panel-scatter-ciudad"-->
+            <div class="stepG" data-ciudad="inicial">
+                <h3>Población en Argentina</h3>
+                <p>Analicé 20 ciudades argentinas. Para cada una, tuve en cuenta cuánta gente vivía ahí y cuánta luz artificial emitían de noche hacia el cielo.</p>
+                <p>La pregunta era simple: ¿a más gente, menos estrellas visibles?</p>
+            </div>
+            
+            <div class="stepG" data-ciudad="CABA">
+                <h3>Ciudad Autónoma de Buenos Aires</h3>
+                <p>CABA es el distrito con mayor densidad y concentración poblacional, superando los 3 millones de habitantes.</p>
+            </div>
+
+            <div class="stepG" data-ciudad="Firmat">
+                <h3>Firmat, Santa Fe</h3>
+                <p>En líneas generales, sí. Las ciudades más grandes contaminan más lumínicamente. CABA está en el extremo: la más poblada del país es también la que más opaca el cielo nocturno.</p>
+                
+            </div>
+
+            <div class="stepG" data-ciudad="Junín">
+                <h3>Junín, Buenos Aires</h3>
+                <p>Pero Junín me llamó la atención. Una ciudad mediana, sin millones de habitantes, con un índice nocturno mucho más alto de lo esperado. La agroindustria y la energía de la región encienden el cielo aunque no haya tanta gente.</p>
+                
+            </div>
+            
+            <div class="stepG" data-ciudad="todas">
+                <h3>Todas las Regiones</h3>
+                <p>Ahí entendí que no alcanzaba con contar personas. Lo que importa es lo que esas personas hacen de noche — y qué tan eficiente es la luz que usan.</p>
+            </div>
+
+            <div class="stepG" data-ciudad="puntos">
+                <h3>Todas las Regiones</h3>
+                <p>Acá podemos ver la distribución completa de las 19 ciudades de nuestra base de datos, junto a que tan industrializados están.</p>
+            </div>
+        </div>
+        </div>
+
+    </div>
+
+     <!-- =============================================
      ESCENA 6C: TRANSICIÓN SCATTER → PIZARRÓN
      ============================================= -->
     <section id="escena-6c" class="escena-scroll-unificada">
@@ -490,18 +492,18 @@
         <div class="disparador-mundo-graficos" data-paso-mg="conclusion"></div>
 
     </section>
+    </div>
 
-    </section>
-
-        <section id="escena-7" class="escena">
-            <div class="contenido-escena">
-                <h2>Escena 7</h2>
-                <p>Fin del trayecto. ¡Gracias por scrollear!</p>
+        <section id="escena-final" class="escena zona-datos">
+            <div class="contenido-escena tarjeta-texto">
+                <h2>Fin del trayecto</h2>
+                <p>¡Gracias por scrollear!</p>
             </div>
         </section>
 
     </main>
 
+    <script src="https://d3js.org/d3.v6.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

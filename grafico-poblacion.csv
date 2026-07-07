@@ -1,0 +1,20 @@
+Ciudad,Provincia,Poblacion,Indice_Industrial_Nocturno,Escala_Bortle,Zona_Geografica
+Purmamarca,Jujuy,3000,1,2,NOA
+Barreal,San Juan,4000,1,1,Cuyo
+Gaiman,Chubut,8000,2,2,Patagonia
+Añelo,Neuquén,10000,1,6,Patagonia
+Tolhuin,Tierra del Fuego,10000,2,3,Patagonia
+Junín,Buenos Aires,80000,2,5,Pampeana
+Ushuaia,Tierra del Fuego,82000,2,6,Patagonia
+Rafaela,Santa Fe,110000,3,6,Centro
+Mendoza Capital,Mendoza,120000,2,6,Cuyo
+Puerto Madryn,Chubut,120000,3,6,Patagonia
+San Rafael,Mendoza,120000,4,4,Cuyo
+Tandil,Buenos Aires,140000,2,5,Pampeana
+Comodoro Rivadavia,Chubut,180000,3,7,Patagonia
+Firmat,Santa Fe,220000,4,5,Centro
+San M. de Tucumán,Tucumán,600000,5,7,NOA
+Mar del Plata,Buenos Aires,620000,5,7,Pampeana
+Rosario,Santa Fe,1000000,7,8,Centro
+Córdoba Capital,Córdoba,1400000,7,8,Centro
+CABA,Buenos Aires,3000000,10,9,Metropolitana
