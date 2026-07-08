@@ -587,20 +587,112 @@ body {
     height:100vh;
     position:relative;
     overflow:hidden;
+    /* Mismo tono que el cielo de base del SVG (ver #grad de fondo en el
+       propio SVG): el viewBox (900×1000, más alto que ancho) casi nunca
+       coincide con la proporción real de este contenedor (75vw × 100vh,
+       mucho más ancho que alto). Con preserveAspectRatio="meet" el SVG no
+       recorta nada — pero puede dejar franjas a los costados — y este
+       fondo hace que esas franjas sean invisibles en vez de una barra de
+       otro color. */
+    background-color: #070912;
 }
 
-.escena-ciudad{
-    position:absolute;
+#svg-cielos {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
 
-    left:0;
-    top:0;
+/* Estrellas de fondo, resplandor y horizonte: cada uno existe una vez por
+   ciudad y se cruza suavemente con la clase que pone el scroll en
+   #cielo-estrellas (.cielo-bsas / .cielo-firmat / .cielo-junin), igual que
+   antes con el fundido entre fotos. */
+.estrellas-ciudad,
+.resplandor-ciudad,
+.horizonte-ciudad,
+.via-lactea {
+    opacity: 0;
+    transition: opacity 1.2s ease;
+}
 
-    height:100%;
-    width:auto;
+/* Orión: la figura nunca desaparece del todo (hover siempre funciona),
+   pero cada estrella arranca tenue y sólo llega a su brillo real una vez
+   que la ciudad activa la "reveló" — ver las reglas .revela-* más abajo. */
+.estrella-orion {
+    cursor: pointer;
+}
 
-    opacity:0;
+.estrella-orion .punto-estrella {
+    opacity: 0.16;
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 0.2s ease, opacity 1s ease;
+}
 
-    transition:opacity 1.2s ease;
+.estrella-orion:hover .punto-estrella {
+    transform: scale(1.6);
+}
+
+/* Revelado acumulativo: lo que ya se ve en Buenos Aires se sigue viendo en
+   Firmat y en Junín; lo que recién se ve en Firmat se mantiene en Junín. */
+.cielo-bsas .revela-bsas .punto-estrella,
+.cielo-firmat .revela-bsas .punto-estrella,
+.cielo-junin .revela-bsas .punto-estrella,
+.cielo-firmat .revela-firmat .punto-estrella,
+.cielo-junin .revela-firmat .punto-estrella,
+.cielo-junin .revela-junin .punto-estrella {
+    opacity: 1;
+}
+
+/* Tooltip que sigue al cursor sobre cada estrella de Orión */
+.tooltip-estrella {
+    position: absolute;
+    z-index: 10;
+    width: 240px;
+    background: rgba(8, 10, 16, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 14px 16px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.55);
+}
+
+.tooltip-estrella.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.tooltip-estrella strong {
+    display: block;
+    color: var(--acento);
+    font-size: 1.05rem;
+    margin-bottom: 4px;
+}
+
+.tooltip-estrella .magnitud {
+    display: block;
+    font-size: 0.78rem;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+
+.tooltip-estrella p {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    color: #f8fafc;
+}
+
+.tooltip-estrella .nota-visibilidad {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--acento);
 }
 
 .contenedor-fijo-viaje{
@@ -669,8 +761,9 @@ body {
     color:#f8fafc;
 }
 
-/* Estado inicial */
-
+/* Estado inicial: activa a la vez las estrellas, el resplandor y el
+   horizonte que le corresponden a la ciudad actual (y la Vía Láctea,
+   sólo en el caso de Junín, porque comparte la clase "junin"). */
 .cielo-bsas .bsas{
     opacity:1;
 }
@@ -981,7 +1074,7 @@ body {
 .escena-luz-lumínica {
     position: relative;
     width: 100%;
-    height: 1100vh; /* 1000vh de recorrido animado (intro pizarrón + cámara) + 100vh de colchón para el telón final */
+    height: 1500vh; /* 1400vh de recorrido animado (intro pizarrón + cámara + tramo interactivo) + 100vh de colchón para el telón final */
     background-color: #03040a;
 }
 
@@ -1004,12 +1097,14 @@ body {
 }
 
 /* Espaciador invisible entre la ilustración pegajosa y el disparador del
-   telón. 900vh + los 100vh de .pin-luz = 1000vh, exactamente el recorrido
-   animado (DURACION_SCRUB_VH en escena-luz.js); + 100vh de disparador-telon
-   = 1100vh, igual a la altura declarada de .escena-luz-lumínica. Si se
-   cambia uno de estos tres números, hay que actualizar los otros dos. */
+   telón. 1300vh + los 100vh de .pin-luz = 1400vh, exactamente el recorrido
+   animado (DURACION_SCRUB_VH en escena-luz.js, que ahora incluye ~5 unidades
+   de "colchón interactivo" al final para poder usar el slider antes de que
+   arranque el telón); + 100vh de disparador-telon = 1500vh, igual a la
+   altura declarada de .escena-luz-lumínica. Si se cambia uno de estos tres
+   números, hay que actualizar los otros dos. */
 .espaciador-luz {
-    height: 900vh;
+    height: 1300vh;
     width: 100%;
     position: relative;
     pointer-events: none;

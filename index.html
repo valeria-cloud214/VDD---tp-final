@@ -178,12 +178,73 @@
 
         <div class="contenedor-fijo-viaje">
 
-            <!-- CIELO A LA IZQUIERDA -->
+            <!-- CIELO A LA IZQUIERDA — ilustración SVG (reemplaza las 3 fotos).
+                 Ver js/escena-cielos.js: genera las estrellas de fondo, la Vía
+                 Láctea, el horizonte de cada ciudad y la constelación de
+                 Orión (siempre visible, interactiva al pasar el mouse). El
+                 cambio de ciudad lo sigue disparando el scroll, igual que
+                 antes (clases .cielo-bsas/.cielo-firmat/.cielo-junin). -->
             <div id="cielo-estrellas">
 
-                <img class="escena-ciudad bsas" src="fotos/bsas.png" alt="bsas">
-                <img class="escena-ciudad firmat" src="fotos/firmat.png" alt="firmat">
-                <img class="escena-ciudad junin" src="fotos/junin.png" alt="junin">
+                <!-- preserveAspectRatio="none": estira el contenido para llenar
+                     EXACTO el contenedor (sin franjas vacías ni recortes),
+                     sea cual sea la proporción real de la pantalla. La
+                     distorsión que agrega es mínima (formas simples: círculos,
+                     rectángulos) y mucho menos notoria que un hueco vacío. -->
+                <svg id="svg-cielos" viewBox="0 0 1300 1000" preserveAspectRatio="none" aria-hidden="true">
+
+                    <defs>
+                        <radialGradient id="grad-resplandor-cielos" cx="50%" cy="100%" r="75%">
+                            <stop offset="0%" stop-color="#ffb45e" stop-opacity="0.95" />
+                            <stop offset="60%" stop-color="#ff9d4d" stop-opacity="0.4" />
+                            <stop offset="100%" stop-color="#ff9d4d" stop-opacity="0" />
+                        </radialGradient>
+                    </defs>
+
+                    <!-- Cielo nocturno de base: el mismo tono en las tres ciudades -->
+                    <rect x="0" y="0" width="1300" height="1000" fill="#070912" />
+
+                    <!-- Estrellas de fondo: cantidad y brillo distintos por ciudad -->
+                    <g class="estrellas-ciudad bsas" id="estrellas-bsas"></g>
+                    <g class="estrellas-ciudad firmat" id="estrellas-firmat"></g>
+                    <g class="estrellas-ciudad junin" id="estrellas-junin"></g>
+
+                    <!-- Vía Láctea: sólo se revela en el cielo más oscuro -->
+                    <g class="via-lactea junin" id="capa-via-lactea"></g>
+
+                    <!-- Resplandor de contaminación lumínica de cada ciudad -->
+                    <g class="resplandor-ciudad bsas">
+                        <ellipse cx="650" cy="900" rx="940" ry="420" fill="url(#grad-resplandor-cielos)" />
+                    </g>
+                    <g class="resplandor-ciudad firmat">
+                        <ellipse cx="650" cy="900" rx="690" ry="260" fill="url(#grad-resplandor-cielos)" />
+                    </g>
+                    <g class="resplandor-ciudad junin">
+                        <ellipse cx="650" cy="900" rx="460" ry="150" fill="url(#grad-resplandor-cielos)" />
+                    </g>
+
+                    <!-- Orión: siempre visible e igual en las tres ciudades. Es
+                         la constelación que Jorge sigue encontrando esté donde
+                         esté; lo que cambia alrededor es el resto del cielo. -->
+                    <g id="capa-orion"></g>
+
+                    <!-- Suelo compartido: nunca queda un hueco bajo el horizonte -->
+                    <rect x="0" y="850" width="1300" height="150" fill="#0b0c14" />
+
+                    <!-- Horizonte / silueta de cada ciudad -->
+                    <g class="horizonte-ciudad bsas" id="horizonte-bsas"></g>
+                    <g class="horizonte-ciudad firmat" id="horizonte-firmat"></g>
+                    <g class="horizonte-ciudad junin" id="horizonte-junin"></g>
+
+                </svg>
+
+                <!-- Tooltip que sigue al cursor al pasar por una estrella de
+                     Orión. Es un dato extra sobre la estrella (nombre real y
+                     magnitud), no información imprescindible para entender la
+                     escena, así que queda oculto para lectores de pantalla en
+                     vez de simular un rol ARIA que no es totalmente accesible
+                     por teclado. -->
+                <div id="tooltip-estrella" class="tooltip-estrella" aria-hidden="true"></div>
 
             </div>
 
@@ -662,6 +723,7 @@
 
     <script src="https://d3js.org/d3.v6.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/escena-cielos.js"></script>
 
     <!-- GSAP + ScrollTrigger: sólo se usan en la escena "luz" (js/escena-luz.js) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

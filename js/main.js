@@ -136,6 +136,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (fondoViajeFinal) fondoViajeFinal.className = "fondo-pantalla-completa-viaje viaje-inicio";
     if (textoViaje) textoViaje.classList.add("activo-viaje");
 
+    // El segundo bloque pegajoso (cielo + panel de ciudad) no tenía ningún
+    // estado por defecto: hasta que el disparador "bsas" disparaba (bastante
+    // más abajo en el scroll), se veía un cielo vacío y ningún panel activo.
+    // Arrancamos directamente en Buenos Aires, igual que el bloque de arriba
+    // ya arranca con su estado "inicio" sin esperar al scroll.
+    const cieloInicial = document.getElementById("cielo-estrellas");
+    if (cieloInicial) cieloInicial.className = "cielo-bsas";
+    const bsasInfoInicial = document.querySelector(".bsas-info");
+    if (bsasInfoInicial) bsasInfoInicial.classList.add("activa");
+
     const opcionesE6 = {
         root: null,
         rootMargin: "-30% 0px -50% 0px",
@@ -152,7 +162,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     textoViaje.classList.toggle("activo-viaje", paso === "inicio");
                 }
 
-                // El fondo dinámico cambia de foto en los pasos "inicio" y "foto1"-"foto4"
+                // El paso "inicio" no toca el cielo ni el panel de ciudad: si
+                // lo hiciera, borraría la "activa" que ya dejamos puesta por
+                // defecto en Buenos Aires (más arriba) sin volver a ponerla
+                // hasta que el disparador "bsas" disparase bastante después
+                // — el panel se quedaba en blanco todo ese tramo de scroll.
+                if (paso === "inicio") return;
+
+                // El fondo dinámico cambia de foto en los pasos "bsas"-"junin"
                 const cielo = document.getElementById("cielo-estrellas");
 
                 if(cielo){

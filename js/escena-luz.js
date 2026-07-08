@@ -443,9 +443,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const panel = document.getElementById("panel-slider-luz");
 
         // Duración fija en vh de la parte "activa" del scroll (intro +
-        // recorrido de cámara). El resto de la sección, más abajo en el
-        // HTML, es el colchón para el telón final.
-        const DURACION_SCRUB_VH = 1000;
+        // recorrido de cámara + tramo final donde el panel ya está visible
+        // y el usuario puede jugar con el slider). El resto de la sección,
+        // más abajo en el HTML, es el colchón para el telón final.
+        const DURACION_SCRUB_VH = 1400;
 
         const tl = gsap.timeline({
             scrollTrigger: {
@@ -549,7 +550,14 @@ document.addEventListener("DOMContentLoaded", () => {
         // Colchón final: el texto de cierre se retira y aparece el panel
         // interactivo. A partir de acá el scroll ya no mueve la cámara.
         tl.to(textos[7], { opacity: 0, duration: 0.6 }, 12.6)
-          .to(panel, { opacity: 1, duration: 1, pointerEvents: "auto" }, 12.7);
+          .to(panel, { opacity: 1, duration: 1, pointerEvents: "auto" }, 12.7)
+          // Antes el panel terminaba de aparecer justo en el mismo instante
+          // en que arrancaba la zona del telón (0 scroll de margen): apenas
+          // se veía, la cortina negra ya lo tapaba. Este tramo "vacío" (nada
+          // se anima) extiende la timeline para que, una vez que el panel
+          // está del todo visible, quede un buen tramo de scroll para
+          // realmente poder tocar el slider antes de que aparezca el telón.
+          .to({}, { duration: 5 }, 13.7);
     })();
 
     // ======================================================================
