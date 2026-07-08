@@ -315,10 +315,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // LÓGICA ESCENA 8 — Grilla mundial
     // ==========================================
+    // La conclusión de esta grilla ("no importa el continente/idioma...")
+    // ya no se muestra acá: ahora es el arranque de la escena de cierre
+    // (ver js/escena-cierre.js), que además se encarga de que la grilla se
+    // desvanezca gradualmente en vez de aparecer un cartel de texto.
     const disparadoresMG = document.querySelectorAll(".disparador-mundo-graficos");
     const introMG = document.querySelector(".intro-graficos-mundo");
     const grillaMG = document.querySelector(".grilla-graficos-mundo");
-    const conclusionMG = document.querySelector(".conclusion-graficos-mundo");
 
     const observadorMG = new IntersectionObserver((entradas) => {
         entradas.forEach(entrada => {
@@ -327,9 +330,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (paso === "graficos") {
                     if (introMG) introMG.classList.add("activo-mg");
                     if (grillaMG) grillaMG.classList.add("activo-mg");
-                }
-                if (paso === "conclusion") {
-                    if (conclusionMG) conclusionMG.classList.add("activo-mg");
                 }
             }
         });

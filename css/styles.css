@@ -102,18 +102,6 @@ body {
     text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
 }
 
-/* Escena de cierre (zona-datos): texto genérico h2/p dentro de .contenido-escena */
-#escena-final {
-    background-color: #050508;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-#escena-final .contenido-escena {
-    max-width: 600px;
-}
-
 .contenido-escena h2 {
     font-family: var(--font-heading, 'Nunito', sans-serif);
     font-size: 2.2rem;
@@ -1320,31 +1308,6 @@ body {
     height: 100%;
 }
 
-/* Conclusión final */
-.conclusion-graficos-mundo {
-    text-align: center;
-    padding: 100px 20px 60px;   /* antes: 40px 20px */
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-}
-
-.conclusion-graficos-mundo.activo-mg {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.conclusion-graficos-mundo p {
-    font-size: 1.5rem;
-    line-height: 1.7;
-    color: #f8fafc;
-    margin-bottom: 12px;
-}
-
-.conclusion-graficos-mundo strong {
-    color: var(--acento);
-}
-
 .disparador-mundo-graficos {
     height: 60vh;
     width: 100%;
@@ -1370,4 +1333,185 @@ body {
 .escena-transicion-mundo .fondo-negro-puro {
     background-color: #050508;
     background-image: none;
+}
+
+/* ==========================================================================
+   ESCENA DE CIERRE — "El regreso" (cierre emocional del proyecto)
+   Todo el contenido visual vive en #svg-cierre (ver index.html y
+   js/escena-cierre.js). El pin es el mismo método que ya funciona en la
+   escena de luz: position:sticky por CSS (no el pin nativo de GSAP), así
+   que acá SÍ hace falta declarar la altura total a mano — tiene que
+   coincidir con DURACION_SCRUB_VH en escena-cierre.js.
+   ========================================================================== */
+
+.escena-cierre-final {
+    position: relative;
+    width: 100%;
+    height: 1800vh; /* = DURACION_SCRUB_VH en escena-cierre.js */
+}
+
+.pin-cierre {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #000;
+}
+
+#svg-cierre {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Frases centradas: todas ocupan el mismo lugar (centro de la pantalla),
+   apiladas una sobre otra; sólo una está visible (opacity) a la vez. */
+.texto-cierre-contenedor {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.frase-cierre {
+    position: absolute;
+    max-width: 700px;
+    padding: 0 40px;
+    text-align: center;
+    opacity: 0;
+}
+
+.frase-cierre p {
+    font-family: var(--font-heading, 'Quicksand', sans-serif);
+    font-size: 2.2rem;
+    line-height: 1.5;
+    color: #f8fafc;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.6);
+}
+
+/* Panel del interruptor: discreto, en una esquina, integrado a la
+   ilustración (nada de tarjetas ni sombras "de app"). */
+.panel-interruptor-cierre {
+    position: absolute;
+    right: 5%;
+    bottom: 8%;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    pointer-events: none;
+    text-align: center;
+}
+
+.interruptor-etiqueta {
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    color: rgba(248, 250, 252, 0.75);
+}
+
+/* El interruptor en sí: un óvalo de madera/metal apagado, sin look de
+   componente de UI moderno (sin bordes redondeados exagerados ni sombras). */
+.interruptor-luz {
+    position: relative;
+    width: 64px;
+    height: 32px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: linear-gradient(180deg, #3a2f1f, #241c12);
+    cursor: pointer;
+    padding: 0;
+}
+
+.interruptor-perilla {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffe3ad, #ffb454);
+    box-shadow: 0 0 10px 2px rgba(255, 180, 84, 0.7);
+    transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1), box-shadow 0.5s ease, background 0.5s ease;
+}
+
+.interruptor-luz[aria-checked="false"] .interruptor-perilla {
+    transform: translateX(32px);
+    background: radial-gradient(circle at 35% 30%, #4b5568, #1f2430);
+    box-shadow: none;
+}
+
+.interruptor-estado {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--acento);
+}
+
+.interruptor-pregunta {
+    max-width: 220px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: rgba(248, 250, 252, 0.85);
+}
+
+/* Mensaje final: mismo lugar que las frases centradas, más abajo en la
+   pantalla para no pisar el cielo/Orión. */
+.mensaje-final-contenedor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 12%;
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.mensaje-final {
+    position: absolute;
+    max-width: 640px;
+    padding: 0 40px;
+    text-align: center;
+    opacity: 0;
+}
+
+.mensaje-final p {
+    color: #f8fafc;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
+}
+
+.mensaje-final-grande {
+    font-family: var(--font-heading, 'Quicksand', sans-serif);
+    font-size: 1.6rem;
+    line-height: 1.6;
+    margin-bottom: 14px;
+}
+
+.mensaje-final-chico {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba(248, 250, 252, 0.75);
+}
+
+@media (max-width: 760px) {
+    .frase-cierre p {
+        font-size: 1.5rem;
+    }
+    .mensaje-final-grande {
+        font-size: 1.25rem;
+    }
+    .panel-interruptor-cierre {
+        right: 50%;
+        transform: translateX(50%);
+        bottom: 6%;
+    }
 }

@@ -692,32 +692,144 @@
                     </div>
                 </div>
 
-            </div>
+            </div> <!-- cierre grilla-graficos-mundo -->
 
+            <div style="height: 240px;"></div>
 
-            </div>  <!-- cierre grilla-graficos-mundo -->
-
-            <div style="height: 120px;"></div>  <!-- ← agregá esta línea -->
-
-            <div class="conclusion-graficos-mundo" id="conclusion-mundo-graficos">
-                <p>Nueva York, Tokio, Londres, El Cairo. No importa el continente ni el idioma.</p>
-                <p>Donde crece la ciudad, <strong>desaparece el cielo.</strong></p>
-            </div>
-
-        </div>
+        </div> <!-- cierre contenedor-fijo-mundo-graficos -->
 
         <div class="disparador-mundo-graficos" data-paso-mg="graficos"></div>
-        <div class="disparador-mundo-graficos" data-paso-mg="conclusion"></div>
 
     </section>
     </div>
 
-        <section id="escena-final" class="escena zona-datos">
-            <div class="contenido-escena tarjeta-texto">
-                <h2>Fin del trayecto</h2>
-                <p>¡Gracias por scrollear!</p>
+    <!-- =============================================
+        ESCENA DE CIERRE: EL REGRESO
+        Cierre emocional del proyecto. Todo en una única timeline de GSAP +
+        ScrollTrigger, pinneada con position:sticky por CSS (mismo método
+        que la escena de luz). La ilustración (la casa del pueblo, ahora
+        con Jorge adulto en la ventana) está visible desde que arranca la
+        escena — sin ningún velo negro de por medio, esa idea se sacó por
+        completo porque un velo fixed controlado desde afuera (main.js) y
+        tocado también por GSAP desde adentro terminaba en un estado roto
+        al scrollear hacia atrás. El recorrido: 5 frases cortas aparecen
+        sobre la ilustración → pausa de contemplación → la cámara sube
+        siguiendo la mirada de Jorge → aparece Orión + 3 frases → panel del
+        interruptor. A partir de ahí ya no depende del scroll: apagar el
+        interruptor dispara la secuencia de apagado de luces + regreso de
+        las estrellas + mensaje final. Ver js/escena-cierre.js.
+        ============================================= -->
+    <section id="escena-cierre" class="escena-cierre-final zona-cuento">
+
+        <div class="pin-cierre" id="pin-cierre">
+
+            <svg id="svg-cierre" viewBox="0 0 1400 1600" preserveAspectRatio="none" aria-hidden="true">
+
+                <defs>
+                    <linearGradient id="gradiente-cielo-cierre" x1="0" y1="1" x2="0" y2="0">
+                        <stop offset="0%" stop-color="#0c1020" />
+                        <stop offset="40%" stop-color="#080a18" />
+                        <stop offset="100%" stop-color="#020208" />
+                    </linearGradient>
+                    <radialGradient id="gradiente-resplandor-horizonte" cx="50%" cy="100%" r="70%">
+                        <stop offset="0%" stop-color="#ffb45e" stop-opacity="0.8" />
+                        <stop offset="70%" stop-color="#ffb45e" stop-opacity="0.25" />
+                        <stop offset="100%" stop-color="#ffb45e" stop-opacity="0" />
+                    </radialGradient>
+                    <radialGradient id="gradiente-halo-casa" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#ffcf8a" stop-opacity="0.5" />
+                        <stop offset="100%" stop-color="#ffcf8a" stop-opacity="0" />
+                    </radialGradient>
+                </defs>
+
+                <!-- CÁMARA: sube siguiendo la mirada de Jorge (traslación en Y,
+                     igual mecánica que en la escena de contaminación lumínica). -->
+                <g id="mundo-cierre">
+
+                    <!-- 1. CIELO DE BASE (estático) -->
+                    <g id="capa-cielo-cierre">
+                        <rect x="-400" y="-2200" width="2200" height="3800" fill="url(#gradiente-cielo-cierre)" />
+                    </g>
+
+                    <!-- 2. ESTRELLAS (generadas por JS; se revelan con el scroll y, sobre todo, con el interruptor) -->
+                    <g id="capa-estrellas-cierre"></g>
+
+                    <!-- 3. VÍA LÁCTEA (sólo con el interruptor apagado del todo) -->
+                    <g id="capa-via-lactea-cierre"></g>
+
+                    <!-- 4. ORIÓN (fijo; siempre la misma constelación de toda la historia) -->
+                    <g id="capa-orion-cierre"></g>
+
+                    <!-- 5. MONTAÑAS (silueta estática de fondo) -->
+                    <g id="capa-montanas-cierre"></g>
+
+                    <!-- 6. RESPLANDOR DE UNA CIUDAD LEJANA EN EL HORIZONTE -->
+                    <g id="capa-resplandor-horizonte-cierre">
+                        <ellipse cx="220" cy="1350" rx="480" ry="75" fill="url(#gradiente-resplandor-horizonte)" />
+                    </g>
+
+                    <!-- 7. ÁRBOLES -->
+                    <g id="capa-arboles-cierre"></g>
+
+                    <!-- 8. HALO CÁLIDO ALREDEDOR DE LA CASA (su propia luz emitida) -->
+                    <g id="capa-halo-casa-cierre">
+                        <ellipse cx="650" cy="1300" rx="260" ry="140" fill="url(#gradiente-halo-casa)" />
+                    </g>
+
+                    <!-- 9. FAROL DEL PUEBLO -->
+                    <g id="capa-farol-cierre"></g>
+
+                    <!-- 10. LA CASA DEL PUEBLO: mismo encuadre que al principio de la historia -->
+                    <g id="capa-casa-cierre"></g>
+
+                    <!-- 11. CARTEL/FAROL DE ENTRADA (lo primero que se apaga) -->
+                    <g id="capa-cartel-cierre"></g>
+
+                    <!-- 12. JORGE ADULTO, apoyado en la ventana -->
+                    <g id="capa-jorge-cierre"></g>
+
+                </g> <!-- fin #mundo-cierre -->
+
+            </svg>
+
+            <!-- FRASES: siempre en el mismo lugar, centradas. Sirven para las
+                 tres etapas de texto (grilla→negro, y los 3 versos de Orión);
+                 cuál grupo se usa en cada momento lo decide el JS. -->
+            <div class="texto-cierre-contenedor">
+                <div class="frase-cierre" data-frase-cierre="continente"><p>No importa el continente.</p></div>
+                <div class="frase-cierre" data-frase-cierre="idioma"><p>No importa el idioma.</p></div>
+                <div class="frase-cierre" data-frase-cierre="cultura"><p>No importa la cultura.</p></div>
+                <div class="frase-cierre" data-frase-cierre="crece"><p>Donde crece la ciudad...</p></div>
+                <div class="frase-cierre" data-frase-cierre="desaparece"><p>...desaparece el cielo.</p></div>
+                <div class="frase-cierre" data-frase-cierre="abuela"><p>Mi abuela tenía razón.</p></div>
+                <div class="frase-cierre" data-frase-cierre="orion-siempre"><p>Orión siempre estuvo ahí.</p></div>
+                <div class="frase-cierre" data-frase-cierre="dificil"><p>Lo difícil era volver a encontrarlo.</p></div>
             </div>
-        </section>
+
+            <!-- PANEL DEL INTERRUPTOR: aparece recién al final del recorrido -->
+            <div class="panel-interruptor-cierre" id="panel-interruptor-cierre">
+                <p class="interruptor-etiqueta">Contaminación lumínica</p>
+                <button type="button" class="interruptor-luz" id="interruptor-luz" role="switch" aria-checked="true" aria-label="Contaminación lumínica">
+                    <span class="interruptor-perilla"></span>
+                </button>
+                <p class="interruptor-estado" id="interruptor-estado">ON</p>
+                <p class="interruptor-pregunta">¿Y si apagamos las luces por un momento?</p>
+            </div>
+
+            <!-- MENSAJE FINAL: aparece solo, de a una frase, después de apagar
+                 el interruptor por primera vez (ver js/escena-cierre.js). -->
+            <div class="mensaje-final-contenedor">
+                <div class="mensaje-final" data-mensaje-final="1"><p>Las estrellas nunca dejaron de estar ahí.</p></div>
+                <div class="mensaje-final" data-mensaje-final="2"><p>Solo dejamos de poder verlas.</p></div>
+                <div class="mensaje-final" data-mensaje-final="3">
+                    <p class="mensaje-final-grande">Las ciudades necesitan luz.<br>El cielo también necesita oscuridad.</p>
+                    <p class="mensaje-final-chico">La contaminación lumínica no apaga las estrellas.<br>Apaga nuestra capacidad de encontrarlas.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
 
     </main>
 
@@ -725,9 +837,10 @@
     <script src="js/main.js"></script>
     <script src="js/escena-cielos.js"></script>
 
-    <!-- GSAP + ScrollTrigger: sólo se usan en la escena "luz" (js/escena-luz.js) -->
+    <!-- GSAP + ScrollTrigger: las usan la escena "luz" y la escena de cierre -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="js/escena-luz.js"></script>
+    <script src="js/escena-cierre.js"></script>
 </body>
 </html>
