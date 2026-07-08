@@ -831,26 +831,37 @@ body {
 }
 
 /* ==========================================================================
-   ESCENA 7 — El Pizarrón
+   ESCENA "LUZ" — Intro de Jorge en el pizarrón (superpuesta)
+   Vive DENTRO del mismo contenedor pegajoso que la ilustración (ver más
+   abajo), como una capa por encima de todo lo demás. Así la disolución
+   hacia la ciudad no depende de que dos secciones con scroll-jacking
+   empalmen justo a tiempo — nunca hay un instante sin nada dibujado.
    ========================================================================== */
 
-   .escena-pizarron {
-    position: relative;
-    height: 600vh;
-    width: 100%;
-}
-
-.contenedor-fijo-pizarron {
-    position: sticky;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
+.intro-pizarron-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10; /* por encima del SVG, los textos y el panel */
     display: flex;
     align-items: center;
     justify-content: center;
+    /* Sin background-color propio a propósito: lo único opaco acá es
+       .fondo-aula-img (la imagen del aula, que ya cubre el 100%). Si este
+       contenedor tuviera su propio fondo, seguiría tapando la ilustración
+       para siempre aun después de que el pizarrón termine de disolverse,
+       porque sólo animamos la opacidad de sus hijos, no la de este div. */
 }
+
+/* Las frases de la intro las anima GSAP directamente (ver escena-luz.js):
+   apagamos la transición CSS para que no se sume una segunda suavización
+   sobre el scrub del scroll. */
+.intro-pizarron-overlay .texto-pizarron {
+    transition: none;
+}
+
+/* ==========================================================================
+   Elementos compartidos del pizarrón (aula, marco, texto tiza, telón)
+   ========================================================================== */
 
 /* Imagen del aula de fondo */
 .fondo-aula-img {
@@ -915,12 +926,6 @@ body {
     padding: 20px;
 }
 
-.texto-pizarron.activo-pizarron {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-}
-
 /* Tipografía estilo tiza */
 .texto-pizarron p {
     font-family: 'Nunito', sans-serif;
@@ -957,18 +962,178 @@ body {
     pointer-events: auto;
 }
 
-.disparador-pizarron {
+.disparador-telon {
     height: 100vh;
     width: 100%;
     position: relative;
     pointer-events: none;
 }
 
-.disparador-telon {
+/* ==========================================================================
+   ESCENA "LUZ" — Contaminación lumínica (ilustración SVG inmersiva)
+   Todo el contenido visual vive dentro de #svg-luz (ver index.html y
+   js/escena-luz.js). Acá sólo resolvemos layout: el contenedor sticky a
+   pantalla completa, la posición fija de las tarjetas de texto y el panel
+   del slider final. El aspecto de cada capa (colores, formas) se define en
+   el propio SVG / al generarla por JS.
+   ========================================================================== */
+
+.escena-luz-lumínica {
+    position: relative;
+    width: 100%;
+    height: 1100vh; /* 1000vh de recorrido animado (intro pizarrón + cámara) + 100vh de colchón para el telón final */
+    background-color: #03040a;
+}
+
+.pin-luz {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
     height: 100vh;
+    overflow: hidden;
+    background-color: #03040a;
+}
+
+#svg-luz {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Espaciador invisible entre la ilustración pegajosa y el disparador del
+   telón. 900vh + los 100vh de .pin-luz = 1000vh, exactamente el recorrido
+   animado (DURACION_SCRUB_VH en escena-luz.js); + 100vh de disparador-telon
+   = 1100vh, igual a la altura declarada de .escena-luz-lumínica. Si se
+   cambia uno de estos tres números, hay que actualizar los otros dos. */
+.espaciador-luz {
+    height: 900vh;
     width: 100%;
     position: relative;
     pointer-events: none;
+}
+
+/* Ventanas, halos de farol y rayos: transición corta para que el encendido/
+   apagado disparado por el slider (o por el avance del scroll) se sienta
+   orgánico y no un parpadeo brusco. */
+#capa-ventanas .ventana,
+#capa-faroles .farol-halo,
+#capa-rayos .rayo {
+    transition: opacity 0.35s ease;
+}
+
+#capa-resplandor-forma {
+    transition: opacity 0.5s ease;
+}
+
+/* Tarjetas de texto: siempre en el mismo lugar de la pantalla. Reutilizan
+   la misma identidad visual (tarjeta oscura translúcida) que el resto del
+   sitio; sólo el contenido cambia entre pasos. */
+.texto-luz-contenedor {
+    position: absolute;
+    left: 60px;
+    bottom: 80px;
+    z-index: 5;
+    width: 100%;
+    max-width: 560px;
+    pointer-events: none;
+}
+
+.texto-luz {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    opacity: 0;
+    background: rgba(8, 10, 16, 0.76);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radio-tarjeta, 10px);
+    padding: 24px 28px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+.texto-luz p {
+    font-size: 1.15rem;
+    line-height: 1.55;
+    color: #f8fafc;
+}
+
+/* Panel interactivo del slider: aparece recién al final del recorrido */
+.panel-interactivo-luz {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 6;
+    width: 300px;
+    opacity: 0;
+    pointer-events: none;
+    background: rgba(8, 10, 16, 0.78);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.panel-interactivo-luz h3 {
+    font-family: var(--font-heading, 'Nunito', sans-serif);
+    font-size: 1.15rem;
+    color: var(--acento);
+    margin-bottom: 16px;
+}
+
+/* Label accesible del slider: presente para lectores de pantalla, oculto
+   visualmente porque el título de arriba ya cumple esa función en pantalla. */
+.slider-label-oculto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+#slider-contaminacion {
+    width: 100%;
+    accent-color: var(--acento);
+}
+
+.slider-etiquetas {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 10px;
+}
+
+/* Responsive: en pantallas angostas las tarjetas ocupan todo el ancho y el
+   panel del slider baja a la parte inferior para no competir con el texto. */
+@media (max-width: 760px) {
+    .texto-luz-contenedor {
+        left: 20px;
+        right: 20px;
+        bottom: 110px;
+        max-width: none;
+    }
+
+    .texto-luz p {
+        font-size: 1.1rem;
+    }
+
+    .panel-interactivo-luz {
+        right: 20px;
+        left: 20px;
+        top: auto;
+        bottom: 20px;
+        transform: none;
+        width: auto;
+    }
 }
 
 

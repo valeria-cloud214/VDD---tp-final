@@ -315,45 +315,202 @@
     </section>
 
     <!-- =============================================
-        ESCENA 7: EL PIZARRÓN
+        ESCENA "LUZ": INMERSIÓN EN LA CONTAMINACIÓN LUMÍNICA
+        Una única ilustración SVG continua (un corte vertical del
+        mundo, de la ciudad al espacio). El scroll no cambia de
+        imagen: sólo mueve la "cámara" (el grupo #mundo). Cada capa
+        es un <g> con id propio y comentado para poder editarla
+        después sin afectar al resto. Ver js/escena-luz.js.
+
+        Jorge y el pizarrón son la PRIMERA fase de este mismo recorrido:
+        un overlay superpuesto a la ilustración (ya renderizada debajo)
+        que se disuelve al principio del scroll. Al estar en el mismo
+        contenedor pegajoso que el resto de la escena, la transición no
+        depende de que dos secciones "empalmen" — nunca hay un cuadro
+        vacío/negro entre una cosa y la otra.
         ============================================= -->
-    <section id="escena-7" class="escena-pizarron">
+    <section id="escena-luz" class="escena-luz-lumínica">
 
-        <div class="contenedor-fijo-pizarron">
+        <div class="pin-luz">
 
-            <div class="fondo-aula-img"></div>
-        
-            <div class="pizarron-marco">
-        
-                <div class="texto-pizarron activo-pizarron" data-pizarron="1">
-                    <p>La contaminación lumínica es la luz artificial que escapa hacia arriba en lugar de iluminar hacia abajo.</p>
-                    <p>Se dispersa en la atmósfera y crea un halo brillante que tapa las estrellas. No la vemos como suciedad. Pero está ahí.</p>
+            <!-- El SVG tapa toda la pantalla (preserveAspectRatio="slice"),
+                 como una ilustración a sangre, sin franjas ni bordes. -->
+            <svg id="svg-luz" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+
+                <defs>
+                    <!-- Cielo nocturno de base: estático, no depende de la contaminación -->
+                    <linearGradient id="gradiente-cielo" x1="0" y1="1" x2="0" y2="0">
+                        <stop offset="0%" stop-color="#0d1024" />
+                        <stop offset="35%" stop-color="#080a18" />
+                        <stop offset="100%" stop-color="#020208" />
+                    </linearGradient>
+
+                    <!-- Atmósfera: banda azul muy translúcida -->
+                    <linearGradient id="gradiente-atmosfera" x1="0" y1="1" x2="0" y2="0">
+                        <stop offset="0%" stop-color="#3b6ea5" stop-opacity="0" />
+                        <stop offset="45%" stop-color="#5a8fc7" stop-opacity="0.55" />
+                        <stop offset="100%" stop-color="#8fb8e6" stop-opacity="0.15" />
+                    </linearGradient>
+
+                    <!-- Resplandor de contaminación: domo cálido que crece con el nivel -->
+                    <radialGradient id="gradiente-resplandor" cx="50%" cy="100%" r="75%">
+                        <stop offset="0%" stop-color="#ffcf8a" stop-opacity="0.9" />
+                        <stop offset="55%" stop-color="#ffb45e" stop-opacity="0.35" />
+                        <stop offset="100%" stop-color="#ffb45e" stop-opacity="0" />
+                    </radialGradient>
+
+                    <!-- Rayos de luz: cálidos, se desvanecen hacia arriba -->
+                    <linearGradient id="gradiente-rayo" x1="0" y1="1" x2="0" y2="0">
+                        <stop offset="0%" stop-color="#ffd9a0" stop-opacity="0.65" />
+                        <stop offset="100%" stop-color="#ffd9a0" stop-opacity="0" />
+                    </linearGradient>
+
+                    <!-- Halo de cada farol -->
+                    <radialGradient id="gradiente-halo-farol" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#ffdca0" stop-opacity="0.9" />
+                        <stop offset="100%" stop-color="#ffdca0" stop-opacity="0" />
+                    </radialGradient>
+                </defs>
+
+                <!-- CÁMARA: todo el mundo vive dentro de este grupo. GSAP anima
+                     su transform (traslación y, sobre el final, escala en Y) para
+                     simular el recorrido de la cámara de la ciudad al espacio. -->
+                <g id="mundo">
+
+                    <!-- 1. CIELO DE FONDO (estático). Mucho más ancho que el
+                         viewBox (1600) para que el "zoom out" final (paso 7,
+                         que achica y recentra la cámara para mostrar todo el
+                         recorrido) no deje bordes vacíos a los costados. -->
+                    <g id="capa-cielo-fondo">
+                        <rect x="-3400" y="-3400" width="8800" height="4400" fill="url(#gradiente-cielo)" />
+                    </g>
+
+                    <!-- 2. ESTRELLAS DE FONDO (generadas por JS) -->
+                    <g id="capa-estrellas"></g>
+
+                    <!-- 3. CONSTELACIÓN DE ORIÓN (guiño a la abuela de Jorge) -->
+                    <g id="capa-constelacion-orion" stroke="#cfe0ff" stroke-opacity="0.35" stroke-width="1.2">
+                        <!-- Líneas que unen las estrellas principales -->
+                        <line x1="710" y1="-1770" x2="760" y2="-1690" />
+                        <line x1="900" y1="-1790" x2="845" y2="-1660" />
+                        <line x1="760" y1="-1690" x2="800" y2="-1680" />
+                        <line x1="800" y1="-1680" x2="845" y2="-1660" />
+                        <line x1="760" y1="-1690" x2="690" y2="-1560" />
+                        <line x1="845" y1="-1660" x2="910" y2="-1560" />
+                        <!-- Estrellas (hombros, cinturón, pies) -->
+                        <circle cx="710" cy="-1770" r="3.4" fill="#fff3e0" stroke="none" />
+                        <circle cx="900" cy="-1790" r="3.2" fill="#eaf1ff" stroke="none" />
+                        <circle cx="760" cy="-1690" r="2.2" fill="#ffffff" stroke="none" />
+                        <circle cx="800" cy="-1680" r="2.2" fill="#ffffff" stroke="none" />
+                        <circle cx="845" cy="-1660" r="2.2" fill="#ffffff" stroke="none" />
+                        <circle cx="690" cy="-1560" r="3" fill="#dce8ff" stroke="none" />
+                        <circle cx="910" cy="-1560" r="3" fill="#fff3e0" stroke="none" />
+                    </g>
+
+                    <!-- 4. ATMÓSFERA (banda azul translúcida). También ancha
+                         por la misma razón que el cielo de fondo. -->
+                    <g id="capa-atmosfera">
+                        <rect id="capa-atmosfera-forma" x="-3400" y="-400" width="8800" height="660" fill="url(#gradiente-atmosfera)" opacity="0" />
+                    </g>
+
+                    <!-- 5. RESPLANDOR DE CONTAMINACIÓN (crece con el nivel/slider) -->
+                    <g id="capa-resplandor">
+                        <ellipse id="capa-resplandor-forma" cx="800" cy="560" rx="1100" ry="620" fill="url(#gradiente-resplandor)" opacity="0" />
+                    </g>
+
+                    <!-- 6. RAYOS DE LUZ (generados por JS: techos, faroles, carteles → atmósfera) -->
+                    <g id="capa-rayos"></g>
+
+                    <!-- 7. SUELO (ancho igual que el cielo, mismo motivo) -->
+                    <g id="capa-suelo">
+                        <rect x="-3400" y="780" width="8800" height="220" fill="#12141c" />
+                        <rect x="-3400" y="796" width="8800" height="30" fill="#0b0c12" />
+                    </g>
+
+                    <!-- 8. EDIFICIOS (generados por JS a partir de CONFIG) -->
+                    <g id="capa-edificios"></g>
+
+                    <!-- 9. CASAS bajas (variedad en primer plano) -->
+                    <g id="capa-casas"></g>
+
+                    <!-- 10. VENTANAS (grilla generada por JS sobre cada edificio) -->
+                    <g id="capa-ventanas"></g>
+
+                    <!-- 11. CARTELES / letreros de neón -->
+                    <g id="capa-carteles"></g>
+
+                    <!-- 12. FAROLES -->
+                    <g id="capa-faroles"></g>
+
+                    <!-- 13. AUTOS -->
+                    <g id="capa-autos"></g>
+
+                </g> <!-- fin #mundo -->
+
+            </svg>
+
+            <!-- INTRO: Jorge frente al pizarrón, superpuesto a la ilustración
+                 (que ya está renderizada debajo, quieta en su estado inicial).
+                 Dice dos frases breves y se disuelve al principio del scroll,
+                 revelando la ciudad. No vuelve a aparecer. -->
+            <div class="intro-pizarron-overlay" id="intro-pizarron-overlay">
+                <div class="fondo-aula-img"></div>
+                <div class="pizarron-marco" id="pizarron-intro-marco">
+                    <div class="texto-pizarron" id="linea-pizarron-1">
+                        <p>Después de años intentando entender qué ocurría con el cielo, descubrí que las estrellas nunca desaparecieron.</p>
+                    </div>
+                    <div class="texto-pizarron" id="linea-pizarron-2">
+                        <p>Todo se debía a un fenómeno llamado <strong>contaminación lumínica</strong>.</p>
+                    </div>
                 </div>
-        
-                <div class="texto-pizarron" data-pizarron="2">
-                    <p>Para medirla, los astrónomos usamos la Escala de Bortle: va del 1 al 9.</p>
-                    <p>En 1, el cielo es tan oscuro que la Vía Láctea proyecta tu propia sombra. En 9, estás en el centro de Buenos Aires y apenas distinguís a Orión.</p>
-                    <p>Mi pueblo natal estaba en 3. Hoy probablemente está en 5.</p>
-                </div>
-        
-                <div class="texto-pizarron" data-pizarron="3">
-                    <p>No es solo un problema para astrónomos nostálgicos.</p>
-                    <p>La luz nocturna desorienta aves migratorias, altera ciclos de insectos, afecta el sueño humano. Estamos iluminando el mundo sin pensar en las consecuencias.</p>
-                </div>
-        
-                <div class="texto-pizarron" data-pizarron="4">
-                    <p>Pero esto no era solo teoría. Lo había visto con mis propios ojos en cada ciudad que visité. Y los números lo confirmaban.</p>
-                </div>
-        
             </div>
-        
-        </div>
-        <div id="telon"></div>
 
-        <div class="disparador-pizarron" data-paso-p="1"></div>
-        <div class="disparador-pizarron" data-paso-p="2"></div>
-        <div class="disparador-pizarron" data-paso-p="3"></div>
-        <div class="disparador-pizarron" data-paso-p="4"></div>
+            <!-- TEXTO: siempre en el mismo lugar de la pantalla; sólo cambia
+                 el contenido. Si se lo saca por completo, la ilustración de
+                 arriba se sigue entendiendo por sí sola. -->
+            <div class="texto-luz-contenedor">
+                <div class="texto-luz" data-paso-luz="1">
+                    <p>Todo comienza en nuestras ciudades. Cada farol, cada ventana y cada cartel encendido emite luz durante toda la noche.</p>
+                </div>
+                <div class="texto-luz" data-paso-luz="2">
+                    <p>El problema es que esa luz casi nunca apunta sólo hacia abajo. Una parte enorme escapa directo hacia el cielo, donde no ilumina nada ni a nadie.</p>
+                </div>
+                <div class="texto-luz" data-paso-luz="3">
+                    <p>Esa luz que se escapa no se detiene en el aire vacío: sigue subiendo hasta chocar con las moléculas y partículas de la atmósfera terrestre.</p>
+                </div>
+                <div class="texto-luz" data-paso-luz="4">
+                    <p>Ahí no rebota en línea recta. Se dispersa en todas direcciones —el mismo motivo por el que el cielo se ve celeste de día— y se esparce por kilómetros a la redonda.</p>
+                </div>
+                <div class="texto-luz" data-paso-luz="5">
+                    <p>Millones de rayos dispersándose a la vez forman un resplandor artificial que envuelve la ciudad como una cúpula de luz: el cielo deja de ser negro incluso lejos de cualquier farol.</p>
+                </div>
+                <div class="texto-luz" data-paso-luz="6">
+                    <p>Las estrellas, mientras tanto, no se movieron ni cambiaron su brillo. Lo único que cambió es el contraste: su luz, mucho más débil, ya no logra atravesar ese resplandor.</p>
+                </div>
+                <div class="texto-luz" data-paso-luz="7">
+                    <p>Ciudad, rayos, resplandor y estrellas son en realidad un solo sistema: cuanta más luz escapa hacia arriba, más grueso es el resplandor y menos estrellas logramos distinguir.</p>
+                </div>
+            </div>
+
+            <!-- PANEL INTERACTIVO: aparece recién al final del recorrido -->
+            <div class="panel-interactivo-luz" id="panel-slider-luz">
+                <h3 id="titulo-slider-luz">Probá aumentar la iluminación</h3>
+                <label class="slider-label-oculto" for="slider-contaminacion">Nivel de iluminación de la ciudad</label>
+                <input type="range" id="slider-contaminacion" min="0" max="100" value="45" aria-labelledby="titulo-slider-luz">
+                <div class="slider-etiquetas"><span>Cielo oscuro</span><span>Ciudad brillante</span></div>
+            </div>
+
+        </div>
+
+        <!-- Espaciador invisible: empuja el disparador del telón hasta el
+             final del recorrido (DURACION_SCRUB_VH en escena-luz.js, que
+             ahora incluye la intro del pizarrón + el viaje de cámara).
+             Sin esto, el disparador queda pegado justo después de .pin-luz
+             y activa la cortina negra casi al empezar el scroll en vez de
+             al terminar. -->
+        <div class="espaciador-luz" aria-hidden="true"></div>
+
+        <div id="telon"></div>
         <div class="disparador-telon" data-telon="baja"></div>
 
     </section>
@@ -505,5 +662,10 @@
 
     <script src="https://d3js.org/d3.v6.js"></script>
     <script src="js/main.js"></script>
+
+    <!-- GSAP + ScrollTrigger: sólo se usan en la escena "luz" (js/escena-luz.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="js/escena-luz.js"></script>
 </body>
 </html>

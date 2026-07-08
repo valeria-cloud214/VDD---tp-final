@@ -243,30 +243,6 @@ document.addEventListener("DOMContentLoaded", () => {
     disparadoresE6c.forEach(d => observador6c.observe(d));
 
 
-    // ==========================================
-    // LÓGICA ESCENA 7 (Pizarrón)
-    // ==========================================
-    const disparadoresPizarron = document.querySelectorAll(".disparador-pizarron");
-    const textosPizarron = document.querySelectorAll(".texto-pizarron");
-
-    const observadorPizarron = new IntersectionObserver((entradas) => {
-        entradas.forEach(entrada => {
-            if (entrada.isIntersecting) {
-                const paso = entrada.target.getAttribute("data-paso-p");
-                textosPizarron.forEach(t => {
-                    if (t.getAttribute("data-pizarron") === paso) {
-                        t.classList.add("activo-pizarron");
-                    } else {
-                        t.classList.remove("activo-pizarron");
-                    }
-                });
-            }
-        });
-    }, { root: null, rootMargin: "-30% 0px -50% 0px", threshold: 0 });
-
-    disparadoresPizarron.forEach(d => observadorPizarron.observe(d));
-
-
 // ==========================================
     // LÓGICA TELÓN
     // ==========================================
