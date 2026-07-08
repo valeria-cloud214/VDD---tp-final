@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // 0-1600): así, cuando el paso 7 achica la cámara para mostrar todo
         // el recorrido de una vez, el cielo sigue lleno de estrellas en vez
         // de dejar bordes vacíos a los costados de una ciudad "flotando".
-        estrellas: { cantidad: 460, xMin: -3200, xMax: 5000, yMin: -3150, yMax: -420 },
+        estrellas: { cantidad: 550, xMin: -3200, xMax: 5000, yMin: -3150, yMax: -420 },
         atmosfera: { yTope: -400, yBase: 260 },
         espacioTopeY: -3200,       // borde superior del campo de estrellas
         // Traslación/escala de la cámara (#mundo) por paso narrativo.
@@ -87,7 +87,13 @@ document.addEventListener("DOMContentLoaded", () => {
             paso4: { y: 430 },
             paso5: { y: 560 },
             paso6: { y: 1900 },
-            paso7: { x: 628, y: 697, scale: 0.2146 } // "zoom out" uniforme, sin deformar
+            // "Zoom out" uniforme (sin deformar), pero acotado: en vez de
+            // encuadrar TODO el mundo (suelo a espacio profundo, que dejaba
+            // la ciudad como una franjita minúscula y casi todo vacío), este
+            // encuadre llega justo hasta un poco por encima de Orión — así
+            // se ven bien juntos, de cerca, la ciudad, los rayos, el cielo y
+            // la constelación, sin resignar tamaño.
+            paso7: { x: 552, y: 601, scale: 0.31 }
         }
     };
 
@@ -314,13 +320,17 @@ document.addEventListener("DOMContentLoaded", () => {
     actualizarCurvaturaRayos(0);
 
     // --- 1h. Campo de estrellas de fondo ------------------------------------
+    // Radio y opacidad base más grandes que un cielo "realista": la cámara
+    // nunca llega a un zoom 1:1, así que una estrella demasiado chica termina
+    // en una fracción de píxel y se pierde aunque tenga opacidad alta. Acá
+    // priorizamos que se LEAN bien por sobre el realismo estricto.
     const estrellas = [];
     (function generarEstrellas() {
         for (let i = 0; i < CONFIG.estrellas.cantidad; i++) {
             const x = entre(CONFIG.estrellas.xMin, CONFIG.estrellas.xMax);
             const y = entre(CONFIG.estrellas.yMin, CONFIG.estrellas.yMax);
-            const r = entre(0.6, 2.1);
-            const opacidadBase = entre(0.35, 1);
+            const r = entre(1.3, 3.6);
+            const opacidadBase = entre(0.55, 1);
             const estrella = crearSVG("circle", { cx: x, cy: y, r, fill: "#f5f7ff", opacity: opacidadBase });
             capaEstrellas.appendChild(estrella);
             estrellas.push({ el: estrella, opacidadBase });
