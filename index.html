@@ -287,26 +287,109 @@
         <div class="disparador-viaje" data-viaje="junin"></div>
 
     </section>
-         <section id="escena-6a" class="escena-scroll-unificada">
-    
-        <div class="contenedor-fijo-unificado">
-            
-            <div class="fondo-pantalla-completa foto-transicion-datos"></div>
-            
-            <div class="contenido-flotante">
-                <div class="parrafo-unificado activo-unificado" data-unificado-6a="1">
-                    <p>Pero ver los cielos con mis propios ojos no era suficiente. Necesitaba entender <em>por qué</em> algunos lugares brillaban más que otros.</p>
+    <!-- =============================================
+        ESCENA 6A — De la observación a la investigación
+        El cielo de Junín sigue exactamente igual que al terminar la escena 6
+        (misma composición, regenerada acá en js/escena-transicion-datos.js
+        para que no haya foto nueva ni corte), ya a pantalla completa — el
+        panel lateral de la escena 6 no se duplica ni se vuelve a mostrar acá,
+        directamente no aparece. Primero unos segundos de silencio, sólo el
+        cielo; después el scroll va revelando frases sueltas —sin cajas, sólo
+        texto y aire— mientras el paisaje se simplifica de a poco hasta
+        convertirse en información: de ahí nace el lenguaje visual (puntos,
+        líneas finas) que retoma el scatter plot que sigue después de esta
+        escena.
+        ============================================= -->
+    <section id="escena-6a" class="escena-transicion-datos">
+
+        <div class="pin-transicion-datos">
+
+            <div class="td-cielo" id="td-cielo">
+                <svg id="svg-transicion-datos" viewBox="0 0 1300 1000" preserveAspectRatio="none" aria-hidden="true">
+
+                    <defs>
+                        <radialGradient id="grad-resplandor-td" cx="50%" cy="100%" r="75%">
+                            <stop offset="0%" stop-color="#ffb45e" stop-opacity="0.7" />
+                            <stop offset="60%" stop-color="#ff9d4d" stop-opacity="0.28" />
+                            <stop offset="100%" stop-color="#ff9d4d" stop-opacity="0" />
+                        </radialGradient>
+                    </defs>
+
+                    <rect x="0" y="0" width="1300" height="1000" fill="#070912" />
+
+                    <!-- Estrellas de Junín + Vía Láctea: idéntica densidad a la
+                         escena anterior -->
+                    <g id="td-estrellas"></g>
+                    <g id="td-via-lactea"></g>
+
+                    <!-- Resplandor tenue del pueblo, en el horizonte -->
+                    <g id="td-resplandor">
+                        <ellipse cx="650" cy="900" rx="460" ry="150" fill="url(#grad-resplandor-td)" />
+                    </g>
+
+                    <!-- Orión: la misma figura de siempre, ya completa -->
+                    <g id="td-orion"></g>
+
+                    <rect x="0" y="850" width="1300" height="150" fill="#0b0c14" />
+
+                    <!-- Montañas, árboles y casitas de Junín -->
+                    <g id="td-horizonte"></g>
+
+                    <!-- Anotaciones sutiles: Jorge empieza a analizar lo que vio -->
+                    <g id="td-anotaciones"></g>
+
+                    <!-- El cielo empezando a convertirse en información -->
+                    <g id="td-nodos"></g>
+
+                    <!-- Velo que oscurece gradualmente el escenario hacia el final -->
+                    <rect id="td-velo-negro" x="0" y="0" width="1300" height="1000" fill="#020204" />
+
+                </svg>
+            </div>
+
+            <!-- Frases sueltas: sin tarjeta, sólo texto blanco con aire alrededor -->
+            <div class="td-texto-contenedor">
+                <div class="td-frase" data-frase-td="1"><p>Durante mi viaje entendí una cosa.</p></div>
+                <div class="td-frase" data-frase-td="2"><p>Algunos lugares conservaban cielos llenos de estrellas.</p></div>
+                <div class="td-frase" data-frase-td="3"><p>Otros apenas dejaban ver unas pocas.</p></div>
+                <div class="td-frase" data-frase-td="4"><p>Pero todavía no entendía por qué.</p></div>
+
+                <div class="td-frase td-frase-chica" data-frase-td="5"><p>Ver los cielos con mis propios ojos ya no era suficiente.</p></div>
+                <div class="td-frase td-frase-chica" data-frase-td="6"><p>Necesitaba encontrar una explicación.</p></div>
+                <div class="td-frase td-frase-chica" data-frase-td="7">
+                    <p>¿Qué hacía que algunos lugares brillaran tanto…<br><span class="td-linea-pausa">…mientras otros seguían siendo oscuros?</span></p>
                 </div>
-                <div class="parrafo-unificado" data-unificado-6a="2">
-                    <p>¿Era solo la cantidad de gente? ¿O había algo más detrás de todo esto?</p>
+
+                <div class="td-frase td-frase-grande" data-frase-td="8">
+                    <p>Para responder esa pregunta…<br>…tenía que mirar los datos.</p>
                 </div>
             </div>
-    
+
+            <!-- Hipótesis: se acumulan una debajo de otra, no se reemplazan -->
+            <div class="td-hipotesis-contenedor" id="td-hipotesis-contenedor">
+                <p class="td-hipotesis" data-hip-td="1">¿Era la población?</p>
+                <p class="td-hipotesis" data-hip-td="2">¿La urbanización?</p>
+                <p class="td-hipotesis" data-hip-td="3">¿La cantidad de luces?</p>
+                <p class="td-hipotesis" data-hip-td="4">¿Existía algún patrón detrás de todo esto?</p>
+            </div>
+
         </div>
-    
-        <div class="disparador-unificado-6a" data-paso-6a="1"></div>
-        <div class="disparador-unificado-6a" data-paso-6a="2"></div>
-    
+
+        <!-- DISPARADORES: 13 tramos de 100vh, uno por cada beat de la escena -->
+        <div class="td-disparador" data-paso-td="1"></div>
+        <div class="td-disparador" data-paso-td="2"></div>
+        <div class="td-disparador" data-paso-td="3"></div>
+        <div class="td-disparador" data-paso-td="4"></div>
+        <div class="td-disparador" data-paso-td="5"></div>
+        <div class="td-disparador" data-paso-td="6"></div>
+        <div class="td-disparador" data-paso-td="7"></div>
+        <div class="td-disparador" data-paso-td="8"></div>
+        <div class="td-disparador" data-paso-td="9"></div>
+        <div class="td-disparador" data-paso-td="10"></div>
+        <div class="td-disparador" data-paso-td="11"></div>
+        <div class="td-disparador" data-paso-td="12"></div>
+        <div class="td-disparador" data-paso-td="13"></div>
+
     </section>
 
     <div class="seccion-grafico">
@@ -694,7 +777,7 @@
 
             </div> <!-- cierre grilla-graficos-mundo -->
 
-            <div style="height: 240px;"></div>
+            <div class="quitar-warning"></div>
 
         </div> <!-- cierre contenedor-fijo-mundo-graficos -->
 
@@ -835,6 +918,7 @@
 
     <script src="https://d3js.org/d3.v6.js"></script>
     <script src="js/escena-cielos.js"></script>
+    <script src="js/escena-transicion-datos.js"></script>
 
     <script>
         window.Flourish = { disable_autoload: true };

@@ -214,29 +214,6 @@ document.addEventListener("DOMContentLoaded", () => {
     disparadoresE6.forEach(d => observadorE6.observe(d));
 
     // ==========================================
-    // LÓGICA ESCENA 6A (Transición datos)
-    // ==========================================
-    const disparadoresE6a = document.querySelectorAll(".disparador-unificado-6a");
-    const parrafos6a = document.querySelectorAll("[data-unificado-6a]");
-
-    const observador6a = new IntersectionObserver((entradas) => {
-        entradas.forEach(entrada => {
-            if (entrada.isIntersecting) {
-                const paso = entrada.target.getAttribute("data-paso-6a");
-                parrafos6a.forEach(p => {
-                    if (p.getAttribute("data-unificado-6a") === paso) {
-                        p.classList.add("activo-unificado");
-                    } else {
-                        p.classList.remove("activo-unificado");
-                    }
-                });
-            }
-        });
-    }, { root: null, rootMargin: "-30% 0px -50% 0px", threshold: 0 });
-
-    disparadoresE6a.forEach(d => observador6a.observe(d));
-
-    // ==========================================
     // LÓGICA ESCENA 6C (Transición puente)
     // ==========================================
     const disparadoresE6c = document.querySelectorAll(".disparador-unificado-6c");

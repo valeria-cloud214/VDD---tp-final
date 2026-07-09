@@ -337,9 +337,9 @@
        width: 100%;
    }
    
-   /* escena-6a y 6c reutilizan .escena-scroll-unificada pero solo tienen 2
-      disparadores cada una: achicamos su altura para que no quede scroll muerto */
-   #escena-6a,
+   /* escena-6c reutiliza .escena-scroll-unificada pero sólo tiene 2
+      disparadores: achicamos su altura para que no quede scroll muerto.
+      (escena-6a tiene su propia sección con su propia altura — ver más abajo) */
    #escena-6c {
        height: 260vh; /* sticky (100vh) + 2 disparadores (100vh c/u) + buffer chico */
    }
@@ -765,22 +765,269 @@
    }
    
    /* ==========================================================================
-      ESCENA 6A — Slide de transición datos
+      ESCENA 6A — De la observación a la investigación
+      El cielo de Junín (ver js/escena-transicion-datos.js) sigue exactamente
+      igual que al terminar la escena 6: misma composición, mismo tono. No hay
+      foto nueva ni corte — sólo se apaga el panel lateral heredado, el
+      paisaje se va simplificando de a poco con el scroll, y el texto flota
+      sin tarjeta (sólo tipografía y aire) sobre el cielo. El final ya casi no
+      tiene paisaje: unos pocos puntos geométricos sobre fondo oscuro,
+      anticipando el lenguaje visual del scatter plot que viene después.
       ========================================================================== */
-   
-      .foto-transicion-datos {
-       background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("../fotos/E6F1.png");
+
+   .escena-transicion-datos {
+       position: relative;
+       width: 100%;
+       height: 1440vh; /* sticky (100vh) + 13 disparadores (100vh c/u) + buffer chico */
+       background-color: #070912;
    }
-   
-   /* Disparadores propios de 6a */
-   .disparador-unificado-6a {
+
+   .pin-transicion-datos {
+       position: sticky;
+       top: 0;
+       left: 0;
+       width: 100%;
+       height: 100vh;
+       overflow: hidden;
+       background-color: #070912;
+   }
+
+   .td-cielo {
+       position: absolute;
+       inset: 0;
+       width: 100%;
+       height: 100%;
+   }
+
+   #svg-transicion-datos {
+       width: 100%;
+       height: 100%;
+       display: block;
+   }
+
+   /* Capas que se transforman con el scroll: cada una a su propio ritmo, para
+      que el cambio se sienta como un lento correr de cortina, no como un corte */
+   #td-via-lactea,
+   #td-resplandor,
+   #td-estrellas {
+       opacity: 1;
+       transition: opacity 2.4s ease;
+   }
+
+   #td-horizonte {
+       opacity: 1;
+       transition: filter 2.4s ease, opacity 2.4s ease;
+   }
+
+   #td-anotaciones,
+   #td-nodos {
+       opacity: 0;
+       transition: opacity 2s ease;
+   }
+
+   #td-velo-negro {
+       opacity: 0;
+       transition: opacity 2.6s ease;
+   }
+
+   /* Paso "Pero todavía no entendía por qué": el paisaje empieza a perder
+      color y detalle, muy sutilmente — nada desaparece todavía */
+   .td-cielo.td-simplifica #td-horizonte {
+       filter: brightness(0.62) saturate(0.4);
+   }
+   .td-cielo.td-simplifica #td-via-lactea {
+       opacity: 0.45;
+   }
+
+   /* Primeras anotaciones: trazos de astrónomo, no de gráfico estadístico */
+   .td-cielo.td-anotado #td-anotaciones {
+       opacity: 1;
+   }
+
+   /* Paso "¿Existía algún patrón...?": el cambio más importante — el paisaje
+      se retira y el cielo empieza a leerse como información */
+   .td-cielo.td-patron #td-horizonte,
+   .td-cielo.td-patron #td-resplandor,
+   .td-cielo.td-patron #td-via-lactea {
+       opacity: 0;
+   }
+   .td-cielo.td-patron #td-nodos {
+       opacity: 1;
+   }
+   .td-cielo.td-patron #td-estrellas {
+       opacity: 0.4;
+   }
+   .td-cielo.td-patron #td-velo-negro {
+       opacity: 0.62;
+   }
+
+   /* Frase final: muchísimo espacio negativo, apenas quedan puntos */
+   .td-cielo.td-final #td-velo-negro {
+       opacity: 0.86;
+   }
+   .td-cielo.td-final #td-nodos {
+       opacity: 0.55;
+   }
+
+   .td-anotacion-linea {
+       stroke: var(--acento);
+       stroke-opacity: 0.32;
+       stroke-width: 1;
+       fill: none;
+   }
+
+   .td-anotacion-punto {
+       stroke: var(--acento);
+       stroke-opacity: 0.55;
+       stroke-width: 1;
+       fill: none;
+   }
+
+   .td-nodo {
+       stroke: var(--acento);
+       stroke-opacity: 0.75;
+       stroke-width: 1.2;
+       fill: rgba(56, 189, 248, 0.12);
+   }
+
+   .td-nodo-linea {
+       stroke: var(--acento);
+       stroke-opacity: 0.2;
+       stroke-width: 1;
+   }
+
+   /* Frases sueltas: nada de tarjeta ni fondo — sólo tipografía blanca con
+      mucho aire alrededor, apoyada en el contraste del cielo oscuro */
+   .td-texto-contenedor {
+       position: absolute;
+       inset: 0;
+       z-index: 3;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       pointer-events: none;
+       padding: 0 12%;
+   }
+
+   .td-frase {
+       position: absolute;
+       max-width: 780px;
+       text-align: center;
+       opacity: 0;
+       transform: translateY(16px);
+       transition: opacity 1.1s ease, transform 1.1s ease;
+   }
+
+   .td-frase.activo-td {
+       opacity: 1;
+       transform: translateY(0);
+   }
+
+   .td-frase p {
+       font-family: var(--font-heading, 'Nunito', sans-serif);
+       font-weight: 600;
+       font-size: 2.3rem;
+       line-height: 1.5;
+       color: #ffffff;
+       /* Halo oscuro en capas (no un texto-shadow único): sin esto, el texto
+          se pierde justo donde pasa por detrás la franja clara de la Vía
+          Láctea. Rodea cada letra en vez de agregar una caja. */
+       text-shadow:
+           0 0 10px rgba(0, 0, 0, 0.9),
+           0 0 26px rgba(0, 0, 0, 0.8),
+           0 4px 18px rgba(0, 0, 0, 0.75);
+       letter-spacing: 0.01em;
+   }
+
+   .td-frase-chica p {
+       font-size: 1.5rem;
+       font-weight: 400;
+       color: rgba(248, 250, 252, 0.9);
+   }
+
+   .td-frase-grande p {
+       font-size: 2.7rem;
+   }
+
+   /* Segunda línea de la pregunta central: aparece con una pequeña pausa
+      propia, como si Jorge dejara flotar la idea antes de completarla */
+   .td-linea-pausa {
+       display: inline-block;
+       opacity: 0;
+       transition: opacity 0.9s ease 0.7s;
+   }
+
+   .td-frase.activo-td .td-linea-pausa {
+       opacity: 1;
+   }
+
+   /* Hipótesis: se van acumulando una debajo de otra, nunca se reemplazan */
+   .td-hipotesis-contenedor {
+       position: absolute;
+       left: 0;
+       right: 0;
+       top: 50%;
+       transform: translateY(-50%);
+       z-index: 3;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       gap: 22px;
+       padding: 0 12%;
+       pointer-events: none;
+       opacity: 1;
+       transition: opacity 1.4s ease;
+   }
+
+   .td-hipotesis-contenedor.td-oculto {
+       opacity: 0;
+   }
+
+   .td-hipotesis {
+       font-family: var(--font-heading, 'Nunito', sans-serif);
+       font-size: 1.7rem;
+       font-weight: 600;
+       color: #ffffff;
+       text-shadow:
+           0 0 8px rgba(0, 0, 0, 0.9),
+           0 0 20px rgba(0, 0, 0, 0.8),
+           0 4px 14px rgba(0, 0, 0, 0.75);
+       opacity: 0;
+       transform: translateY(14px);
+       transition: opacity 0.9s ease, transform 0.9s ease;
+   }
+
+   .td-hipotesis.activo-td {
+       opacity: 1;
+       transform: translateY(0);
+   }
+
+   .td-disparador {
        height: 100vh;
        width: 100%;
        position: relative;
        pointer-events: none;
    }
-   
-   
+
+   @media (max-width: 760px) {
+       .td-frase p {
+           font-size: 1.5rem;
+       }
+       .td-frase-grande p {
+           font-size: 1.8rem;
+       }
+       .td-frase-chica p {
+           font-size: 1.15rem;
+       }
+       .td-hipotesis {
+           font-size: 1.15rem;
+       }
+   }
+
+   .quitar-warning {
+    height: 240px;
+   }
+
    /*-----------------------------------------------------------------------------*/
    /*                                 Gráfico poblacion                           */
    /*-----------------------------------------------------------------------------*/
