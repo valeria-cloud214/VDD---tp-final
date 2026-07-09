@@ -337,13 +337,9 @@
        width: 100%;
    }
    
-   /* escena-6c reutiliza .escena-scroll-unificada pero sólo tiene 2
-      disparadores: achicamos su altura para que no quede scroll muerto.
-      (escena-6a tiene su propia sección con su propia altura — ver más abajo) */
-   #escena-6c {
-       height: 260vh; /* sticky (100vh) + 2 disparadores (100vh c/u) + buffer chico */
-   }
-   
+   /* (escena-6a y escena-6c ya no usan esta clase compartida — cada una
+      tiene su propia sección con su propia altura, ver más abajo) */
+
    /* Fija el fondo y el contenido durante el scroll */
    .contenedor-fijo-unificado {
        position: sticky;
@@ -1130,147 +1126,306 @@
    }
    
    /* ==========================================================================
-      ESCENA 6C — Transición puente
+      Reutilizada por escena-8-transicion (el propio scatter/6c ya no la usa)
       ========================================================================== */
-   
-      .foto-puente-pizarron {
-       background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0,0,0,0.3)), 
-                         url("../fotos/E6F1.png");
-   }
-   
+
    .contenido-centrado {
        justify-content: center !important;
        align-items: center !important;
        text-align: center;
        max-width: 100% !important;
    }
-   
+
    .contenido-centrado .parrafo-unificado {
        text-align: center;
        max-width: 700px;
        margin: 0 auto;
    }
-   
-   .disparador-unificado-6c {
+
+   /* ==========================================================================
+      ESCENA 6C — Puente hacia la física de la contaminación lumínica
+      Pequeño descanso narrativo entre el scatter (que muestra un patrón) y
+      la explicación física (por qué existe ese patrón). Fondo casi negro,
+      mucho espacio negativo, animaciones lentas: primero un par de frases
+      sueltas, después un mini-gráfico discreto que recuerda la relación
+      población↔luz, y por último una única farola que se enciende — esa
+      misma imagen es el punto de partida visual de la escena "luz" que sigue.
+      ========================================================================== */
+
+   /* El scatter (#contenedor-svg, en la sección anterior) se desvanece antes
+      de scrollear fuera de pantalla, para que no corte de golpe */
+   #contenedor-svg {
+       transition: opacity 1.8s ease;
+   }
+   #contenedor-svg.tf-desvanecido {
+       opacity: 0;
+   }
+   .tf-disparador-salida-grafico {
        height: 100vh;
        width: 100%;
        position: relative;
        pointer-events: none;
    }
-   
-   /* ==========================================================================
-      ESCENA "LUZ" — Intro de Jorge en el pizarrón (superpuesta)
-      Vive DENTRO del mismo contenedor pegajoso que la ilustración (ver más
-      abajo), como una capa por encima de todo lo demás. Así la disolución
-      hacia la ciudad no depende de que dos secciones con scroll-jacking
-      empalmen justo a tiempo — nunca hay un instante sin nada dibujado.
-      ========================================================================== */
-   
-   .intro-pizarron-overlay {
-       position: absolute;
-       inset: 0;
-       z-index: 10; /* por encima del SVG, los textos y el panel */
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       /* Sin background-color propio a propósito: lo único opaco acá es
-          .fondo-aula-img (la imagen del aula, que ya cubre el 100%). Si este
-          contenedor tuviera su propio fondo, seguiría tapando la ilustración
-          para siempre aun después de que el pizarrón termine de disolverse,
-          porque sólo animamos la opacidad de sus hijos, no la de este div. */
-   }
-   
-   /* Las frases de la intro las anima GSAP directamente (ver escena-luz.js):
-      apagamos la transición CSS para que no se sume una segunda suavización
-      sobre el scrub del scroll. */
-   .intro-pizarron-overlay .texto-pizarron {
-       transition: none;
-   }
-   
-   /* ==========================================================================
-      Elementos compartidos del pizarrón (aula, marco, texto tiza, telón)
-      ========================================================================== */
-   
-   /* Imagen del aula de fondo */
-   .fondo-aula-img {
-       position: absolute;
-       top: 0; left: 0;
-       width: 100%; height: 100%;
-       background-image: url("../fotos/pizarron.png");
-       background-size: cover;
-       background-position: center;
-       z-index: 1;
-   }
-   
-   /* Marco del pizarrón — construido en CSS */
-   .pizarron-marco {
+
+   .escena-transicion-fisica {
        position: relative;
-       z-index: 2;
-       width: 44%;
-       height: 58vh;
-       background: #1e3d2a;
-       border: 10px solid #3d2b14;
-       border-radius: 4px;
-       box-shadow: 
-           0 0 0 3px #2a1f0e,
-           0 8px 32px rgba(0,0,0,0.8),
-           inset 0 0 60px rgba(0,0,0,0.25);
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       overflow: hidden;
+       width: 100%;
+       height: 1440vh; /* sticky (100vh) + 13 disparadores (100vh c/u) + buffer chico */
+       background-color: #060816;
    }
-   
-   /* Textura sutil de tiza en el fondo del pizarrón */
-   .pizarron-marco::before {
-       content: '';
+
+   .pin-transicion-fisica {
+       position: sticky;
+       top: 0;
+       left: 0;
+       width: 100%;
+       height: 100vh;
+       overflow: hidden;
+       background-color: #060816;
+   }
+
+   #svg-transicion-fisica {
        position: absolute;
        inset: 0;
-       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-       opacity: 0.08;
-       pointer-events: none;
+       width: 100%;
+       height: 100%;
+       display: block;
    }
-   
-   /* Bandeja de tiza abajo del pizarrón */
-   .pizarron-marco::after {
-       content: '';
-       position: absolute;
-       bottom: 0; left: 0; right: 0;
-       height: 14px;
-       background: #2a1e0e;
-       border-top: 2px solid #3d2b14;
+
+   #tf-luces {
+       opacity: 0;
+       transition: opacity 2.2s ease;
    }
-   
-   /* Cada bloque de texto dentro del pizarrón */
-   .texto-pizarron {
+   .pin-transicion-fisica.tf-luces #tf-luces {
+       opacity: 1;
+   }
+
+   #tf-lampara {
+       opacity: 0;
+       transition: opacity 2s ease;
+   }
+   .pin-transicion-fisica.tf-farol #tf-lampara {
+       opacity: 1;
+   }
+
+   /* Apagada por defecto: nada de halo hasta que la escena la "encienda" */
+   #tf-halo-chico,
+   #tf-halo-grande {
+       opacity: 0;
+       transition: opacity 3s ease;
+   }
+   #tf-bulbo {
+       fill: #544a3a;
+       transition: fill 2.5s ease;
+   }
+   .pin-transicion-fisica.tf-farol-encendido #tf-halo-chico {
+       opacity: 1;
+   }
+   .pin-transicion-fisica.tf-farol-encendido #tf-halo-grande {
+       opacity: 1;
+       transition-delay: 0.4s;
+   }
+   .pin-transicion-fisica.tf-farol-encendido #tf-bulbo {
+       fill: #ffdca0;
+   }
+
+   /* Mini-gráfico: apoyo visual chico, nunca compite con el scatter anterior */
+   .tf-mini-grafico {
        position: absolute;
-       width: 80%;
-       text-align: center;
+       left: 50%;
+       bottom: 14%;
+       transform: translate(-50%, 12px);
+       width: 25vw;
+       min-width: 220px;
+       max-width: 320px;
        z-index: 3;
        opacity: 0;
-       transform: translateY(10px);
-       transition: opacity 0.8s ease, transform 0.8s ease;
+       transition: opacity 1.4s ease, transform 1.4s ease;
        pointer-events: none;
-       padding: 20px;
    }
-   
-   /* Tipografía estilo tiza */
-   .texto-pizarron p {
-       font-family: 'Nunito', sans-serif;
-       font-size: 1.25rem;
-       line-height: 1.85;
-       color: rgba(240, 235, 210, 0.90);
-       text-shadow: 
-           0 0 12px rgba(240, 235, 210, 0.15),
-           1px 1px 0px rgba(0,0,0,0.3);
-       margin-bottom: 12px;
+   .pin-transicion-fisica.tf-grafico .tf-mini-grafico {
+       opacity: 1;
+       transform: translate(-50%, 0);
+   }
+   .tf-mini-grafico svg {
+       width: 100%;
+       height: auto;
+       display: block;
+   }
+   #tf-linea-grafico {
+       transition: stroke-dashoffset 2.4s ease;
+   }
+   .tf-mini-grafico-etiquetas {
+       display: flex;
+       justify-content: space-between;
+       margin-top: 6px;
+       font-size: 0.7rem;
        letter-spacing: 0.02em;
+       color: rgba(226, 232, 240, 0.5);
    }
-   
-   .texto-pizarron p:last-child {
-       margin-bottom: 0;
+
+   /* Nota de fuente: muy chica y tenue a propósito, para que no compita
+      visualmente con el resto de la escena */
+   .tf-mini-grafico-fuente {
+       margin-top: 10px;
+       font-size: 0.6rem;
+       line-height: 1.4;
+       letter-spacing: 0.01em;
+       color: rgba(226, 232, 240, 0.32);
+       text-align: center;
    }
-   
+
+   /* Infografía puente: aparece después del mini-gráfico, con la misma
+      mecánica de fade que el resto de la escena. Fila horizontal chica,
+      líneas finas, nada de cajas ni colores fuertes — se siente como una
+      explicación editorial, no como un gráfico. */
+   .tf-infografia {
+       position: absolute;
+       left: 50%;
+       top: 50%;
+       transform: translate(-50%, -50%);
+       z-index: 3;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       gap: 18px;
+       max-width: 1100px;
+       padding: 0 6%;
+       opacity: 0;
+       pointer-events: none;
+       transition: opacity 1.8s ease;
+   }
+   .pin-transicion-fisica.tf-infografia-visible .tf-infografia {
+       opacity: 1;
+   }
+
+   .tf-info-bloque {
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       gap: 10px;
+       width: 165px;
+       text-align: center;
+       opacity: 0;
+       transition: opacity 1.6s ease;
+   }
+   .tf-info-bloque.visible-tf {
+       opacity: 1;
+   }
+
+   .tf-info-icono {
+       font-size: 2.1rem;
+       line-height: 1;
+   }
+
+   .tf-info-texto {
+       font-size: 0.92rem;
+       line-height: 1.35;
+       color: rgba(248, 250, 252, 0.92);
+       text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+   }
+
+   /* Flecha fina entre bloques: gris tenue por defecto, se "ilumina" en
+      tono cálido a medida que aparece el bloque siguiente */
+   .tf-info-flecha {
+       font-size: 1.3rem;
+       line-height: 1;
+       color: rgba(255, 255, 255, 0.18);
+       transition: color 1.4s ease, text-shadow 1.4s ease;
+   }
+   .tf-info-flecha.encendida-tf {
+       color: #f6c453;
+       text-shadow: 0 0 12px rgba(246, 196, 83, 0.5);
+   }
+
+   @media (max-width: 900px) {
+       .tf-infografia {
+           flex-direction: column;
+           gap: 10px;
+       }
+       .tf-info-flecha {
+           transform: rotate(90deg);
+       }
+       .tf-info-bloque {
+           width: auto;
+       }
+   }
+
+   /* Frases sueltas: aparecen y desaparecen en el mismo lugar — sin cajas,
+      sin desplazamiento, "simplemente aparecen" */
+   .tf-texto-contenedor {
+       position: absolute;
+       inset: 0;
+       z-index: 4;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       pointer-events: none;
+       padding: 0 12%;
+   }
+
+   .tf-frase {
+       position: absolute;
+       max-width: 760px;
+       text-align: center;
+       opacity: 0;
+       transition: opacity 1.8s ease;
+   }
+
+   .tf-frase.activo-tf {
+       opacity: 1;
+   }
+
+   .tf-frase p {
+       font-family: var(--font-heading, 'Nunito', sans-serif);
+       font-weight: 600;
+       font-size: 2.2rem;
+       line-height: 1.55;
+       color: #ffffff;
+       letter-spacing: 0.01em;
+       text-shadow:
+           0 0 10px rgba(0, 0, 0, 0.9),
+           0 0 26px rgba(0, 0, 0, 0.8),
+           0 4px 18px rgba(0, 0, 0, 0.75);
+   }
+
+   .tf-frase-final p {
+       font-size: 2rem;
+   }
+
+   /* Segunda línea de cada frase: llega con una pequeña pausa propia */
+   .tf-linea-pausa {
+       display: inline-block;
+       opacity: 0;
+       transition: opacity 1s ease 0.8s;
+   }
+   .tf-frase.activo-tf .tf-linea-pausa {
+       opacity: 1;
+   }
+
+   .tf-disparador {
+       height: 100vh;
+       width: 100%;
+       position: relative;
+       pointer-events: none;
+   }
+
+   @media (max-width: 760px) {
+       .tf-frase p {
+           font-size: 1.5rem;
+       }
+       .tf-frase-final p {
+           font-size: 1.35rem;
+       }
+       .tf-mini-grafico {
+           width: 60vw;
+       }
+   }
+
+   /* (La intro de Jorge en el pizarrón que vivía acá se quitó por completo:
+      la escena "luz" ahora arranca directo sobre la ciudad ya renderizada,
+      sin ningún overlay superpuesto — ver js/escena-luz.js.) */
+
    /* Telón */
    #telon {
        position: fixed;
@@ -1309,7 +1464,7 @@
    .escena-luz-lumínica {
        position: relative;
        width: 100%;
-       height: 1500vh; /* 1400vh de recorrido animado (intro pizarrón + cámara + tramo interactivo) + 100vh de colchón para el telón final */
+       height: 1200vh; /* 1100vh de recorrido animado (cámara + tramo interactivo) + 100vh de colchón para el telón final */
        background-color: #03040a;
    }
    
@@ -1332,14 +1487,14 @@
    }
    
    /* Espaciador invisible entre la ilustración pegajosa y el disparador del
-      telón. 1300vh + los 100vh de .pin-luz = 1400vh, exactamente el recorrido
-      animado (DURACION_SCRUB_VH en escena-luz.js, que ahora incluye ~5 unidades
-      de "colchón interactivo" al final para poder usar el slider antes de que
-      arranque el telón); + 100vh de disparador-telon = 1500vh, igual a la
+      telón. 1000vh + los 100vh de .pin-luz = 1100vh, exactamente el recorrido
+      animado (DURACION_SCRUB_VH en escena-luz.js, que incluye ~5 unidades de
+      "colchón interactivo" al final para poder usar el slider antes de que
+      arranque el telón); + 100vh de disparador-telon = 1200vh, igual a la
       altura declarada de .escena-luz-lumínica. Si se cambia uno de estos tres
       números, hay que actualizar los otros dos. */
    .espaciador-luz {
-       height: 1300vh;
+       height: 1000vh;
        width: 100%;
        position: relative;
        pointer-events: none;

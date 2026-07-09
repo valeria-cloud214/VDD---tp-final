@@ -11,10 +11,10 @@
       scroll no cambia de imagen, sólo mueve la cámara dentro de la misma
       ilustración (traslada y/x, y al final achica de forma uniforme para
       el efecto de "ver todo junto", sin deformar nada).
-   4) La mini-introducción de Jorge frente al pizarrón es la primera fase
-      de esa MISMA timeline (un overlay superpuesto a la ilustración, ya
-      renderizada detrás) — no una sección aparte, para que la transición
-      hacia la ciudad nunca deje un cuadro vacío/negro entre medio.
+   4) Arranca directo sobre la ciudad (sin intro superpuesta): el primer
+      cuadro visible es la misma ilustración en su estado de reposo, para
+      que la escena anterior (el puente hacia la física, que termina con
+      una farola encendida) desemboque acá sin ningún corte de imagen.
    5) Conecta el slider final: un único "nivel de contaminación" (0-100)
       que decide cuántas ventanas/faroles están encendidos, la cantidad
       de rayos, el brillo de la atmósfera y el contraste de las estrellas.
@@ -412,24 +412,18 @@ document.addEventListener("DOMContentLoaded", () => {
     render(0);
 
     // ======================================================================
-    // 3. TIMELINE ÚNICA — intro del pizarrón + recorrido de cámara
+    // 3. TIMELINE ÚNICA — recorrido de cámara
     // ======================================================================
-    // Todo (la intro de Jorge Y el viaje de cámara) vive en UNA sola
-    // ScrollTrigger/timeline, pinneada por el mismo .pin-luz vía CSS sticky.
-    // Antes la intro tenía su propia sección con su propio pin, y el "empalme"
-    // entre las dos secciones podía desalinearse con el disparador del telón
-    // y otros elementos, dejando huecos en negro. Al fusionarlas, no existe
-    // ningún punto de corte entre "una escena" y "la otra": es un único
-    // recorrido continuo sobre la misma ilustración, siempre visible.
+    // Toda la escena vive en UNA sola ScrollTrigger/timeline, pinneada por
+    // .pin-luz vía CSS sticky. Antes esta timeline arrancaba con la intro de
+    // Jorge frente al pizarrón (un overlay que se disolvía en los primeros
+    // ~4 "segundos" de timeline); se quitó por completo para que el primer
+    // cuadro visible de esta escena sea directamente la ciudad — la misma
+    // que veía el usuario en la escena anterior (la farola encendida de
+    // escena-6c) — sin ningún corte hacia una imagen nueva.
     (function timelineUnica() {
         const seccion = document.getElementById("escena-luz");
         if (!seccion) return;
-
-        const introOverlay = document.getElementById("intro-pizarron-overlay");
-        const linea1 = document.getElementById("linea-pizarron-1");
-        const linea2 = document.getElementById("linea-pizarron-2");
-        const marcoIntro = document.getElementById("pizarron-intro-marco");
-        const aulaIntro = introOverlay ? introOverlay.querySelector(".fondo-aula-img") : null;
 
         const textos = {
             1: document.querySelector('[data-paso-luz="1"]'),
@@ -442,11 +436,13 @@ document.addEventListener("DOMContentLoaded", () => {
         };
         const panel = document.getElementById("panel-slider-luz");
 
-        // Duración fija en vh de la parte "activa" del scroll (intro +
-        // recorrido de cámara + tramo final donde el panel ya está visible
-        // y el usuario puede jugar con el slider). El resto de la sección,
-        // más abajo en el HTML, es el colchón para el telón final.
-        const DURACION_SCRUB_VH = 1400;
+        // Duración fija en vh de la parte "activa" del scroll (recorrido de
+        // cámara + tramo final donde el panel ya está visible y el usuario
+        // puede jugar con el slider). El resto de la sección, más abajo en
+        // el HTML, es el colchón para el telón final. (Antes eran 1400vh,
+        // que incluían la intro del pizarrón ya eliminada: se achicó en la
+        // misma proporción en que se acortó la timeline de abajo.)
+        const DURACION_SCRUB_VH = 1100;
 
         const tl = gsap.timeline({
             scrollTrigger: {
@@ -473,54 +469,39 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // --- FASE 0 — Jorge frente al pizarrón (posiciones 0 a 4) ----------
-        tl.set(linea1, { opacity: 0, y: 14 })
-          .set(linea2, { opacity: 0, y: 14 })
-          .to(linea1, { opacity: 1, y: 0, duration: 1 }, 0)
-          .to(linea1, { opacity: 0, y: -14, duration: 0.6 }, 1.6)
-          .to(linea2, { opacity: 1, y: 0, duration: 1 }, 1.9)
-          .to(linea2, { opacity: 0, y: -14, duration: 0.5 }, 3.0)
-          // Transición cinematográfica: el pizarrón se acerca y se disuelve,
-          // revelando la ciudad (ya renderizada detrás, en su estado de reposo).
-          .to(marcoIntro, { scale: 1.15, opacity: 0, duration: 0.8, ease: "power1.in" }, 3.2)
-          .to(aulaIntro, { opacity: 0, duration: 0.8, ease: "power1.in" }, 3.2)
-          // Una vez disuelto, sacamos el overlay de en medio del todo (si no,
-          // aunque sea invisible seguiría "tapando" el panel del slider al
-          // final, porque por defecto un div recibe clics aunque tenga
-          // opacity:0).
-          .set(introOverlay, { pointerEvents: "none" }, 4.0);
-
-        // --- FASE 1: sólo la ciudad (posición 4.0) --------------------------
-        tl.call(() => mostrarSoloTexto(1), null, 4.0)
-          .set(mundo, { y: CONFIG.camara.paso1.y }, 4.0);
+        // --- FASE 1: sólo la ciudad (posición 0) -----------------------------
+        // Arranca directo acá: nada de intro superpuesta, la ciudad ya está
+        // renderizada (en su estado de reposo) desde el primer cuadro.
+        tl.call(() => mostrarSoloTexto(1), null, 0)
+          .set(mundo, { y: CONFIG.camara.paso1.y }, 0);
 
         // PASO 1 → 2: la cámara asciende apenas, aparecen los rayos
-        tl.to(mundo, { y: CONFIG.camara.paso2.y, duration: 1, ease: "none" }, 4.4)
-          .call(() => mostrarSoloTexto(2), null, 4.5)
-          .to(nivelProxy, { v: 18, duration: 1, onUpdate: () => render(nivelProxy.v) }, 4.5);
+        tl.to(mundo, { y: CONFIG.camara.paso2.y, duration: 1, ease: "none" }, 0.4)
+          .call(() => mostrarSoloTexto(2), null, 0.5)
+          .to(nivelProxy, { v: 18, duration: 1, onUpdate: () => render(nivelProxy.v) }, 0.5);
 
         // PASO 3: aparece la atmósfera, los rayos la alcanzan
-        tl.to(mundo, { y: CONFIG.camara.paso3.y, duration: 1, ease: "none" }, 5.6)
-          .call(() => mostrarSoloTexto(3), null, 5.7)
-          .to(capaAtmosfera, { opacity: 0.55, duration: 1 }, 5.7)
-          .to(nivelProxy, { v: 26, duration: 1, onUpdate: () => render(nivelProxy.v) }, 5.7);
+        tl.to(mundo, { y: CONFIG.camara.paso3.y, duration: 1, ease: "none" }, 1.6)
+          .call(() => mostrarSoloTexto(3), null, 1.7)
+          .to(capaAtmosfera, { opacity: 0.55, duration: 1 }, 1.7)
+          .to(nivelProxy, { v: 26, duration: 1, onUpdate: () => render(nivelProxy.v) }, 1.7);
 
         // PASO 4: los rayos se dispersan (curvatura orgánica, sin flechas)
-        tl.to(mundo, { y: CONFIG.camara.paso4.y, duration: 1, ease: "none" }, 6.8)
-          .call(() => mostrarSoloTexto(4), null, 6.9)
+        tl.to(mundo, { y: CONFIG.camara.paso4.y, duration: 1, ease: "none" }, 2.8)
+          .call(() => mostrarSoloTexto(4), null, 2.9)
           .to(dispersión, {
               valor: 1, duration: 1.2,
               onUpdate: () => actualizarCurvaturaRayos(dispersión.valor)
-          }, 6.9);
+          }, 2.9);
 
         // PASO 5: el cielo deja de ser completamente oscuro (glow gradual)
-        tl.to(mundo, { y: CONFIG.camara.paso5.y, duration: 1, ease: "none" }, 8.1)
-          .call(() => mostrarSoloTexto(5), null, 8.2)
-          .to(nivelProxy, { v: 40, duration: 1.2, onUpdate: () => render(nivelProxy.v) }, 8.2);
+        tl.to(mundo, { y: CONFIG.camara.paso5.y, duration: 1, ease: "none" }, 4.1)
+          .call(() => mostrarSoloTexto(5), null, 4.2)
+          .to(nivelProxy, { v: 40, duration: 1.2, onUpdate: () => render(nivelProxy.v) }, 4.2);
 
         // PASO 6: aparecen las estrellas — la cámara ya está en el espacio
-        tl.to(mundo, { y: CONFIG.camara.paso6.y, duration: 1.6, ease: "power1.inOut" }, 9.4)
-          .call(() => mostrarSoloTexto(6), null, 9.6)
+        tl.to(mundo, { y: CONFIG.camara.paso6.y, duration: 1.6, ease: "power1.inOut" }, 5.4)
+          .call(() => mostrarSoloTexto(6), null, 5.6)
           .to({ v: 0 }, {
               v: 1, duration: 1.4,
               onUpdate: function () {
@@ -528,7 +509,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   aplicarOpacidadEstrellas(estado.nivel / 100);
                   aplicarOpacidadOrion(estado.nivel / 100);
               }
-          }, 9.6);
+          }, 5.6);
 
         // PASO 7: zoom out — se ve todo el recorrido de la luz de una vez.
         // Escala UNIFORME (no sólo en Y) + recentrado en X: el campo de
@@ -542,22 +523,22 @@ document.addEventListener("DOMContentLoaded", () => {
             scale: CONFIG.camara.paso7.scale,
             duration: 1.6,
             ease: "power2.inOut"
-          }, 11.2)
-          .call(() => mostrarSoloTexto(7), null, 11.3)
+          }, 7.2)
+          .call(() => mostrarSoloTexto(7), null, 7.3)
           // Fijamos el nivel "actual" de contaminación (el punto de partida del slider)
-          .to(nivelProxy, { v: 45, duration: 1, onUpdate: () => render(nivelProxy.v) }, 11.3);
+          .to(nivelProxy, { v: 45, duration: 1, onUpdate: () => render(nivelProxy.v) }, 7.3);
 
         // Colchón final: el texto de cierre se retira y aparece el panel
         // interactivo. A partir de acá el scroll ya no mueve la cámara.
-        tl.to(textos[7], { opacity: 0, duration: 0.6 }, 12.6)
-          .to(panel, { opacity: 1, duration: 1, pointerEvents: "auto" }, 12.7)
+        tl.to(textos[7], { opacity: 0, duration: 0.6 }, 8.6)
+          .to(panel, { opacity: 1, duration: 1, pointerEvents: "auto" }, 8.7)
           // Antes el panel terminaba de aparecer justo en el mismo instante
           // en que arrancaba la zona del telón (0 scroll de margen): apenas
           // se veía, la cortina negra ya lo tapaba. Este tramo "vacío" (nada
           // se anima) extiende la timeline para que, una vez que el panel
           // está del todo visible, quede un buen tramo de scroll para
           // realmente poder tocar el slider antes de que aparezca el telón.
-          .to({}, { duration: 5 }, 13.7);
+          .to({}, { duration: 5 }, 9.7);
     })();
 
     // ======================================================================

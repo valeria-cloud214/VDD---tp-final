@@ -431,30 +431,149 @@
                 <h3>Todas las Regiones</h3>
                 <p>Acá podemos ver la distribución completa de las 19 ciudades de nuestra base de datos, junto a que tan industrializados están.</p>
             </div>
+
+            <!-- Disparador silencioso: mientras el gráfico sigue pegajoso acá
+                 arriba (ver #contenedor-svg), este tramo lo desvanece de a
+                 poco (clase "tf-desvanecido", ver escena-transicion-fisica.js)
+                 ANTES de que termine de scrollear fuera de pantalla. Así la
+                 escena siguiente arranca con el fondo ya limpio, en vez de
+                 con el scatter cortándose de golpe. -->
+            <div class="tf-disparador-salida-grafico" data-salida-grafico="1"></div>
         </div>
         </div>
 
     </div>
 
-     <!-- =============================================
-     ESCENA 6C: TRANSICIÓN SCATTER → PIZARRÓN
-     ============================================= -->
-    <section id="escena-6c" class="escena-scroll-unificada">
+    <!-- =============================================
+        ESCENA 6C — Puente hacia la física de la contaminación lumínica
+        El scatter recién visto mostraba una relación (más población, menos
+        estrellas), pero no una explicación. Esta escena es el pequeño
+        descanso narrativo entre "encontramos un patrón en los datos" y
+        "vamos a entender el mecanismo físico detrás": el fondo se queda
+        oscuro y casi vacío, aparecen unas frases sueltas (sin cajas), un
+        mini-gráfico discreto recuerda la relación población↔luz, y todo eso
+        se disuelve hasta quedar una única farola apagada. Se enciende
+        lentamente con la frase final, y esa imagen —la farola ya
+        encendida— es el punto de partida de la escena siguiente.
+        ============================================= -->
+    <section id="escena-6c" class="escena-transicion-fisica">
 
-        <div class="contenedor-fijo-unificado">
-            <div class="fondo-pantalla-completa foto-puente-pizarron"></div>
-            <div class="contenido-flotante contenido-centrado">
-                <div class="parrafo-unificado activo-unificado" data-unificado-6c="1">
-                    <p>Los datos me daban un mapa. Pero un mapa sin explicación no sirve de nada.</p>
+        <div class="pin-transicion-fisica">
+
+            <svg id="svg-transicion-fisica" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+
+                <defs>
+                    <filter id="tf-filtro-desenfoque" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="5" />
+                    </filter>
+                    <radialGradient id="tf-grad-halo-chico" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#ffdca0" stop-opacity="0.9" />
+                        <stop offset="100%" stop-color="#ffdca0" stop-opacity="0" />
+                    </radialGradient>
+                    <radialGradient id="tf-grad-halo-grande" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#ffcf8a" stop-opacity="0.4" />
+                        <stop offset="100%" stop-color="#ffcf8a" stop-opacity="0" />
+                    </radialGradient>
+                </defs>
+
+                <!-- Luces urbanas lejanas: no son estrellas, son ventanas
+                     desenfocadas a la distancia. Muy pocas, muy discretas. -->
+                <g id="tf-luces" filter="url(#tf-filtro-desenfoque)">
+                    <circle cx="180" cy="260" r="5" fill="#ffb46a" opacity="0.35" />
+                    <circle cx="340" cy="410" r="4" fill="#ffcf8a" opacity="0.3" />
+                    <circle cx="1120" cy="300" r="6" fill="#ffb46a" opacity="0.3" />
+                    <circle cx="1240" cy="460" r="4" fill="#ffcf8a" opacity="0.25" />
+                    <circle cx="980" cy="200" r="3.5" fill="#ffcf8a" opacity="0.28" />
+                    <circle cx="240" cy="530" r="3.5" fill="#ffb46a" opacity="0.22" />
+                    <circle cx="1050" cy="560" r="5" fill="#ffcf8a" opacity="0.26" />
+                </g>
+
+                <!-- La farola: única protagonista del cierre de esta escena -->
+                <g id="tf-lampara">
+                    <ellipse id="tf-halo-grande" cx="700" cy="470" rx="280" ry="280" fill="url(#tf-grad-halo-grande)" />
+                    <rect x="694" y="470" width="12" height="230" fill="#1a1622" />
+                    <path d="M 660,470 Q 700,430 740,470 Z" fill="#1a1622" />
+                    <circle id="tf-halo-chico" cx="700" cy="470" r="90" fill="url(#tf-grad-halo-chico)" />
+                    <circle id="tf-bulbo" cx="700" cy="470" r="9" fill="#544a3a" />
+                </g>
+
+            </svg>
+
+            <!-- Mini-gráfico: sólo un recordatorio visual, no compite con el
+                 scatter principal que ya vimos. Los datos reales (D3, desde
+                 grafico-chico.csv) los completa js/escena-transicion-fisica.js;
+                 el "d" de acá abajo es sólo un fallback por si ese fetch falla. -->
+            <div class="tf-mini-grafico" id="tf-mini-grafico">
+                <svg viewBox="0 0 300 170" aria-hidden="true">
+                    <line x1="14" y1="10" x2="14" y2="150" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+                    <line x1="14" y1="150" x2="290" y2="150" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+                    <path id="tf-linea-grafico" d="M 18,142 C 90,132 150,100 180,70 C 220,32 250,20 286,12" fill="none" stroke="#f6c453" stroke-width="2.5" stroke-linecap="round" />
+                </svg>
+                <div class="tf-mini-grafico-etiquetas">
+                    <span>Población (miles de habitantes)</span>
+                    <span>Calidad del cielo nocturno</span>
                 </div>
-                <div class="parrafo-unificado" data-unificado-6c="2">
-                    <p>Para entender por qué pasaba todo esto, necesitaba volver a la física básica.</p>
+                <p class="tf-mini-grafico-fuente">Fuente: Censo Nacional 2022 (INDEC) y Globe at Night (2006–2025).</p>
+            </div>
+
+            <!-- Infografía puente: aparece después de que se desvanece el
+                 mini-gráfico, con la misma mecánica de fade que el resto de
+                 la escena. Resume en 4 pasos muy simples el mecanismo físico
+                 que la próxima escena (contaminación lumínica) va a explicar
+                 en detalle. -->
+            <div class="tf-infografia" id="tf-infografia">
+                <div class="tf-info-bloque" data-info-bloque="1">
+                    <span class="tf-info-icono" aria-hidden="true">👥</span>
+                    <span class="tf-info-texto">Más población</span>
+                </div>
+                <div class="tf-info-flecha" data-info-flecha="1" aria-hidden="true">→</div>
+                <div class="tf-info-bloque" data-info-bloque="2">
+                    <span class="tf-info-icono" aria-hidden="true">💡</span>
+                    <span class="tf-info-texto">Más iluminación artificial</span>
+                </div>
+                <div class="tf-info-flecha" data-info-flecha="2" aria-hidden="true">→</div>
+                <div class="tf-info-bloque" data-info-bloque="3">
+                    <span class="tf-info-icono" aria-hidden="true">🌫️</span>
+                    <span class="tf-info-texto">Más luz dispersada en la atmósfera</span>
+                </div>
+                <div class="tf-info-flecha" data-info-flecha="3" aria-hidden="true">→</div>
+                <div class="tf-info-bloque" data-info-bloque="4">
+                    <span class="tf-info-icono" aria-hidden="true">⭐</span>
+                    <span class="tf-info-texto">Menor visibilidad del cielo</span>
                 </div>
             </div>
+
+            <!-- Frases sueltas: aparecen y desaparecen en el mismo lugar, sin
+                 desplazamiento — "simplemente aparecen" -->
+            <div class="tf-texto-contenedor">
+                <div class="tf-frase" data-frase-tf="1"><p>Los datos mostraban un patrón.</p></div>
+                <div class="tf-frase" data-frase-tf="2">
+                    <p>Cuantas más personas vivían en un lugar…<br><span class="tf-linea-pausa">…menos estrellas podían verse.</span></p>
+                </div>
+                <div class="tf-frase" data-frase-tf="3">
+                    <p>Pero una relación no es una explicación.<br><span class="tf-linea-pausa">Necesitaba entender qué estaba ocultando realmente el cielo.</span></p>
+                </div>
+                <div class="tf-frase tf-frase-final" data-frase-tf="4">
+                    <p>La respuesta siempre estuvo sobre nuestras cabezas…<br><span class="tf-linea-pausa">…y empezaba con algo tan simple como una lámpara.</span></p>
+                </div>
+            </div>
+
         </div>
 
-        <div class="disparador-unificado-6c" data-paso-6c="1"></div>
-        <div class="disparador-unificado-6c" data-paso-6c="2"></div>
+        <!-- DISPARADORES: 13 tramos de 100vh (se sumaron 4 para la infografía) -->
+        <div class="tf-disparador" data-paso-tf="1"></div>
+        <div class="tf-disparador" data-paso-tf="2"></div>
+        <div class="tf-disparador" data-paso-tf="3"></div>
+        <div class="tf-disparador" data-paso-tf="4"></div>
+        <div class="tf-disparador" data-paso-tf="5"></div>
+        <div class="tf-disparador" data-paso-tf="6"></div>
+        <div class="tf-disparador" data-paso-tf="7"></div>
+        <div class="tf-disparador" data-paso-tf="8"></div>
+        <div class="tf-disparador" data-paso-tf="9"></div>
+        <div class="tf-disparador" data-paso-tf="10"></div>
+        <div class="tf-disparador" data-paso-tf="11"></div>
+        <div class="tf-disparador" data-paso-tf="12"></div>
+        <div class="tf-disparador" data-paso-tf="13"></div>
 
     </section>
 
@@ -466,12 +585,13 @@
         es un <g> con id propio y comentado para poder editarla
         después sin afectar al resto. Ver js/escena-luz.js.
 
-        Jorge y el pizarrón son la PRIMERA fase de este mismo recorrido:
-        un overlay superpuesto a la ilustración (ya renderizada debajo)
-        que se disuelve al principio del scroll. Al estar en el mismo
-        contenedor pegajoso que el resto de la escena, la transición no
-        depende de que dos secciones "empalmen" — nunca hay un cuadro
-        vacío/negro entre una cosa y la otra.
+        Arranca directamente sobre la ciudad ya renderizada (sin ningún
+        overlay/intro superpuesto): la escena anterior (puente hacia la
+        física, escena-6c) termina con una única farola encendida sobre
+        fondo oscuro, y acá el primer cuadro visible es esa misma ciudad
+        en su estado de reposo (nivel de contaminación bajo, unas pocas
+        ventanas y faroles encendidos) — la cámara no se mueve ni hay
+        corte de imagen entre una escena y la otra.
         ============================================= -->
     <section id="escena-luz" class="escena-luz-lumínica">
 
@@ -592,22 +712,6 @@
                 </g> <!-- fin #mundo -->
 
             </svg>
-
-            <!-- INTRO: Jorge frente al pizarrón, superpuesto a la ilustración
-                 (que ya está renderizada debajo, quieta en su estado inicial).
-                 Dice dos frases breves y se disuelve al principio del scroll,
-                 revelando la ciudad. No vuelve a aparecer. -->
-            <div class="intro-pizarron-overlay" id="intro-pizarron-overlay">
-                <div class="fondo-aula-img"></div>
-                <div class="pizarron-marco" id="pizarron-intro-marco">
-                    <div class="texto-pizarron" id="linea-pizarron-1">
-                        <p>Después de años intentando entender qué ocurría con el cielo, descubrí que las estrellas nunca desaparecieron.</p>
-                    </div>
-                    <div class="texto-pizarron" id="linea-pizarron-2">
-                        <p>Todo se debía a un fenómeno llamado <strong>contaminación lumínica</strong>.</p>
-                    </div>
-                </div>
-            </div>
 
             <!-- TEXTO: siempre en el mismo lugar de la pantalla; sólo cambia
                  el contenido. Si se lo saca por completo, la ilustración de
@@ -919,6 +1023,7 @@
     <script src="https://d3js.org/d3.v6.js"></script>
     <script src="js/escena-cielos.js"></script>
     <script src="js/escena-transicion-datos.js"></script>
+    <script src="js/escena-transicion-fisica.js"></script>
 
     <script>
         window.Flourish = { disable_autoload: true };
