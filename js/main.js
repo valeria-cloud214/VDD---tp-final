@@ -319,9 +319,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // ya no se muestra acá: ahora es el arranque de la escena de cierre
     // (ver js/escena-cierre.js), que además se encarga de que la grilla se
     // desvanezca gradualmente en vez de aparecer un cartel de texto.
+    
     const disparadoresMG = document.querySelectorAll(".disparador-mundo-graficos");
     const introMG = document.querySelector(".intro-graficos-mundo");
     const grillaMG = document.querySelector(".grilla-graficos-mundo");
+    const celdasGrafico = document.querySelectorAll(".celda-grafico-mundo");
 
     const observadorMG = new IntersectionObserver((entradas) => {
         entradas.forEach(entrada => {
@@ -329,13 +331,47 @@ document.addEventListener("DOMContentLoaded", () => {
                 const paso = entrada.target.getAttribute("data-paso-mg");
                 if (paso === "graficos") {
                     if (introMG) introMG.classList.add("activo-mg");
-                    if (grillaMG) grillaMG.classList.add("activo-mg");
                 }
             }
         });
     }, { root: null, rootMargin: "-10% 0px -20% 0px", threshold: 0 });
 
     disparadoresMG.forEach(d => observadorMG.observe(d));
+
+    // ==========================================
+    // Carga manual de cada gráfico Flourish de la grilla
+    // ==========================================
+    const observadorGraficosMG = new IntersectionObserver((entradas) => {
+        entradas.forEach(entrada => {
+            if (entrada.isIntersecting) {
+                const placeholder = entrada.target.querySelector(".flourish-embed");
+                if (placeholder && !placeholder.dataset.cargado && window.Flourish && window.Flourish.loadEmbed) {
+                    window.Flourish.loadEmbed(placeholder);
+                    placeholder.dataset.cargado = "1";
+
+                    requestAnimationFrame(() => {
+                        entrada.target.style.transform = "translateZ(0)";
+                        void entrada.target.offsetHeight;
+                    });
+
+                    // Flourish crea el <iframe> real recién después de loadEmbed(),
+                    // así que esperamos a que aparezca y a que termine de cargar
+                    // su contenido, en vez de asumir que ya está listo.
+                    const chequearIframe = setInterval(() => {
+                        const iframe = placeholder.querySelector("iframe");
+                        if (iframe) {
+                            clearInterval(chequearIframe);
+                            iframe.addEventListener("load", () => {
+                                entrada.target.classList.add("grafico-listo");
+                            });
+                        }
+                    }, 100);
+                }
+            }
+        });
+    }, { root: null, rootMargin: "300px 0px", threshold: 0.01 });
+
+    celdasGrafico.forEach(c => observadorGraficosMG.observe(c));
 
 }); // ← cierre del DOMContentLoaded
 
