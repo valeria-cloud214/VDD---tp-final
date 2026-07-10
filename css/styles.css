@@ -121,7 +121,7 @@
    
    .escena-scroll-largo {
        position: relative;
-       height: 520vh; /* sticky (100vh) + 4 disparadores (100vh c/u) + buffer chico */
+       height: 680vh; /* sticky (100vh) + 8 disparadores (70vh c/u, sin gap) + buffer chico */
        width: 100%;
    }
    
@@ -189,20 +189,63 @@
        pointer-events: auto;
    }
    
-   /* Clases para las imágenes de fondo (manteniendo tu ruta relativa correcta) */
-   .foto1 { background-image: url("../fotos/E1F1.png"); }
-   .foto2 { background-image: url("../fotos/E1F3.jpg"); }
-   .foto3 { background-image: url("../fotos/E1F2.jpg"); }
-   .foto4 { background-image: url("../fotos/E1F4.jpg"); }
+   /* Las 8 fotos de la Escena 2 */
+   .foto1 { background-image: url("../fotos/F1E1.png"); }
+   .foto2 { background-image: url("../fotos/F2E1.png"); }
+   .foto3 { background-image: url("../fotos/F3E1.png"); }
+   .foto4 { background-image: url("../fotos/F4E1.png"); }
+   .foto5 { background-image: url("../fotos/F5E1.png"); }
+   .foto6 { background-image: url("../fotos/F6E1.png"); }
+   .foto7 { background-image: url("../fotos/F7E1.png"); }
+   .foto8 { background-image: url("../fotos/F8E1.png"); }
    
    /* Disparadores de scroll invisibles */
    .disparador {
-       height: 90vh; /* Un poco menos de la pantalla completa para evitar solapamientos */
+       height: 70vh; /* Más chico que antes: menos scroll "muerto" entre foto y foto */
        width: 100%;
        position: relative;
        pointer-events: none;
-       margin-bottom: 10vh; /* Espacio de amortiguación */
    }
+
+   /* ==========================================================================
+      5b. ESCENA 2 — Crossfade de fotos + Orión superpuesto (js/escena-jorge-cuarto.js)
+      ==========================================================================
+      "transition: background-image" en .fondo-dinamico no anima en NINGÚN
+      navegador (el spec de CSS no permite interpolar background-image), así
+      que el corte entre fotos era siempre seco. Acá hay 2 capas superpuestas
+      (.fondo-capa-a/b): la que no se ve recibe la foto siguiente y recién
+      ahí sube su opacidad — eso sí es un crossfade real (ver js/main.js).
+
+      Encima de las fotos va un Orión en SVG que queda SIEMPRE visible, con
+      la misma técnica que ya usa js/escena-cielos.js (halo + punto + líneas
+      finas, mismos colores) en vez de estar pintado en la foto. */
+
+   .fondo-capa-a, .fondo-capa-b {
+       opacity: 0;
+       transition: opacity .8s ease-in-out;
+   }
+   .fondo-capa-a.foto-visible, .fondo-capa-b.foto-visible {
+       opacity: 1;
+   }
+
+   #svg-orion-overlay {
+       position: absolute;
+       top: 0; left: 0;
+       width: 100%;
+       height: 100%;
+       pointer-events: none;
+   }
+
+   /* Aparece suave al entrar a la escena y ya se queda así todo el
+      recorrido (no depende del paso de scroll) */
+   #capa-orion-overlay {
+       opacity: 0;
+       animation: jc-orion-aparece 2.4s ease-in-out .3s forwards;
+   }
+   @keyframes jc-orion-aparece {
+       to { opacity: 1; }
+   }
+
    /* ==========================================================================
       6. ESCENA 3
       ========================================================================= */
@@ -328,14 +371,11 @@
    
    
    /* ==========================================================================
-      7. ESCENA 5
+      7. ESCENA 5 — Ruta con auto (ver js/escena-ruta.js). El resto de las
+      reglas de acá abajo (.contenedor-fijo-unificado, .fondo-pantalla-
+      completa, .contenido-flotante, .parrafo-unificado) las sigue usando
+      escena-8-transicion, así que quedan igual.
       ========================================================================= */
-   
-   .escena-scroll-unificada {
-       position: relative;
-       height: 420vh; /* sticky (100vh) + 3 disparadores-unificado (100vh c/u) + buffer chico */
-       width: 100%;
-   }
    
    /* (escena-6a y escena-6c ya no usan esta clase compartida — cada una
       tiene su propia sección con su propia altura, ver más abajo) */
@@ -366,9 +406,6 @@
        z-index: 1;
    }
    
-   .foto-investigacion {
-       background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url("../fotos/E4F1.png");
-   }
    
    /* Contenedor donde van apareciendo las cosas */
    .contenido-flotante {
@@ -416,69 +453,98 @@
        pointer-events: auto;
    }
    
-   /* Disparadores de scroll */
-   .disparador-unificado {
-       height: 100vh;
-       width: 100%;
+   /* ==========================================================================
+      7a. ESCENA 5 — Ruta con auto (contenedor propio, SVG generado en
+      js/escena-ruta.js). El auto se mueve leyendo el scroll directamente en
+      cada frame (no por pasos con IntersectionObserver como el resto del
+      sitio), para que el movimiento sea continuo y no se sienta trabado.
+      ========================================================================= */
+
+   .escena-scroll-ruta {
        position: relative;
+       height: 400vh;
+       width: 100%;
+   }
+
+   .contenedor-fijo-ruta {
+       position: sticky;
+       top: 0;
+       left: 0;
+       width: 100%;
+       height: 100vh;
+       overflow: hidden;
+       background-color: #0a1220;
+   }
+
+   #escena-ruta {
+       position: absolute;
+       inset: 0;
+       width: 100%;
+       height: 100%;
+   }
+
+   #svg-ruta {
+       width: 100%;
+       height: 100%;
+       display: block;
+   }
+
+   /* Cartel: post + tablero, apagado hasta que el auto lo pasa */
+   .ruta-cartel .ruta-cartel-halo {
+       opacity: 0;
+       transition: opacity 1s ease-in-out;
+   }
+   .ruta-cartel .ruta-cartel-tablero {
+       fill: #1b2338;
+       stroke: #4a4560;
+       transition: fill 0.6s ease-in-out, stroke 0.6s ease-in-out;
+   }
+   .ruta-cartel .ruta-cartel-texto {
+       fill: #7d84a6;
+       transition: fill 0.6s ease-in-out;
+   }
+   .ruta-cartel.ruta-cartel-visitado .ruta-cartel-halo {
+       opacity: 0.7;
+   }
+   .ruta-cartel.ruta-cartel-visitado .ruta-cartel-tablero {
+       fill: #24304f;
+       stroke: #ffd166;
+   }
+   .ruta-cartel.ruta-cartel-visitado .ruta-cartel-texto {
+       fill: #ffd166;
+   }
+
+   /* Texto arriba del todo, sin tarjeta ni recuadro — sólo el texto, para
+      no taparle los carteles al camino que va abajo */
+   .texto-ruta-flotante {
+       position: absolute;
+       z-index: 2;
+       left: 0;
+       top: 0;
+       width: 100%;
+       display: flex;
+       justify-content: center;
+       padding: 48px 60px 0;
        pointer-events: none;
    }
-   
-   /* ==========================================================================
-      7b. BLOQUE DE VISUALIZACIÓN — patrón reutilizable: texto arriba (con
-      tarjeta), gráfico/mapa abajo en su propio bloque separado, sin foto de
-      fondo. Se usa para el primer mapa (escena-5b) y sirve de referencia para
-      futuras visualizaciones.
-      ========================================================================== */
-   
-   .bloque-visualizacion {
-       width: 100%;
-       background-color: #080a10;
-       padding: 110px 60px;
-       display: flex;
-       flex-direction: column;
-       align-items: center;
-       gap: 44px;
-   }
-   
-   .bloque-visualizacion-header {
-       max-width: 700px;
+
+   .texto-ruta-simple {
+       max-width: 780px;
        text-align: center;
+       font-size: 1.25rem;
+       line-height: 1.7;
+       color: #f8fafc;
+       text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7), 0 1px 4px rgba(0, 0, 0, 0.85);
+       margin: 0;
+       opacity: 0;
+       transform: translateY(-14px);
+       animation: ruta-texto-aparece 1s ease-in-out .3s forwards;
    }
-   
-   .bloque-visualizacion-header .kicker {
-       display: block;
-       text-transform: uppercase;
-       letter-spacing: 0.08em;
-       font-size: 0.85rem;
-       font-weight: 700;
-       color: var(--acento);
-       margin-bottom: 12px;
+
+   @keyframes ruta-texto-aparece {
+       to { opacity: 1; transform: translateY(0); }
    }
-   
-   .bloque-visualizacion-header h2 {
-       font-family: var(--font-heading, 'Nunito', sans-serif);
-       font-size: 2.1rem;
-       color: #ffffff;
-       margin-bottom: 14px;
-   }
-   
-   .bloque-visualizacion-header p {
-       font-size: 1.1rem;
-       line-height: 1.6;
-       color: #cbd5e1;
-   }
-   
-   .bloque-visualizacion-viz {
-       width: 100%;
-       max-width: 1000px;
-       background: rgba(15, 23, 42, 0.6);
-       border: 1px solid rgba(255, 255, 255, 0.08);
-       border-radius: 16px;
-       padding: 24px;
-       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-   }
-   
+
    /* ==========================================================================
       8. ESCENA 6 (Viaje en busca de los cielos + Grilla final)
       ========================================================================== */
@@ -518,43 +584,6 @@
    .viaje-foto2 { background-image: url("../fotos/E5F2.jfif"); }
    .viaje-foto3 { background-image: url("../fotos/E5F3.jfif"); }
    .viaje-foto4 { background-image: url("../fotos/E5F4.jpg"); }
-   
-   /* Texto centrado que solo se ve durante el paso "inicio" */
-   .texto-centrado-viaje {
-       position: absolute;
-       top: 0;
-       left: 0;
-       width: 100%;
-       height: 100%;
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       padding: 60px;
-       z-index: 2;
-       opacity: 0;
-       transition: opacity 0.6s ease-in-out;
-       pointer-events: none;
-   }
-   
-   .texto-centrado-viaje.activo-viaje {
-       opacity: 1;
-       pointer-events: auto;
-   }
-   
-   .texto-centrado-viaje p {
-       max-width: 750px;
-       text-align: center;
-       font-size: 1.5rem;
-       line-height: 1.7;
-       color: #f8fafc;
-       background: rgba(8, 10, 16, 0.72);
-       -webkit-backdrop-filter: blur(10px);
-       backdrop-filter: blur(10px);
-       border: 1px solid rgba(255, 255, 255, 0.08);
-       border-radius: var(--radio-tarjeta, 16px);
-       padding: 30px 38px;
-       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
-   }
    
    /* Disparadores de scroll de la escena 6 */
    .disparador-viaje {

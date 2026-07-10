@@ -1,39 +1,65 @@
 document.addEventListener("DOMContentLoaded", () => {
     
     // ==========================================
-    // LÓGICA ESCENA 2 (Cambio de fotos y textos)
+    // LÓGICA ESCENA 2 (Fotos con crossfade real, 8 fotos / 4 párrafos)
     // ==========================================
-    const fondoJorge = document.getElementById("fondo-jorge");
+    // "transition: background-image" no anima en ningún navegador, así que
+    // el corte entre fotos era siempre seco. Con 2 capas superpuestas sí
+    // hay una transición real: a la capa que está OCULTA se le pone la
+    // foto que sigue, y recién ahí se le sube la opacidad mientras la otra
+    // baja la suya.
+    //
+    // Ahora hay 8 fotos pero el texto sigue siendo el mismo de 4 párrafos:
+    // cada párrafo acompaña 2 fotos seguidas (pasos 1-2 → párrafo 1,
+    // 3-4 → párrafo 2, 5-6 → párrafo 3, 7-8 → párrafo 4).
+    const capaFotoA = document.getElementById("fondo-jorge-a");
+    const capaFotoB = document.getElementById("fondo-jorge-b");
     const disparadoresE2 = document.querySelectorAll(".disparador");
     const parrafos = document.querySelectorAll(".parrafo-historia");
 
-    if (fondoJorge) fondoJorge.className = "fondo-dinamico foto1";
+    const PARRAFO_POR_PASO = { 1: 1, 2: 1, 3: 2, 4: 2, 5: 3, 6: 3, 7: 4, 8: 4 };
+
+    let capaVisible = capaFotoA;
+    let capaOculta = capaFotoB;
+
+    if (capaFotoA && capaFotoB) {
+        capaFotoA.classList.add("foto1", "foto-visible");
+    }
 
     const opcionesE2 = {
         root: null,
-        rootMargin: "-20% 0px -60% 0px",
-        threshold: 0.1
+        rootMargin: "-10% 0px -50% 0px", // más ajustado que antes, ritmo parecido al de la ráfaga de escena 3
+        threshold: 0
     };
 
     const observadorE2 = new IntersectionObserver((entradas) => {
         entradas.forEach(entrada => {
             if (entrada.isIntersecting) {
-                const paso = entrada.target.getAttribute("data-foto");
-                fondoJorge.className = "fondo-dinamico";
-                fondoJorge.classList.add(`foto${paso}`);
-                
-                parrafos.forEach(parrafo => {
-                    if (parrafo.getAttribute("data-parrafo") === paso) {
-                        parrafo.classList.add("activo");
-                    } else {
-                        parrafo.classList.remove("activo");
+                const paso = Number(entrada.target.getAttribute("data-foto"));
+
+                if (capaFotoA && capaFotoB) {
+                    const claseFoto = `foto${paso}`;
+                    if (!capaVisible.classList.contains(claseFoto)) {
+                        capaOculta.className = `fondo-dinamico fondo-capa-${capaOculta === capaFotoA ? "a" : "b"} ${claseFoto}`;
+                        // Fuerza un reflow antes de subir la opacidad, si no
+                        // el navegador puede saltarse la transición.
+                        void capaOculta.offsetWidth;
+                        capaOculta.classList.add("foto-visible");
+                        capaVisible.classList.remove("foto-visible");
+                        [capaVisible, capaOculta] = [capaOculta, capaVisible];
                     }
+                }
+
+                const parrafoActivo = String(PARRAFO_POR_PASO[paso]);
+                parrafos.forEach(parrafo => {
+                    parrafo.classList.toggle("activo", parrafo.getAttribute("data-parrafo") === parrafoActivo);
                 });
             }
         });
     }, opcionesE2);
 
     disparadoresE2.forEach(d => observadorE2.observe(d));
+
 
 
     // ==========================================
@@ -94,36 +120,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }, opcionesE4);
 
     disparadoresE4.forEach(d => observadorE4.observe(d));
-   // ==========================================
-    // LÓGICA ESCENA 5 (Pantalla Completa Unificada)
-    // ==========================================
-    const disparadoresE5 = document.querySelectorAll(".disparador-unificado");
-    const parrafosUnificados = document.querySelectorAll(".parrafo-unificado");
 
-    const opcionesE5 = {
-        root: null,
-        rootMargin: "-30% 0px -50% 0px",
-        threshold: 0
-    };
-
-    const observadorE5 = new IntersectionObserver((entradas) => {
-        entradas.forEach(entrada => {
-            if (entrada.isIntersecting) {
-                const pasoU = entrada.target.getAttribute("data-paso-u");
-                
-                // Recorremos y activamos solo el elemento que corresponde
-                parrafosUnificados.forEach(parrafo => {
-                    if (parrafo.getAttribute("data-unificado") === pasoU) {
-                        parrafo.classList.add("activo-unificado");
-                    } else {
-                        parrafo.classList.remove("activo-unificado");
-                    }
-                });
-            }
-        });
-    }, opcionesE5);
-
-    disparadoresE5.forEach(d => observadorE5.observe(d));
+    // La Escena 5 (ruta con el auto) ahora la maneja js/escena-ruta.js,
+    // sincronizada directo con el scroll en vez de por disparadores.
 
     // ==========================================
     // LÓGICA ESCENA 6 (Viaje final + Grilla)

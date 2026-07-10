@@ -21,7 +21,20 @@
             <div class="contenedor-fijo-split">
                 
                 <div class="bloque-imagen">
-                    <div class="fondo-dinamico" id="fondo-jorge"></div>
+                    <!-- 2 capas para el crossfade (ver js/main.js): la que no se ve
+                         recibe la foto siguiente y recién ahí se le sube la opacidad,
+                         así el cambio de foto anima de verdad ("transition:
+                         background-image" no anima en ningún navegador). -->
+                    <div class="fondo-dinamico fondo-capa-a" id="fondo-jorge-a"></div>
+                    <div class="fondo-dinamico fondo-capa-b" id="fondo-jorge-b"></div>
+
+                    <!-- Orión, siempre visible, dibujado con la misma técnica que
+                         js/escena-cielos.js (halo + punto + líneas finas) en vez de
+                         venir pintado en la foto. Coordenadas ajustables al principio
+                         de js/escena-jorge-cuarto.js. -->
+                    <svg id="svg-orion-overlay" viewBox="0 0 1366 768" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                        <g id="capa-orion-overlay"></g>
+                    </svg>
                 </div>
                 
                 <div class="bloque-texto">
@@ -46,13 +59,20 @@
 
             </div>
 
+            <!-- 8 disparadores de foto (antes 4): cada párrafo de al lado ahora
+                 acompaña 2 fotos en vez de 1 — ver PARRAFO_POR_PASO en
+                 js/main.js, que mapea pasos 1-2→párrafo 1, 3-4→párrafo 2,
+                 5-6→párrafo 3, 7-8→párrafo 4. -->
             <div class="disparador" data-foto="1"></div>
             <div class="disparador" data-foto="2"></div>
             <div class="disparador" data-foto="3"></div>
             <div class="disparador" data-foto="4"></div>
+            <div class="disparador" data-foto="5"></div>
+            <div class="disparador" data-foto="6"></div>
+            <div class="disparador" data-foto="7"></div>
+            <div class="disparador" data-foto="8"></div>
             
         </section>
-            
 
         <section id="escena-3" class="escena-scroll-rafaga">
             
@@ -102,9 +122,7 @@
                     </div>
                     <div class="bloque-texto bloque-entra-der">
                         <div class="texto-impacto">
-                            <p>Pasó el tiempo. Me convertí en adulto, pasaron los años, cambiaron los gobiernos, la ciudad creció y se expandió hacia arriba. Cada tanto, en las noches nostálgicas, volvía a ese mismo lugar donde vi la constelación por primera vez en la ciudad.</p>
-                            <br>
-                            <p>Hasta que una noche miré hacia arriba y ya no había nada, el cielo estaba completamente vacío. <strong>La ciudad finalmente se había robado todo el brillo.</strong></p>
+                            <p>Con los años, el misterio no hizo más que crecer. Aquella pregunta de la infancia seguía flotando en el aire: ¿por qué los cielos de mi ciudad se habían vuelto tan borrosos y opacos? Impulsado por esa curiosidad indomable, convertí la obsesión en mi profesión y me recibí de astrónomo.</p>
                         </div>
                     </div>
                 </div>
@@ -117,63 +135,62 @@
     </div>
 
     <div class="zona-datos">
-       <section id="escena-5" class="escena-scroll-unificada">
-            
-            <div class="contenedor-fijo-unificado">
-                
-                <div class="fondo-pantalla-completa foto-investigacion"></div>
-                
-                <div class="contenido-flotante">
-                    
-                    <div class="parrafo-unificado activo-unificado" data-unificado="1">
-                        <p>Fueron pasando los años y, mientras el cielo de la ciudad se apagaba, crecía en mí una obsesión: necesitaba entender qué estaba pasando. Necesitaba saber quién se estaba robando las estrellas.</p>
-                    </div>
+       <section id="escena-5" class="escena-scroll-ruta">
 
-                    <div class="parrafo-unificado" data-unificado="2">
-                        <p>En honor a mi abuela, y a aquella promesa en la ventana, decidí convertir la nostalgia en ciencia: estudié Astronomía.</p>
-                    </div>
+            <div class="contenedor-fijo-ruta">
 
-                    <div class="parrafo-unificado" data-unificado="3">
-                        <p>Como parte de mi investigación, me propuse mapear los cielos argentinos. ¿Era Buenos Aires una excepción o el país entero se estaba quedando a oscuras?</p>
-                    </div>
+                <!-- Ruta ilustrada en SVG (ver js/escena-ruta.js): camino
+                     horizontal con 3 carteles (Buenos Aires, Firmat, Junín) y
+                     un auto que se mueve en sincro directo con el scroll —
+                     no por pasos, sino recalculando su posición en cada
+                     frame, para que el movimiento sea continuo y no se
+                     sienta trabado. Cuando el auto pasa un cartel, ese
+                     cartel se enciende. -->
+                <div id="escena-ruta">
+                    <svg id="svg-ruta" viewBox="0 0 1400 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
 
+                        <defs>
+                            <linearGradient id="ruta-grad-cielo" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#0a1220" />
+                                <stop offset="100%" stop-color="#1c2a4a" />
+                            </linearGradient>
+                            <radialGradient id="ruta-grad-halo-cartel" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#ffd166" stop-opacity="0.55" />
+                                <stop offset="100%" stop-color="#ffd166" stop-opacity="0" />
+                            </radialGradient>
+                        </defs>
+
+                        <rect x="0" y="0" width="1400" height="700" fill="url(#ruta-grad-cielo)" />
+
+                        <g id="ruta-estrellas"></g>
+                        <g id="ruta-horizonte"></g>
+
+                        <!-- Camino -->
+                        <rect x="0" y="480" width="1400" height="80" fill="#26232b" />
+                        <rect x="0" y="480" width="1400" height="6" fill="#332f38" />
+                        <rect x="0" y="554" width="1400" height="6" fill="#171519" />
+                        <g id="ruta-linea-central"></g>
+
+                        <!-- Carteles (postes + tablero + halo, se arman en JS) -->
+                        <g id="ruta-carteles"></g>
+
+                        <!-- Auto -->
+                        <g id="ruta-auto"></g>
+
+                    </svg>
+                </div>
+
+                <div class="texto-ruta-flotante">
+                    <p class="texto-ruta-simple">Pero el papel y las aulas pronto me quedaron chicos. Necesitaba ver las estrellas con mis propios ojos, recuperar el asombro perdido. Así fue como armé las valijas y emprendí un viaje persiguiendo la luz por distintas ciudades de Argentina.</p>
                 </div>
 
             </div>
 
-            <div class="disparador-unificado" data-paso-u="1"></div>
-            <div class="disparador-unificado" data-paso-u="2"></div>
-            <div class="disparador-unificado" data-paso-u="3"></div>
-
-        </section>
-
-        <section id="escena-5b" class="bloque-visualizacion">
-            <div class="bloque-visualizacion-header">
-                <p class="kicker">Primer vistazo a los datos</p>
-                <h2>El mapa de los cielos argentinos</h2>
-                <p>Un relevamiento de contaminación lumínica ciudad por ciudad, para responder la pregunta con números.</p>
-            </div>
-            <div class="bloque-visualizacion-viz">
-                <div class="flourish-embed flourish-map" data-src="visualisation/29399923">
-                    <script src="https://public.flourish.studio/resources/embed.js"></script>
-                    <noscript>
-                        <img src="https://public.flourish.studio/visualisation/29399923/thumbnail" width="100%" alt="map visualization" />
-                    </noscript>
-                </div>
-            </div>
         </section>
 
     <section id="escena-6" class="escena-scroll-viaje">
 
-        <!-- CONTENIDO FIJO -->
-        <div class="contenedor-fijo-viaje">
-
-                <div class="fondo-pantalla-completa-viaje" id="fondo-viaje-final"></div>
-
-                <div class="texto-centrado-viaje">
-                    <p>Ahora ya tenía la teoría, el papel no me era suficiente. Como un buen amante de las estrellas necesitaba verlo con mis propios ojos. Así fue como emprendí un viaje en busca de los mejores cielos Argentinos. Arranqué por comodidad en capital, seguí por Firmat, Junín para terminar en Ushuaia.</p>
-                </div>
-        </div>        
+              
 
 
         <div class="contenedor-fijo-viaje">
@@ -1021,6 +1038,8 @@
     </main>
 
     <script src="https://d3js.org/d3.v6.js"></script>
+    <script src="js/escena-jorge-cuarto.js"></script>
+    <script src="js/escena-ruta.js"></script>
     <script src="js/escena-cielos.js"></script>
     <script src="js/escena-transicion-datos.js"></script>
     <script src="js/escena-transicion-fisica.js"></script>
