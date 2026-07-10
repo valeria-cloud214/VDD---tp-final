@@ -6,13 +6,22 @@
    que terminó la escena 6 (misma composición, mismo tono — se regenera acá
    con la misma técnica de js/escena-cielos.js), pero ya a pantalla completa:
    el panel lateral de la escena 6 no se duplica acá, así que no hay ningún
-   recuadro que aparezca y vuelva a desaparecer. Primero unos segundos de
-   silencio, sólo el paisaje; después aparecen frases sueltas sin caja; y
-   sobre el final el paisaje se retira y el propio cielo empieza a leerse
-   como datos (puntos y líneas finas), anticipando el scatter plot que viene
-   después.
+   recuadro que aparezca y vuelva a desaparecer.
 
-   El cambio de paso lo dispara el scroll (13 disparadores de 100vh, ver
+   4 partes en 9 pasos de scroll (antes eran 13 pasos para la misma idea —
+   demasiados cambios de texto para lo que en el fondo es un solo
+   razonamiento). El texto ya no siempre reemplaza al anterior: en las
+   partes 1 y 3 se va ACUMULANDO, para que se sienta como una idea que se
+   arma de a poco y no como pantallas sueltas:
+   1) el razonamiento inicial se arma línea por línea (pasos 1-3);
+   2) un único bloque editorial, con mucho aire (paso 4);
+   3) las hipótesis se acumulan una debajo de otra (pasos 5-8);
+   4) todo se disuelve y queda sólo la frase de cierre (paso 9).
+   En paralelo, el paisaje se sigue simplificando hasta convertirse en
+   información — mismos disparadores visuales de antes (simplifica /
+   anotado / patrón / final), sólo remapeados a los pasos nuevos.
+
+   El cambio de paso lo dispara el scroll (9 disparadores de 100vh, ver
    #escena-6a en index.html), con el mismo patrón de IntersectionObserver que
    ya usan escena-5/6c en main.js.
    ========================================================================== */
@@ -221,38 +230,55 @@ document.addEventListener("DOMContentLoaded", () => {
     })();
 
     // ======================================================================
-    // 6. SCROLL — los 13 pasos de la escena
+    // 6. SCROLL — los 9 pasos de la escena (ver el desglose por partes en
+    //    el comentario del encabezado del archivo)
     // ======================================================================
+    const lineasRazonamiento = document.querySelectorAll("[data-linea-td]");
+    const contenedorRazonamiento = document.getElementById("td-razonamiento");
     const frases = document.querySelectorAll("[data-frase-td]");
     const hipotesis = document.querySelectorAll("[data-hip-td]");
     const contenedorHipotesis = document.getElementById("td-hipotesis-contenedor");
     const disparadores = document.querySelectorAll(".td-disparador");
 
-    // Qué frase suelta corresponde a cada paso (el resto de los pasos —
-    // silencio, hipótesis— no activan ninguna).
-    const FRASE_POR_PASO = { 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 7, 13: 8 };
+    // Qué frase suelta corresponde a cada paso: 1 = bloque editorial
+    // (segunda parte), 2 = frase de cierre (cuarta parte). El resto de los
+    // pasos (razonamiento, hipótesis) no activan ninguna de éstas.
+    const FRASE_POR_PASO = { 4: 1, 9: 2 };
 
     function actualizarPaso(paso) {
-        // Transformación visual progresiva del paisaje.
-        cielo.classList.toggle("td-simplifica", paso >= 5);
-        cielo.classList.toggle("td-anotado", paso >= 8 && paso < 12);
-        cielo.classList.toggle("td-patron", paso >= 12);
-        cielo.classList.toggle("td-final", paso >= 13);
+        // Transformación visual progresiva del paisaje (mismos disparadores
+        // de siempre, remapeados a los 9 pasos nuevos).
+        cielo.classList.toggle("td-simplifica", paso >= 3);
+        cielo.classList.toggle("td-anotado", paso >= 4 && paso < 8);
+        cielo.classList.toggle("td-patron", paso >= 8);
+        cielo.classList.toggle("td-final", paso >= 9);
 
-        // Frases sueltas: sólo una activa a la vez.
+        // PRIMERA PARTE — el razonamiento se arma de a poco: cada línea
+        // llega desde su propio paso y ninguna se retira; el bloque entero
+        // se desvanece recién cuando arranca la segunda parte (paso 4).
+        if (contenedorRazonamiento) contenedorRazonamiento.classList.toggle("td-visible", paso >= 1 && paso <= 3);
+        lineasRazonamiento.forEach(l => {
+            const desde = Number(l.getAttribute("data-linea-td")); // 1, 2, 2, 3
+            l.classList.toggle("activo-td", paso >= desde);
+        });
+
+        // SEGUNDA y CUARTA PARTE — frases sueltas, sólo una activa a la vez.
         const fraseActiva = FRASE_POR_PASO[paso] || null;
         frases.forEach(f => {
             const num = Number(f.getAttribute("data-frase-td"));
             f.classList.toggle("activo-td", fraseActiva !== null && num === fraseActiva);
         });
 
-        // Hipótesis: se acumulan (paso 9 → 4 preguntas, cada una desde su
-        // propio paso) y se desvanecen todas juntas cuando llega la frase final.
+        // TERCERA PARTE — hipótesis: se acumulan (cada una desde su propio
+        // paso) y se desvanecen todas juntas cuando llega la frase de
+        // cierre. La más reciente se lee con fuerza; las anteriores quedan
+        // más tenues (ver .td-hipotesis-anterior).
         hipotesis.forEach(h => {
-            const desde = Number(h.getAttribute("data-hip-td")) + 8; // 1→9, 2→10, 3→11, 4→12
-            h.classList.toggle("activo-td", paso >= desde);
+            const desde = Number(h.getAttribute("data-hip-td")) + 4; // 1→5, 2→6, 3→7, 4→8
+            h.classList.toggle("activo-td", paso >= desde && paso < 9);
+            h.classList.toggle("td-hipotesis-anterior", paso > desde);
         });
-        if (contenedorHipotesis) contenedorHipotesis.classList.toggle("td-oculto", paso >= 13);
+        if (contenedorHipotesis) contenedorHipotesis.classList.toggle("td-oculto", paso >= 9);
     }
 
     const observador = new IntersectionObserver((entradas) => {

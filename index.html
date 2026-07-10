@@ -430,12 +430,21 @@
         (misma composición, regenerada acá en js/escena-transicion-datos.js
         para que no haya foto nueva ni corte), ya a pantalla completa — el
         panel lateral de la escena 6 no se duplica ni se vuelve a mostrar acá,
-        directamente no aparece. Primero unos segundos de silencio, sólo el
-        cielo; después el scroll va revelando frases sueltas —sin cajas, sólo
-        texto y aire— mientras el paisaje se simplifica de a poco hasta
-        convertirse en información: de ahí nace el lenguaje visual (puntos,
-        líneas finas) que retoma el scatter plot que sigue después de esta
-        escena.
+        directamente no aparece.
+
+        4 partes, 9 pasos de scroll en total (antes eran 13: el ritmo estaba
+        repartido en demasiados cambios de texto para una sola idea):
+        1) el razonamiento de Jorge se arma de a poco — cada línea se SUMA a
+           las anteriores en vez de reemplazarlas (pasos 1-3);
+        2) un único bloque editorial, con mucho aire, resume que ya no le
+           alcanzaba con mirar — necesitaba entender (paso 4);
+        3) las hipótesis que se le ocurren se acumulan una debajo de otra,
+           la más nueva se lee más fuerte que las anteriores (pasos 5-8);
+        4) todo eso se disuelve y sólo queda una frase enorme y centrada
+           que conecta con los datos (paso 9).
+        En paralelo, el paisaje se va simplificando hasta convertirse en
+        información: de ahí nace el lenguaje visual (puntos, líneas finas)
+        que retoma el scatter plot que sigue después de esta escena.
         ============================================= -->
     <section id="escena-6a" class="escena-transicion-datos">
 
@@ -484,25 +493,33 @@
                 </svg>
             </div>
 
-            <!-- Frases sueltas: sin tarjeta, sólo texto blanco con aire alrededor -->
-            <div class="td-texto-contenedor">
-                <div class="td-frase" data-frase-td="1"><p>Durante mi viaje entendí una cosa.</p></div>
-                <div class="td-frase" data-frase-td="2"><p>Algunos lugares conservaban cielos llenos de estrellas.</p></div>
-                <div class="td-frase" data-frase-td="3"><p>Otros apenas dejaban ver unas pocas.</p></div>
-                <div class="td-frase" data-frase-td="4"><p>Pero todavía no entendía por qué.</p></div>
+            <!-- PRIMERA PARTE — el razonamiento se construye de a poco: cada
+                 línea que aparece se suma a las anteriores, nunca las
+                 reemplaza (líneas 2 y 3 llegan juntas, en el mismo paso). -->
+            <div class="td-razonamiento" id="td-razonamiento">
+                <p class="td-linea-razonamiento" data-linea-td="1">Durante mi viaje entendí una cosa.</p>
+                <p class="td-linea-razonamiento" data-linea-td="2">Algunos lugares conservaban cielos llenos de estrellas.</p>
+                <p class="td-linea-razonamiento" data-linea-td="2">Otros apenas dejaban ver unas pocas.</p>
+                <p class="td-linea-razonamiento" data-linea-td="3">Pero todavía no entendía por qué.</p>
+            </div>
 
-                <div class="td-frase td-frase-chica" data-frase-td="5"><p>Ver los cielos con mis propios ojos ya no era suficiente.</p></div>
-                <div class="td-frase td-frase-chica" data-frase-td="6"><p>Necesitaba encontrar una explicación.</p></div>
-                <div class="td-frase td-frase-chica" data-frase-td="7">
-                    <p>¿Qué hacía que algunos lugares brillaran tanto…<br><span class="td-linea-pausa">…mientras otros seguían siendo oscuros?</span></p>
+            <!-- SEGUNDA PARTE (bloque único) y CUARTA PARTE (frase de cierre):
+                 sin tarjeta, sólo texto blanco con aire alrededor -->
+            <div class="td-texto-contenedor">
+                <div class="td-frase" data-frase-td="1">
+                    <p>Ver los cielos con mis propios ojos<br>ya no era suficiente.</p>
+                    <p class="td-frase-secundaria">Necesitaba entender qué hacía que algunos lugares brillaran más que otros.</p>
                 </div>
 
-                <div class="td-frase td-frase-grande" data-frase-td="8">
+                <div class="td-frase td-frase-grande" data-frase-td="2">
                     <p>Para responder esa pregunta…<br>…tenía que mirar los datos.</p>
                 </div>
             </div>
 
-            <!-- Hipótesis: se acumulan una debajo de otra, no se reemplazan -->
+            <!-- TERCERA PARTE — hipótesis: se acumulan una debajo de otra, no
+                 se reemplazan; la más reciente se lee con más fuerza, las
+                 anteriores quedan un poco más tenues (siguen ahí, ya
+                 formuladas, pero no son el foco). -->
             <div class="td-hipotesis-contenedor" id="td-hipotesis-contenedor">
                 <p class="td-hipotesis" data-hip-td="1">¿Era la población?</p>
                 <p class="td-hipotesis" data-hip-td="2">¿La urbanización?</p>
@@ -512,7 +529,8 @@
 
         </div>
 
-        <!-- DISPARADORES: 13 tramos de 100vh, uno por cada beat de la escena -->
+        <!-- DISPARADORES: 9 tramos de 100vh, uno por cada beat de la escena
+             (antes eran 13 — ver js/escena-transicion-datos.js) -->
         <div class="td-disparador" data-paso-td="1"></div>
         <div class="td-disparador" data-paso-td="2"></div>
         <div class="td-disparador" data-paso-td="3"></div>
@@ -522,10 +540,6 @@
         <div class="td-disparador" data-paso-td="7"></div>
         <div class="td-disparador" data-paso-td="8"></div>
         <div class="td-disparador" data-paso-td="9"></div>
-        <div class="td-disparador" data-paso-td="10"></div>
-        <div class="td-disparador" data-paso-td="11"></div>
-        <div class="td-disparador" data-paso-td="12"></div>
-        <div class="td-disparador" data-paso-td="13"></div>
 
     </section>
 
@@ -536,37 +550,107 @@
 
         <div class="contenedor-textos">
             <div > <!-- id="panel-scatter-ciudad"-->
-            <div class="stepG" data-ciudad="inicial">
+
+            <!-- PRIMERA PARTE — sólo población: barras únicamente, sin
+                 puntos ni referencia a contaminación. Primero el conjunto,
+                 después CABA, Firmat y Junín se van resaltando de a una
+                 (ver resaltarBarra() en main.js), con el resto de las
+                 barras atenuado. -->
+            <div class="stepG" data-fase="poblacion">
                 <h3>Población en Argentina</h3>
-                <p>Analicé 20 ciudades argentinas. Para cada una, tuve en cuenta cuánta gente vivía ahí y cuánta luz artificial emitían de noche hacia el cielo.</p>
-                <p>La pregunta era simple: ¿a más gente, menos estrellas visibles?</p>
+                <p>Los primeros datos parecían simples.</p>
+                <p>Cada ciudad tenía una población muy distinta.</p>
             </div>
-            
-            <div class="stepG" data-ciudad="CABA">
+
+            <div class="stepG" data-fase="poblacion-ciudad" data-ciudad="CABA">
                 <h3>Ciudad Autónoma de Buenos Aires</h3>
-                <p>CABA es el distrito con mayor densidad y concentración poblacional, superando los 3 millones de habitantes.</p>
+                <p>Buenos Aires concentraba, por lejos, la mayor población del país: más de 3 millones de personas.</p>
             </div>
 
-            <div class="stepG" data-ciudad="Firmat">
+            <div class="stepG" data-fase="poblacion-ciudad" data-ciudad="Firmat">
                 <h3>Firmat, Santa Fe</h3>
-                <p>En líneas generales, sí. Las ciudades más grandes contaminan más lumínicamente. CABA está en el extremo: la más poblada del país es también la que más opaca el cielo nocturno.</p>
-                
+                <p>Firmat, en cambio, era una ciudad mucho más chica — apenas una fracción de esa población.</p>
             </div>
 
-            <div class="stepG" data-ciudad="Junín">
+            <div class="stepG" data-fase="poblacion-ciudad" data-ciudad="Junín">
+                <h3>Junín, Buenos Aires</h3>
+                <p>Y Junín, más pequeña todavía. Tres ciudades, tres tamaños completamente distintos.</p>
+            </div>
+
+            <!-- SEGUNDA ETAPA — nacen los puntos: sobre cada barra, en el
+                 mismo punto exacto que marca su población en el eje Y (así
+                 después funcionan como dot plot sin moverse), se enciende
+                 muy de a poco una lucecita cálida. Las barras siguen
+                 intactas; todavía no se explica qué representa el punto. -->
+            <div class="stepG" data-fase="nace-punto" data-opacidad-puntos="0.5">
+                <p>Sobre cada ciudad empezó a encenderse una luz.</p>
+                <p>Todavía no sabía qué representaba.</p>
+            </div>
+
+            <!-- TERCERA ETAPA — dot plot: único cambio, las barras
+                 desaparecen. Los ejes (X con las ciudades, Y con la
+                 población) quedan exactamente iguales, así que el punto no
+                 pierde nunca su referencia: sigue leyéndose con los mismos
+                 dos ejes de siempre. -->
+            <div class="stepG" data-fase="dot-plot" data-opacidad-puntos="1">
+                <h3>Un mismo dato, otra forma</h3>
+                <p>Ahora eran sólo puntos — pero seguían siendo la misma población, sobre los mismos ejes.</p>
+                <p>La población explicaba parte de la historia.</p>
+            </div>
+
+            <!-- CUARTA ETAPA — cambio de narrativa: el dot plot no se mueve
+                 ni un píxel en este paso, sólo cambia el texto. -->
+            <div class="stepG" data-fase="dot-plot">
+                <p>Pero todavía faltaba una pieza.</p>
+                <p>Necesitaba observar otra variable.</p>
+            </div>
+
+            <!-- QUINTA ETAPA — transformación del eje X, en dos pasos: primero
+                 se apagan los nombres de ciudad, después nace el nuevo eje
+                 (índice de industrialización). El eje Y sigue sin tocarse y
+                 los puntos todavía no se mueven — sólo cambia el significado
+                 del eje, no los datos. -->
+            <div class="stepG" data-fase="eje-x-oculta">
+                <p>Los nombres de cada ciudad empezaron a desdibujarse.</p>
+            </div>
+
+            <div class="stepG" data-fase="eje-x-industrial">
+                <h3>Un nuevo eje</h3>
+                <p>En su lugar apareció otra escala: el índice de industrialización de cada ciudad.</p>
+            </div>
+
+            <!-- SEXTA ETAPA — recién ahora, con el nuevo eje ya instalado,
+                 cada punto interpola lentamente hacia su nueva posición
+                 horizontal. El eje Y (población) no cambia en ningún
+                 momento: es la misma información, vista desde otro ángulo. -->
+            <div class="stepG" data-fase="transformacion">
+                <p>No eran datos nuevos.</p>
+                <p>Era la misma información, observada desde otro ángulo.</p>
+            </div>
+
+            <!-- SÉPTIMA ETAPA — ya no hay barras ni eje de ciudades, sólo el
+                 scatter (población × industrialización). Recién acá arranca
+                 la explicación de esa relación (mismo contenido que ya
+                 existía, ahora resaltando puntos en vez de barras — ver
+                 resaltarPunto()). -->
+            <div class="stepG" data-fase="scatter">
+                <h3>Todas las Regiones</h3>
+                <p>Acá podemos ver la distribución completa de las 19 ciudades de nuestra base de datos, junto a qué tan industrializadas están.</p>
+            </div>
+
+            <div class="stepG" data-fase="scatter-ciudad" data-ciudad="CABA">
+                <h3>Ciudad Autónoma de Buenos Aires</h3>
+                <p>En líneas generales, sí: las ciudades más grandes contaminan más lumínicamente. CABA está en el extremo — la más poblada del país es también la que más opaca el cielo nocturno.</p>
+            </div>
+
+            <div class="stepG" data-fase="scatter-ciudad" data-ciudad="Junín">
                 <h3>Junín, Buenos Aires</h3>
                 <p>Pero Junín me llamó la atención. Una ciudad mediana, sin millones de habitantes, con un índice nocturno mucho más alto de lo esperado. La agroindustria y la energía de la región encienden el cielo aunque no haya tanta gente.</p>
-                
-            </div>
-            
-            <div class="stepG" data-ciudad="todas">
-                <h3>Todas las Regiones</h3>
-                <p>Ahí entendí que no alcanzaba con contar personas. Lo que importa es lo que esas personas hacen de noche — y qué tan eficiente es la luz que usan.</p>
             </div>
 
-            <div class="stepG" data-ciudad="puntos">
+            <div class="stepG" data-fase="scatter-todas">
                 <h3>Todas las Regiones</h3>
-                <p>Acá podemos ver la distribución completa de las 19 ciudades de nuestra base de datos, junto a que tan industrializados están.</p>
+                <p>Ahí entendí que no alcanzaba con contar personas. Lo que importa es lo que esas personas hacen de noche — y qué tan eficiente es la luz que usan.</p>
             </div>
 
             <!-- Disparador silencioso: mientras el gráfico sigue pegajoso acá

@@ -407,28 +407,91 @@ const svg = d3.select("#my_dataviz")
 // Leemos tu archivo CSV
 d3.csv("grafico-poblacion.csv").then( function(data) {
 
-  // 1. EJE X: Escala de bandas para textos (Ciudades)
+  // 1. EJE X "ciudades": escala de bandas, una por ciudad (el CSV ya viene
+  // ordenado de menor a mayor población). Este es el eje que se ve en las
+  // barras y en el dot plot — la evolución nunca lo toca hasta la quinta
+  // etapa, cuando cambia de significado (ver ejeXIndustrial más abajo).
   const x = d3.scaleBand()
       .range([0, width])
       .domain(data.map(function(d) { return d.Ciudad; }))
       .padding(0.2);
 
-  // Dibujamos el Eje X
-  svg.append("g")
+  const ejeXCiudades = svg.append("g")
+      .attr("class", "eje-grafico eje-x-ciudades")
       .attr("transform", `translate(0, ${height})`)
-      .call(d3.axisBottom(x))
-      .selectAll("text")
+      .call(d3.axisBottom(x));
+  ejeXCiudades.selectAll("text")
         .attr("transform", "translate(-10,0)rotate(-45)")
         .style("text-anchor", "end");
+  // Nombre de la variable, como pequeña etiqueta en la esquina superior
+  // derecha del gráfico (arriba del todo, por encima de cualquier barra —
+  // incluida CABA, la más alta) — se desvanece junto con el resto de este
+  // eje cuando cambia de significado (quinta etapa). El grupo ya está
+  // trasladado a (0, height), así que restamos esa distancia para volver
+  // a ubicarnos arriba del todo, a la misma altura que la etiqueta del eje Y.
+  ejeXCiudades.append("text")
+      .attr("x", width)
+      .attr("y", -(height + 18))
+      .attr("fill", "#94a3b8")
+      .attr("text-anchor", "end")
+      .style("font-size", "0.8rem")
+      .text("Ciudades");
 
-  // 2. EJE Y: Escala lineal para los números (Población)
+  // 2. EJE Y: escala lineal de población. No cambia NUNCA a lo largo de
+  // toda la transición (barras → dot plot → scatter): es la referencia que
+  // el lector no pierde en ningún momento.
   const y = d3.scaleLinear()
       .domain([0, d3.max(data, function(d) { return +d.Poblacion; })])
       .range([height, 0]);
 
-  // Dibujamos el Eje Y
-  svg.append("g")
+  const ejeY = svg.append("g")
+      .attr("class", "eje-grafico eje-y")
       .call(d3.axisLeft(y));
+  // Nombre de la variable, esquina superior izquierda: nunca se desvanece,
+  // porque el eje Y (población) tampoco lo hace en ningún momento.
+  ejeY.append("text")
+      .attr("x", -40)
+      .attr("y", -18)
+      .attr("fill", "#94a3b8")
+      .attr("text-anchor", "start")
+      .style("font-size", "0.8rem")
+      .text("Población");
+
+  // EJE X "industrialización": nace oculto, superpuesto exactamente al eje
+  // de ciudades. En la quinta etapa uno se apaga y el otro se enciende, así
+  // el lector entiende primero que cambió el SIGNIFICADO del eje X, antes
+  // de que ningún punto se mueva un solo píxel (ver eje-x-oculta /
+  // eje-x-industrial en el switch de abajo).
+  const xIndustrial = d3.scaleLinear()
+      .domain([0, 10])
+      .range([0, width]);
+
+  const ejeXIndustrial = svg.append("g")
+      .attr("class", "eje-grafico eje-x-industrial")
+      .attr("transform", `translate(0, ${height})`)
+      .style("opacity", 0)
+      .call(d3.axisBottom(xIndustrial).ticks(6));
+  ejeXIndustrial.append("text")
+      .attr("x", width / 2)
+      .attr("y", 40)
+      .attr("fill", "#94a3b8")
+      .attr("text-anchor", "middle")
+      .style("font-size", "0.8rem")
+      .text("Índice de industrialización (aprox. iluminación artificial)");
+
+  function mostrarEjeXCiudades(visible) { ejeXCiudades.style("opacity", visible ? 1 : 0); }
+  function mostrarEjeXIndustrial(visible) { ejeXIndustrial.style("opacity", visible ? 1 : 0); }
+
+  // Definición del brillo de los puntos: una lucecita cálida, no un círculo
+  // plano — mismo lenguaje de color que faroles, ventanas y resplandores en
+  // el resto del proyecto (ver gradiente-halo-farol en escena-luz.js).
+  const defs = svg.append("defs");
+  const gradGlow = defs.append("radialGradient")
+      .attr("id", "grad-punto-industrial")
+      .attr("cx", "50%").attr("cy", "50%").attr("r", "50%");
+  gradGlow.append("stop").attr("offset", "0%").attr("stop-color", "#fff6e5").attr("stop-opacity", 0.95);
+  gradGlow.append("stop").attr("offset", "40%").attr("stop-color", "#ffcf8a").attr("stop-opacity", 0.55);
+  gradGlow.append("stop").attr("offset", "100%").attr("stop-color", "#ffb45e").attr("stop-opacity", 0);
 
   // 3. DIBUJAR LAS BARRAS (Nacen desmarcadas)
   const barras = svg.selectAll("rect")
@@ -438,44 +501,122 @@ d3.csv("grafico-poblacion.csv").then( function(data) {
         .attr("y", function(d) { return y(+d.Poblacion); })
         .attr("width", x.bandwidth())
         .attr("height", function(d) { return height - y(+d.Poblacion); })
-        .style("fill", "#69b3a2")
-        .style("opacity", 0.5) 
-        .style("transition", "opacity 0.4s ease"); // Transición suave para el encendido
+        .style("fill", "#38bdf8") // mismo azul de acento que las tarjetas de texto (--acento, zona-datos)
+        .style("opacity", 0.5)
+        .style("transition", "opacity 1.4s ease"); // Transición lenta: nada aparece/desaparece de golpe
 
+    // Posición del punto mientras es parte del dot plot: exactamente la
+    // misma altura que marca su población en el eje Y (el mismo punto en el
+    // que termina la barra), sobre el centro de su banda en el eje X de
+    // ciudades. Por eso el punto "nace sobre la barra" y funciona como dot
+    // plot sin necesitar ningún ajuste.
+    function posPoblacion(d) {
+      return { cx: x(d.Ciudad) + x.bandwidth() / 2, cy: y(+d.Poblacion) };
+    }
 
-   // 1. NUEVA ESCALA PARA EL ÍNDICE INDUSTRIAL
-    const yIndustrial = d3.scaleLinear()
-        .domain([0, 10]) 
-        .range([height, 0]);
+    // Posición final del punto dentro del scatter: el eje Y sigue siendo
+    // población (no cambia), sólo el eje X pasa a ser el índice industrial.
+    function posScatter(d) {
+      return { cx: xIndustrial(+d.Indice_Industrial_Nocturno), cy: y(+d.Poblacion) };
+    }
 
-    // 2. CREACIÓN DE LOS PUNTOS (Ponlo justo debajo de tus barras)
-    const puntos = svg.selectAll("circle")
+    // CREACIÓN DE LOS PUNTOS: cada uno es un grupo con un halo (glow suave)
+    // y un núcleo brillante, no un círculo rojo plano. Se mueven animando
+    // su "transform" (translate), así que basta con reescribir ese atributo
+    // para que la transición de posición (CSS, ver styles.css) la anime sola.
+    const puntos = svg.selectAll(".punto-industrial")
         .data(data)
-        .join("circle")
-        .attr("cx", function(d) { return x(d.Ciudad) + x.bandwidth() / 2; })
-        .attr("cy", function(d) { return yIndustrial(+d.Indice_Industrial_Nocturno); })
-        .attr("r", 6)
-        .style("fill", "#ff6b6b")
-        .style("opacity", 0) // <--- NACEN COMPLETAMENTE OCULTOS
-        .style("transition", "opacity 0.4s ease");     
+        .join("g")
+        .attr("class", "punto-industrial")
+        .attr("transform", function(d) { const p = posPoblacion(d); return `translate(${p.cx}, ${p.cy})`; })
+        .style("opacity", 0); // <--- NACEN COMPLETAMENTE OCULTOS
 
+    puntos.append("circle").attr("class", "punto-halo").attr("r", 14).style("fill", "url(#grad-punto-industrial)");
+    puntos.append("circle").attr("class", "punto-nucleo").attr("r", 2.5).style("fill", "#fff8ec");
 
-  // Función para marcar una sola ciudad
-  function marcarSolo(nombreCiudad) {
-    puntos.style("opacity", 0);
-    barras.style("opacity", function(d) {
-      return d.Ciudad === nombreCiudad ? 1.0 : 0.1;
-    });
+    // Mueve todos los puntos a la posición que calcule posFn (con transición
+    // suave, ver CSS) y ajusta su opacidad.
+    function moverPuntos(posFn, opacidad) {
+      puntos
+        .attr("transform", function(d) { const p = posFn(d); return `translate(${p.cx}, ${p.cy})`; })
+        .style("opacity", opacidad);
+    }
+
+  // --- FUNCIONES DE ESTADO, una por etapa de la narrativa ---
+
+  // Primera etapa: sólo el conjunto de barras, atenuado, sin resaltar nada.
+  function estadoPoblacionInicial() {
+    mostrarEjeXCiudades(true); mostrarEjeXIndustrial(false);
+    barras.style("opacity", 0.15);
+    moverPuntos(posPoblacion, 0);
   }
 
-  // Función para marcar absolutamente todas
-  function marcarTodas() {
+  // Primera etapa (continuación): resalta una única ciudad entre las barras.
+  function resaltarBarra(nombreCiudad) {
+    mostrarEjeXCiudades(true); mostrarEjeXIndustrial(false);
+    barras.style("opacity", function(d) { return d.Ciudad === nombreCiudad ? 1.0 : 0.1; });
+    moverPuntos(posPoblacion, 0);
+  }
+
+  // Segunda etapa: sobre cada barra nace, muy de a poco, una lucecita
+  // cálida — en el mismo lugar exacto que después ocupará como dot plot.
+  // Las barras siguen intactas, sólo los puntos ganan opacidad.
+  function nacePuntos(opacidadPuntos) {
+    mostrarEjeXCiudades(true); mostrarEjeXIndustrial(false);
     barras.style("opacity", 1.0);
-    puntos.style("opacity", 0.0);
+    moverPuntos(posPoblacion, opacidadPuntos);
   }
 
-  function marcarPuntos(){
-    puntos.style("opacity", 1.0);
+  // Tercera y cuarta etapa: dot plot. Único cambio respecto a la anterior:
+  // las barras desaparecen. Los ejes (ciudades en X, población en Y) siguen
+  // exactamente iguales, así el punto nunca queda sin referencia — y se
+  // mantiene así durante los tres pasos de texto de la cuarta etapa.
+  function estadoDotPlot() {
+    mostrarEjeXCiudades(true); mostrarEjeXIndustrial(false);
+    barras.style("opacity", 0);
+    moverPuntos(posPoblacion, 1.0);
+  }
+
+  // Quinta etapa, paso 1: se apagan los nombres de ciudad. El eje Y no se
+  // toca. Los puntos todavía no se mueven.
+  function ocultarEjeCiudades() {
+    mostrarEjeXCiudades(false); mostrarEjeXIndustrial(false);
+    barras.style("opacity", 0);
+    moverPuntos(posPoblacion, 1.0);
+  }
+
+  // Quinta etapa, paso 2: nace el nuevo eje (industrialización). Los puntos
+  // siguen quietos en su posición de dot plot — primero cambia el
+  // significado del eje, recién después cambian los datos.
+  function mostrarEjeIndustrial() {
+    mostrarEjeXCiudades(false); mostrarEjeXIndustrial(true);
+    barras.style("opacity", 0);
+    moverPuntos(posPoblacion, 1.0);
+  }
+
+  // Sexta etapa: transformación — con el nuevo eje ya instalado, cada punto
+  // interpola lentamente su posición horizontal hacia el scatter. El eje Y
+  // (población) sigue siendo el mismo de siempre.
+  function transformarEnScatter() {
+    mostrarEjeXCiudades(false); mostrarEjeXIndustrial(true);
+    barras.style("opacity", 0);
+    moverPuntos(posScatter, 1.0);
+  }
+
+  // Séptima etapa: ya no hay barras ni eje de ciudades — sólo se resalta o
+  // se muestra el conjunto completo de puntos dentro del scatter ya formado.
+  function resaltarPunto(nombreCiudad) {
+    mostrarEjeXCiudades(false); mostrarEjeXIndustrial(true);
+    barras.style("opacity", 0);
+    puntos
+      .attr("transform", function(d) { const p = posScatter(d); return `translate(${p.cx}, ${p.cy})`; })
+      .style("opacity", function(d) { return d.Ciudad === nombreCiudad ? 1.0 : 0.12; });
+  }
+
+  function mostrarTodosPuntos() {
+    mostrarEjeXCiudades(false); mostrarEjeXIndustrial(true);
+    barras.style("opacity", 0);
+    moverPuntos(posScatter, 1.0);
   }
 
   // --- CONTROL DE SCROLLYTELLING CON .stepG ---
@@ -500,19 +641,41 @@ d3.csv("grafico-poblacion.csv").then( function(data) {
         steps.forEach(s => s.classList.remove('active'));
         step.classList.add('active');
 
-        // B) Leemos qué ciudad tiene asignada esta tarjeta mediante su atributo HTML
+        // B) Leemos en qué fase de la narrativa estamos y, si aplica, qué
+        // ciudad tiene asignada esta tarjeta.
+        const fase = step.getAttribute('data-fase');
         const ciudadActiva = step.getAttribute('data-ciudad');
 
         // C) Ejecutamos la animación correspondiente en el gráfico
-        if (ciudadActiva === "inicial") {
-          barras.style("opacity", 0.15); // Todo apagado
-          puntos.style("opacity", 0);
-        } else if (ciudadActiva === "todas") {
-          marcarTodas();                 // Todo encendido
-        } else if (ciudadActiva === "puntos") {
-          marcarPuntos();                // Muestra el índice industrial nocturno
-        } else {
-          marcarSolo(ciudadActiva);      // Enciende CABA, Firmat o Junín dinámicamente
+        switch (fase) {
+          case "poblacion":
+            estadoPoblacionInicial();
+            break;
+          case "poblacion-ciudad":
+            resaltarBarra(ciudadActiva);
+            break;
+          case "nace-punto":
+            nacePuntos(parseFloat(step.getAttribute('data-opacidad-puntos')) || 1);
+            break;
+          case "dot-plot":
+            estadoDotPlot();
+            break;
+          case "eje-x-oculta":
+            ocultarEjeCiudades();
+            break;
+          case "eje-x-industrial":
+            mostrarEjeIndustrial();
+            break;
+          case "transformacion":
+            transformarEnScatter();
+            break;
+          case "scatter":
+          case "scatter-todas":
+            mostrarTodosPuntos();
+            break;
+          case "scatter-ciudad":
+            resaltarPunto(ciudadActiva);
+            break;
         }
       }
     });

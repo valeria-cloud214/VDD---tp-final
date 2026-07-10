@@ -1116,7 +1116,7 @@
    .escena-transicion-datos {
        position: relative;
        width: 100%;
-       height: 1440vh; /* sticky (100vh) + 13 disparadores (100vh c/u) + buffer chico */
+       height: 1040vh; /* sticky (100vh) + 9 disparadores (100vh c/u) + buffer chico */
        background-color: #070912;
    }
 
@@ -1234,8 +1234,64 @@
        stroke-width: 1;
    }
 
-   /* Frases sueltas: nada de tarjeta ni fondo — sólo tipografía blanca con
-      mucho aire alrededor, apoyada en el contraste del cielo oscuro */
+   /* Halo oscuro en capas (no un texto-shadow único): sin esto, el texto se
+      pierde justo donde pasa por detrás la franja clara de la Vía Láctea.
+      Rodea cada letra en vez de agregar una caja — se reutiliza en las tres
+      partes con texto de esta escena (razonamiento, bloques, hipótesis). */
+   .td-razonamiento,
+   .td-frase p,
+   .td-hipotesis {
+       text-shadow:
+           0 0 10px rgba(0, 0, 0, 0.9),
+           0 0 26px rgba(0, 0, 0, 0.8),
+           0 4px 18px rgba(0, 0, 0, 0.75);
+   }
+
+   /* --- PRIMERA PARTE: el razonamiento se arma de a poco ------------------
+      Lista vertical centrada (mismo mecanismo que las hipótesis, más abajo):
+      cada línea entra con su propio fade, ninguna se retira — recién
+      cuando arranca la segunda parte se desvanece el bloque entero. */
+   .td-razonamiento {
+       position: absolute;
+       left: 0;
+       right: 0;
+       top: 50%;
+       transform: translateY(-50%);
+       z-index: 3;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       gap: 16px;
+       padding: 0 14%;
+       pointer-events: none;
+       opacity: 0;
+       transition: opacity 1.3s ease;
+   }
+
+   .td-razonamiento.td-visible {
+       opacity: 1;
+   }
+
+   .td-linea-razonamiento {
+       font-family: var(--font-heading, 'Nunito', sans-serif);
+       font-weight: 600;
+       font-size: 2rem;
+       line-height: 1.5;
+       color: #ffffff;
+       text-align: center;
+       opacity: 0;
+       transform: translateY(14px);
+       transition: opacity 1.1s ease, transform 1.1s ease;
+   }
+
+   .td-linea-razonamiento.activo-td {
+       opacity: 1;
+       transform: translateY(0);
+   }
+
+   /* --- SEGUNDA PARTE (bloque editorial único) y CUARTA PARTE (frase de
+      cierre): nada de tarjeta ni fondo — sólo tipografía blanca con mucho
+      aire alrededor, apoyada en el contraste del cielo oscuro --------------- */
    .td-texto-contenedor {
        position: absolute;
        inset: 0;
@@ -1267,39 +1323,34 @@
        font-size: 2.3rem;
        line-height: 1.5;
        color: #ffffff;
-       /* Halo oscuro en capas (no un texto-shadow único): sin esto, el texto
-          se pierde justo donde pasa por detrás la franja clara de la Vía
-          Láctea. Rodea cada letra en vez de agregar una caja. */
-       text-shadow:
-           0 0 10px rgba(0, 0, 0, 0.9),
-           0 0 26px rgba(0, 0, 0, 0.8),
-           0 4px 18px rgba(0, 0, 0, 0.75);
        letter-spacing: 0.01em;
-   }
-
-   .td-frase-chica p {
-       font-size: 1.5rem;
-       font-weight: 400;
-       color: rgba(248, 250, 252, 0.9);
    }
 
    .td-frase-grande p {
        font-size: 2.7rem;
    }
 
-   /* Segunda línea de la pregunta central: aparece con una pequeña pausa
-      propia, como si Jorge dejara flotar la idea antes de completarla */
-   .td-linea-pausa {
-       display: inline-block;
+   /* Segunda línea del bloque editorial: más chica, aparece con una pequeña
+      pausa propia — como si Jorge dejara flotar la primera idea antes de
+      completarla con la segunda. */
+   .td-frase-secundaria {
+       display: block;
+       margin-top: 20px;
+       font-family: var(--font-heading, 'Nunito', sans-serif);
+       font-weight: 400;
+       font-size: 1.4rem;
+       line-height: 1.5;
+       color: rgba(248, 250, 252, 0.78);
        opacity: 0;
-       transition: opacity 0.9s ease 0.7s;
+       transition: opacity 1s ease;
    }
 
-   .td-frase.activo-td .td-linea-pausa {
+   .td-frase.activo-td .td-frase-secundaria {
        opacity: 1;
+       transition-delay: 0.6s;
    }
 
-   /* Hipótesis: se van acumulando una debajo de otra, nunca se reemplazan */
+   /* --- TERCERA PARTE: hipótesis — se acumulan, nunca se reemplazan ------- */
    .td-hipotesis-contenedor {
        position: absolute;
        left: 0;
@@ -1310,7 +1361,7 @@
        display: flex;
        flex-direction: column;
        align-items: center;
-       gap: 22px;
+       gap: 20px;
        padding: 0 12%;
        pointer-events: none;
        opacity: 1;
@@ -1321,23 +1372,41 @@
        opacity: 0;
    }
 
+   /* Tipografía más chica que las frases principales y con un pequeño trazo
+      a la izquierda (no un ícono): se leen como anotaciones — hipótesis que
+      Jorge va tirando, no como otra frase más. */
    .td-hipotesis {
+       position: relative;
+       padding-left: 28px;
        font-family: var(--font-heading, 'Nunito', sans-serif);
-       font-size: 1.7rem;
+       font-size: 1.5rem;
        font-weight: 600;
        color: #ffffff;
-       text-shadow:
-           0 0 8px rgba(0, 0, 0, 0.9),
-           0 0 20px rgba(0, 0, 0, 0.8),
-           0 4px 14px rgba(0, 0, 0, 0.75);
        opacity: 0;
        transform: translateY(14px);
-       transition: opacity 0.9s ease, transform 0.9s ease;
+       transition: opacity 0.9s ease, transform 0.9s ease, color 0.9s ease;
+   }
+
+   .td-hipotesis::before {
+       content: "";
+       position: absolute;
+       left: 0;
+       top: 0.62em;
+       width: 16px;
+       height: 1px;
+       background: var(--acento);
+       opacity: 0.75;
    }
 
    .td-hipotesis.activo-td {
        opacity: 1;
        transform: translateY(0);
+   }
+
+   /* La hipótesis más reciente se lee con fuerza; las que ya se formularon
+      antes quedan más tenues — siguen ahí, pero ya no son el foco. */
+   .td-hipotesis.activo-td.td-hipotesis-anterior {
+       opacity: 0.42;
    }
 
    .td-disparador {
@@ -1348,14 +1417,17 @@
    }
 
    @media (max-width: 760px) {
+       .td-linea-razonamiento {
+           font-size: 1.4rem;
+       }
        .td-frase p {
            font-size: 1.5rem;
        }
        .td-frase-grande p {
            font-size: 1.8rem;
        }
-       .td-frase-chica p {
-           font-size: 1.15rem;
+       .td-frase-secundaria {
+           font-size: 1.1rem;
        }
        .td-hipotesis {
            font-size: 1.15rem;
@@ -1376,6 +1448,7 @@
      flex-direction: row-reverse;
      position: relative;
      width: 100%;
+     background-color: #060816;
    }
    
    /* El gráfico ocupa la mitad izquierda y se queda fijo */
@@ -1410,6 +1483,31 @@
    #my_dataviz .domain,
    #my_dataviz .tick line {
      stroke: #64748b;
+   }
+
+   /* Puntos de industrialización (halo + núcleo): el eje Y (cy) nunca se
+      anima — la población no cambia en toda la transición. El "transform"
+      sólo entra en juego en la sexta etapa, cuando el eje X ya pasó a ser
+      industrialización y cada punto interpola su posición horizontal hacia
+      el scatter (ver transformarEnScatter() en main.js). Easing simétrico,
+      sin overshoot ni rebote: el movimiento tiene que sentirse tranquilo. */
+   #my_dataviz .punto-industrial {
+     transition: transform 2.6s cubic-bezier(0.45, 0, 0.15, 1), opacity 1.8s ease;
+   }
+   #my_dataviz .punto-halo {
+     pointer-events: none;
+   }
+   #my_dataviz .punto-nucleo {
+     pointer-events: none;
+   }
+
+   /* Ejes del gráfico: el eje Y (población) nunca cambia de opacidad — sólo
+      los dos ejes X (ciudades / industrialización) se cruzan en la quinta
+      etapa, uno se apaga y el otro nace en su lugar (ver
+      ocultarEjeCiudades() / mostrarEjeIndustrial() en main.js). El lector
+      nunca se queda sin al menos un eje de referencia visible. */
+   #my_dataviz .eje-grafico {
+     transition: opacity 1.6s ease;
    }
    
    /* La columna de textos ocupa la mitad derecha */
