@@ -2071,75 +2071,282 @@
        background-image: none;
    }
    
-   .disparador-unificado-8t {
+   /* ==========================================================================
+      ESCENA MUNDIAL — El mismo patrón, repetido en todo el planeta
+      (ver js/escena-mundo.js y js/datos-mundo.js)
+
+      3 partes: intro pinneada (actos 1-2) → grilla en SCROLL NORMAL (acto
+      3) → cierre pinneado (acto 4). La grilla dejó de estar pinneada
+      porque los embeds de Flourish traen su propio título/leyenda
+      incrustado, y forzarlos a entrar en 100vh recortados los hacía
+      solaparse con el resto del contenido — mejor tamaño real y que el
+      usuario siga bajando.
+      ========================================================================== */
+
+   /* ---- PARTE 1 y 3: mecanismo pinneado compartido (mismo método que
+      ESCENA 6A: pin de 100vh + N disparadores de 100vh) -------------------- */
+   .escena-mundo-intro-pin {
+       position: relative;
+       width: 100%;
+       height: 840vh; /* sticky (100vh) + 7 disparadores (100vh c/u) + buffer chico */
+       background-color: #050508;
+   }
+
+   .escena-mundo-cierre-pin {
+       position: relative;
+       width: 100%;
+       height: 440vh; /* sticky (100vh) + 3 disparadores (100vh c/u) + buffer chico */
+       background-color: #050508;
+   }
+
+   .pin-mundo-intro,
+   .pin-mundo-cierre {
+       position: sticky;
+       top: 0;
+       left: 0;
+       width: 100%;
+       height: 100vh;
+       overflow: hidden;
+       background-color: #050508;
+   }
+
+   .mundo-intro-disparador,
+   .mundo-cierre-disparador {
        height: 100vh;
        width: 100%;
        position: relative;
        pointer-events: none;
    }
-   
-   /* ==========================================================================
-      ESCENA 8 — Grilla de 16 gráficos mundiales
-      ========================================================================== */
-   
-   .escena-mundo-scroll {
-       position: relative;
-       width: 100%;
-       background-color: #050508;
-       padding: 80px 60px 120px;
-   }
-   
-   .contenedor-fijo-mundo-graficos {
-       width: 100%;
-       max-width: 1400px;
-       margin: 0 auto;
+
+   /* Cada acto es una capa a pantalla completa dentro de su pin. Por
+      defecto invisible: sólo se enciende durante su propio tramo de scroll
+      (ver actualizarPaso() en escena-mundo.js). */
+   .mundo-acto {
+       position: absolute;
+       inset: 0;
+       z-index: 3;
        display: flex;
        flex-direction: column;
-       gap: 40px;
-   }
-   
-   .intro-graficos-mundo {
-       text-align: center;
+       align-items: center;
+       justify-content: center;
+       pointer-events: none;
        opacity: 0;
-       transform: translateY(20px);
-       transition: opacity 0.8s ease, transform 0.8s ease;
+       transition: opacity 1.6s ease;
    }
-   
-   .intro-graficos-mundo.activo-mg {
+
+   .mundo-acto.mundo-visible {
+       opacity: 1;
+   }
+
+   /* Texto compartido por todos los "beats" de esta escena: mismo halo
+      oscuro que ya usa escena-6a para que el texto se lea bien encima de
+      cualquier fondo, sin necesidad de una caja de fondo. */
+   .mundo-acto1-texto,
+   .mundo-acto2-texto,
+   .mundo-acto4-texto {
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       gap: 14px;
+       padding: 0 12%;
+       text-align: center;
+   }
+
+   .mundo-acto4-texto {
+       position: absolute;
+       inset: 0;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       justify-content: center;
+   }
+
+   .mundo-linea-acto1,
+   .mundo-frase-acto2,
+   .mundo-linea-acto4 {
+       font-family: var(--font-heading, 'Nunito', sans-serif);
+       font-weight: 600;
+       font-size: 1.9rem;
+       line-height: 1.5;
+       color: #ffffff;
+       opacity: 0;
+       transform: translateY(14px);
+       transition: opacity 1.1s ease, transform 1.1s ease;
+       text-shadow:
+           0 0 10px rgba(0, 0, 0, 0.9),
+           0 0 26px rgba(0, 0, 0, 0.8),
+           0 4px 18px rgba(0, 0, 0, 0.75);
+   }
+
+   .mundo-linea-acto1.activo-m,
+   .mundo-frase-acto2.activo-m,
+   .mundo-linea-acto4.activo-m {
        opacity: 1;
        transform: translateY(0);
    }
-   
-   .intro-graficos-mundo p {
-       font-size: 1.3rem;
-       color: #94a3b8;
-       line-height: 1.6;
+
+   /* Las frases del acto 2 se posicionan una encima de otra (mismo lugar en
+      pantalla, sólo una activa a la vez — se REEMPLAZAN) — igual mecánica
+      que .td-frase en escena-6a. Las líneas del acto 4, en cambio, se
+      ACUMULAN (varias activas a la vez): por eso viven en flujo normal,
+      apiladas verticalmente por el "gap" del contenedor, en vez de
+      superpuestas — si no, se pisan entre sí. */
+   .mundo-acto2-texto {
+       position: relative;
+       min-height: 3.5em;
    }
-   
-   /* Grilla 4 columnas */
+   .mundo-frase-acto2 {
+       position: absolute;
+       left: 0;
+       right: 0;
+   }
+
+   /* ACTO 2 — nombres de ciudades entrando de a poco, dispersos y con poca
+      opacidad: no es una lista, son lugares nuevos entrando a la
+      investigación. */
+   .mundo-nombres-ciudades {
+       position: absolute;
+       inset: 0;
+       z-index: 2;
+   }
+
+   .mundo-nombre-ciudad {
+       position: absolute;
+       font-family: var(--font-heading, 'Nunito', sans-serif);
+       font-weight: 600;
+       color: #cbd5e1;
+       opacity: 0;
+       transform: translateY(8px);
+       transition: opacity 1.8s ease, transform 1.8s ease;
+       white-space: nowrap;
+   }
+
+   .mundo-nombre-ciudad.mundo-nombre-activo {
+       opacity: 0.32;
+       transform: translateY(0);
+   }
+
+   /* ---- PARTE 2: la grilla (acto 3), en scroll normal --------------------
+      Sección normal (no pinneada, no sticky): crece con el contenido, así
+      cada gráfico tiene su tamaño real en vez de pelear por un cupo de
+      100vh. */
+   .escena-mundo-grilla {
+       position: relative;
+       width: 100%;
+       background-color: #050508;
+       padding: 70px 40px 90px;
+   }
+
+   .mundo-grilla-contenido {
+       width: 100%;
+       max-width: 1300px;
+       margin: 0 auto;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       gap: 16px;
+   }
+
+   .mundo-intro-grilla {
+       font-size: 1rem;
+       color: #94a3b8;
+       text-align: center;
+       max-width: 640px;
+       opacity: 0;
+       transform: translateY(14px);
+       transition: opacity 1s ease, transform 1s ease;
+   }
+
+   .mundo-intro-grilla.mundo-visible {
+       opacity: 1;
+       transform: translateY(0);
+   }
+
+   /* Guía breve: no es una leyenda técnica, una sola tarjeta chica que
+      aparece al entrar a la sección y se apaga sola apenas la segunda fila
+      ya está a la vista (con la primera alcanza para entender qué se está
+      mirando). Al ser scroll normal ya no compite por espacio pinneado:
+      basta con un simple fade. */
+   .mundo-guia {
+       max-width: 520px;
+       text-align: center;
+       background: rgba(8, 10, 16, 0.6);
+       border: 1px solid rgba(255, 255, 255, 0.08);
+       border-radius: var(--radio-tarjeta, 10px);
+       padding: 14px 22px;
+       opacity: 0;
+       transform: translateY(-10px);
+       transition: opacity 1.1s ease, transform 1.1s ease;
+   }
+
+   .mundo-guia.mundo-visible {
+       opacity: 1;
+       transform: translateY(0);
+   }
+
+   .mundo-guia h3 {
+       color: var(--acento);
+       font-size: 1rem;
+       margin-bottom: 4px;
+   }
+
+   .mundo-guia p {
+       color: #cbd5e1;
+       font-size: 0.85rem;
+       line-height: 1.5;
+   }
+
+   /* La grilla: cada fila es una frase (que ocupa todo el ancho, ver
+      .mundo-narrativa-fila) seguida de sus 4 ciudades — sin wrappers
+      extra: el "grid-column: 1 / -1" de la frase alcanza para forzar su
+      propia fila antes de que entren las 4 celdas siguientes. Alto de
+      celda real (no recortado a un vh): acá es donde se ve el gráfico. */
    .grilla-graficos-mundo {
+       width: 100%;
        display: grid;
        grid-template-columns: repeat(4, 1fr);
-       gap: 20px;
+       gap: 18px;
+       margin-top: 8px;
    }
-   
-   .grilla-graficos-mundo {
-       opacity: 1 !important;
-       transform: none !important;
+
+   .mundo-narrativa-fila {
+       grid-column: 1 / -1;
+       font-size: 1.15rem;
+       font-weight: 500;
+       color: #e2e8f0;
+       text-align: center;
+       margin: 26px 0 6px;
+       opacity: 0;
+       transform: translateY(12px);
+       transition: opacity 1s ease, transform 1s ease;
    }
-   
-   
+
+   .grilla-graficos-mundo > .mundo-narrativa-fila:first-child {
+       margin-top: 0;
+   }
+
+   .mundo-narrativa-fila.mundo-visible {
+       opacity: 1;
+       transform: translateY(0);
+   }
+
    .celda-grafico-mundo {
        background: #0f172a;
-       border-radius: 10px;
+       border-radius: 8px;
        overflow: hidden;
-       border: 1px solid rgba(255,255,255,0.06);
-       height: 200px;
-       transition: border-color 0.3s ease, transform 0.3s ease;
+       border: 1px solid rgba(255, 255, 255, 0.06);
        position: relative;
-       will-change: transform;
+       height: 200px;
+       opacity: 0;
+       transform: translateY(20px) scale(0.97);
+       transition: opacity 1s ease, transform 1s ease, border-color 0.4s ease, box-shadow 0.4s ease;
    }
-   
+
+   .celda-grafico-mundo.mundo-visible {
+       opacity: 1;
+       transform: translateY(0) scale(1);
+   }
+
    .cargando-grafico {
        position: absolute;
        inset: 0;
@@ -2151,51 +2358,69 @@
        font-size: 0.8rem;
        text-align: center;
        padding: 10px;
-       background: #0f172a;   /* ← nueva: tapa el gráfico hasta que esté realmente listo */
+       background: #0f172a;
        z-index: 2;
    }
-   
+
    .celda-grafico-mundo.grafico-listo .cargando-grafico {
        display: none;
    }
-   
-   .celda-grafico-mundo:hover {
-       border-color: var(--acento-suave);
-       transform: translateY(-3px);
-   }
-   
+
    .celda-grafico-mundo .flourish-embed {
        width: 100%;
        height: 100%;
    }
-   
-   .disparador-mundo-graficos {
-       height: 60vh;
-       width: 100%;
-       position: relative;
+
+   /* Anotación discreta por gráfico (▲ tendencia creciente, etc.) — ver
+      "overlay" en cada ciudad de js/datos-mundo.js. */
+   .grafico-overlay {
+       position: absolute;
+       bottom: 7px;
+       right: 8px;
+       z-index: 3;
+       font-size: 0.65rem;
+       font-weight: 600;
+       color: var(--acento);
+       background: rgba(5, 6, 10, 0.6);
+       padding: 3px 7px;
+       border-radius: 4px;
        pointer-events: none;
    }
-   
-   /* ==========================================================================
-      ESCENA 8 — Transición post-telón (reemplaza escena-scroll-unificada)
-      ========================================================================== */
-   
-      .escena-transicion-mundo {
-       position: relative;
-       height: 220vh; /* sticky (100vh) + 1 disparador (100vh) + buffer chico */
-       width: 100%;
-       background-color: #050508;
+
+   /* Resaltado contextual: sólo se activa cuando la grilla entera tiene la
+      clase "mundo-grilla-resaltando" (ver escena-mundo.js, se agrega al
+      revelarse la última fila) — el resto del tiempo, "destacado" en los
+      datos no cambia nada visualmente. Nada exagerado: un poco más de
+      brillo, un borde fino y una escala mínima. */
+   .mundo-grilla-resaltando .celda-grafico-mundo.mundo-destacada {
+       border-color: var(--acento);
+       box-shadow: 0 0 0 1px var(--acento-suave), 0 10px 26px rgba(0, 0, 0, 0.5);
+       transform: translateY(0) scale(1.03);
+       z-index: 2;
    }
-   
-   .escena-transicion-mundo .contenedor-fijo-unificado {
-       background-color: #050508;
+
+   .mundo-grilla-resaltando .celda-grafico-mundo:not(.mundo-destacada) {
+       opacity: 0.45;
    }
-   
-   .escena-transicion-mundo .fondo-negro-puro {
-       background-color: #050508;
-       background-image: none;
+
+   @media (max-width: 900px) {
+       .grilla-graficos-mundo {
+           grid-template-columns: repeat(2, 1fr);
+       }
    }
-   
+
+   @media (max-width: 768px) {
+       .mundo-linea-acto1,
+       .mundo-frase-acto2,
+       .mundo-linea-acto4 {
+           font-size: 1.3rem;
+       }
+       .mundo-nombre-ciudad {
+           font-size: 0.95rem !important;
+       }
+   }
+
+
    /* ==========================================================================
       ESCENA DE CIERRE — "El regreso" (cierre emocional del proyecto)
       Todo el contenido visual vive en #svg-cierre (ver index.html y

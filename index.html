@@ -984,129 +984,72 @@
 
     </section>
 
-        <!-- =============================================
-        ESCENA 8: LOS 16 GRÁFICOS MUNDIALES
-        ============================================= -->
+    <!-- =============================================
+        ESCENA MUNDIAL — El mismo patrón, repetido en todo el planeta
+        (ver js/escena-mundo.js y js/datos-mundo.js)
 
-    <section id="escena-8-transicion" class="escena-transicion-mundo">
-        <div class="contenedor-fijo-unificado">
-            <div class="fondo-pantalla-completa fondo-negro-puro"></div>
-            <div class="contenido-flotante contenido-centrado">
-                <div class="parrafo-unificado activo-unificado" data-unificado-8t="1">
-                    <p>Lo que descubrí en Argentina no era una excepción.</p>
-                    <p>Era parte de algo mucho más grande.</p>
-                </div>
+        3 partes, ya NO todas pinneadas: los gráficos de Flourish traen su
+        propio título/leyenda incrustado en el embed, y forzarlos a entrar
+        en una grilla clippeada a 100vh los hacía solaparse. Ahora sólo el
+        arranque (actos 1-2, sólo texto) y el cierre (acto 4) están
+        pinneados; la grilla del medio (acto 3) es scroll normal, cada fila
+        aparece a tamaño completo y el usuario puede seguir bajando para
+        ver más — no hace falta que las 16 entren en una sola pantalla.
+
+        El id "escena-8-transicion" se mantiene en la PARTE 1 (aunque ya no
+        se llame así puertas afuera) porque main.js lo usa para decidir
+        cuándo levantar el telón que viene de la escena de luz.
+    ============================================= -->
+
+    <!-- PARTE 1 — pinneada: actos 1 (cambio de escala) y 2 (el mundo
+         empieza a aparecer) -->
+    <section id="escena-8-transicion" class="escena-mundo-intro-pin">
+
+        <div class="pin-mundo-intro" id="mundo-intro-pin">
+
+            <div class="mundo-acto mundo-acto1" id="mundo-acto1">
+                <div class="mundo-acto1-texto" id="mundo-acto1-texto"></div>
             </div>
+
+            <div class="mundo-acto mundo-acto2" id="mundo-acto2">
+                <div class="mundo-nombres-ciudades" id="mundo-nombres-ciudades" aria-hidden="true"></div>
+                <div class="mundo-acto2-texto" id="mundo-acto2-texto"></div>
+            </div>
+
         </div>
-        <div class="disparador-unificado-8t" data-paso-8t="1"></div>
+
+        <!-- 7 tramos de 100vh: acto 1 = pasos 1-4, acto 2 = pasos 5-7 -->
+        <div class="mundo-intro-disparador" data-paso-mundo="1"></div>
+        <div class="mundo-intro-disparador" data-paso-mundo="2"></div>
+        <div class="mundo-intro-disparador" data-paso-mundo="3"></div>
+        <div class="mundo-intro-disparador" data-paso-mundo="4"></div>
+        <div class="mundo-intro-disparador" data-paso-mundo="5"></div>
+        <div class="mundo-intro-disparador" data-paso-mundo="6"></div>
+        <div class="mundo-intro-disparador" data-paso-mundo="7"></div>
+
     </section>
 
-    <section id="escena-8" class="escena-mundo-scroll">
+    <!-- PARTE 2 — acto 3: la grilla, en scroll normal (NO pinneada). Cada
+         fila (con su frase y sus 4 gráficos a tamaño completo) se revela
+         sola al entrar en pantalla — ver escena-mundo.js. -->
+    <section id="escena-mundo-grilla" class="escena-mundo-grilla">
+        <div class="mundo-grilla-contenido">
+            <p class="mundo-intro-grilla" id="mundo-intro-grilla"></p>
+            <div class="mundo-guia" id="mundo-guia"></div>
+            <div class="grilla-graficos-mundo" id="grilla-graficos-mundo"></div>
+        </div>
+    </section>
 
-        <div class="contenedor-fijo-mundo-graficos">
+    <!-- PARTE 3 — pinneada: acto 4 (cierre, empalma con la escena final) -->
+    <section id="escena-mundo-cierre" class="escena-mundo-cierre-pin">
 
-            <div class="intro-graficos-mundo">
-                <p>La evolución de la contaminación lumínica en 16 ciudades del mundo entre 2006 y 2024.</p>
-            </div>
+        <div class="pin-mundo-cierre" id="mundo-cierre-pin">
+            <div class="mundo-acto4-texto" id="mundo-acto4-texto"></div>
+        </div>
 
-            <div class="grilla-graficos-mundo">
-
-                <!-- FILA 1 -->
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29324397">
-                    </div>
-                </div>
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29324604">
-                    </div>
-                </div>
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29324591">
-                    </div>
-                </div>
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29324582">
-                    </div>
-                </div>
-
-                <!-- FILA 2 -->
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29324438">
-                    </div>
-                </div>
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29324485">
-                    </div>
-                </div>
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29480361">
-                    </div>
-                </div>
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29480465">
-                    </div>
-                </div>
-
-                <!-- FILA 3 -->
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29480504">
-                    </div>
-                </div>
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29480539">
-                    </div>
-                </div>
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29480564">
-                    </div>
-                </div>
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29480590">
-                    </div>
-                </div>
-
-                
-                <!-- FILA 4 -->
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29324397">
-                    </div>
-                </div>
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29324604">
-                    </div>
-                </div>
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29324591">
-                    </div>
-                </div>
-                <div class="celda-grafico-mundo">
-                    <div class="cargando-grafico">Cargando gráfico…</div>   <!-- ← esta línea es nueva -->
-                    <div class="flourish-embed flourish-chart" data-src="visualisation/29324582">
-                    </div>
-                </div>
-
-            </div> <!-- cierre grilla-graficos-mundo -->
-
-            <div class="quitar-warning"></div>
-
-        </div> <!-- cierre contenedor-fijo-mundo-graficos -->
-
-        <div class="disparador-mundo-graficos" data-paso-mg="graficos"></div>
+        <div class="mundo-cierre-disparador" data-paso-cierre="1"></div>
+        <div class="mundo-cierre-disparador" data-paso-cierre="2"></div>
+        <div class="mundo-cierre-disparador" data-paso-cierre="3"></div>
 
     </section>
     </div>
@@ -1252,6 +1195,8 @@
         window.Flourish = { disable_autoload: true };
     </script>
     <script src="https://public.flourish.studio/resources/embed.js"></script>
+    <script src="js/datos-mundo.js"></script>
+    <script src="js/escena-mundo.js"></script>
     <script src="js/main.js"></script>
 
     <!-- GSAP + ScrollTrigger: las usan la escena "luz" y la escena de cierre -->

@@ -288,96 +288,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     disparadoresTelon.forEach(d => observadorTelon.observe(d));
 
-    // Cuando aparece la escena 8, el telón se levanta
+    // Cuando aparece la escena mundial, el telón se levanta. threshold es
+    // relativo al alto TOTAL del elemento observado, no al viewport: con
+    // 0.1 esto funcionaba mientras la escena medía unos pocos cientos de
+    // vh, pero la parte 1 de la escena mundial (ver escena-mundo-intro-pin
+    // en styles.css) pinnea varios cientos de vh — ningún scroll llega a
+    // mostrar el 10% de ESE alto de una, así que el observer nunca
+    // disparaba y el telón se quedaba negro para siempre. threshold: 0
+    // dispara apenas asoma el primer píxel, que es lo que en realidad
+    // queremos acá.
     const observadorLevantaTelon = new IntersectionObserver((entradas) => {
         entradas.forEach(entrada => {
             if (entrada.isIntersecting) {
                 telon.classList.remove("telon-activo");
             }
         });
-    }, { root: null, rootMargin: "0px", threshold: 0.1 });
+    }, { root: null, rootMargin: "0px", threshold: 0 });
 
     if (escena8) observadorLevantaTelon.observe(escena8);
 
-
-    
-    // ==========================================
-    // LÓGICA ESCENA 8 TRANSICIÓN
-    // ==========================================
-    const disparadores8t = document.querySelectorAll(".disparador-unificado-8t");
-    const parrafos8t = document.querySelectorAll("[data-unificado-8t]");
-
-    const observador8t = new IntersectionObserver((entradas) => {
-        entradas.forEach(entrada => {
-            if (entrada.isIntersecting) {
-                parrafos8t.forEach(p => p.classList.add("activo-unificado"));
-            }
-        });
-    }, { root: null, rootMargin: "-30% 0px -50% 0px", threshold: 0 });
-
-    disparadores8t.forEach(d => observador8t.observe(d));
-
-
-    // ==========================================
-    // LÓGICA ESCENA 8 — Grilla mundial
-    // ==========================================
-    // La conclusión de esta grilla ("no importa el continente/idioma...")
-    // ya no se muestra acá: ahora es el arranque de la escena de cierre
-    // (ver js/escena-cierre.js), que además se encarga de que la grilla se
-    // desvanezca gradualmente en vez de aparecer un cartel de texto.
-    
-    const disparadoresMG = document.querySelectorAll(".disparador-mundo-graficos");
-    const introMG = document.querySelector(".intro-graficos-mundo");
-    const grillaMG = document.querySelector(".grilla-graficos-mundo");
-    const celdasGrafico = document.querySelectorAll(".celda-grafico-mundo");
-
-    const observadorMG = new IntersectionObserver((entradas) => {
-        entradas.forEach(entrada => {
-            if (entrada.isIntersecting) {
-                const paso = entrada.target.getAttribute("data-paso-mg");
-                if (paso === "graficos") {
-                    if (introMG) introMG.classList.add("activo-mg");
-                }
-            }
-        });
-    }, { root: null, rootMargin: "-10% 0px -20% 0px", threshold: 0 });
-
-    disparadoresMG.forEach(d => observadorMG.observe(d));
-
-    // ==========================================
-    // Carga manual de cada gráfico Flourish de la grilla
-    // ==========================================
-    const observadorGraficosMG = new IntersectionObserver((entradas) => {
-        entradas.forEach(entrada => {
-            if (entrada.isIntersecting) {
-                const placeholder = entrada.target.querySelector(".flourish-embed");
-                if (placeholder && !placeholder.dataset.cargado && window.Flourish && window.Flourish.loadEmbed) {
-                    window.Flourish.loadEmbed(placeholder);
-                    placeholder.dataset.cargado = "1";
-
-                    requestAnimationFrame(() => {
-                        entrada.target.style.transform = "translateZ(0)";
-                        void entrada.target.offsetHeight;
-                    });
-
-                    // Flourish crea el <iframe> real recién después de loadEmbed(),
-                    // así que esperamos a que aparezca y a que termine de cargar
-                    // su contenido, en vez de asumir que ya está listo.
-                    const chequearIframe = setInterval(() => {
-                        const iframe = placeholder.querySelector("iframe");
-                        if (iframe) {
-                            clearInterval(chequearIframe);
-                            iframe.addEventListener("load", () => {
-                                entrada.target.classList.add("grafico-listo");
-                            });
-                        }
-                    }, 100);
-                }
-            }
-        });
-    }, { root: null, rootMargin: "300px 0px", threshold: 0.01 });
-
-    celdasGrafico.forEach(c => observadorGraficosMG.observe(c));
+    // La vieja "escena 8 transición" (frase suelta) y "escena 8" (grilla
+    // mundial ya armada) se reemplazaron por la escena mundial de 3 partes
+    // (intro pinneada → grilla en scroll normal → cierre pinneado) — ver
+    // js/escena-mundo.js (arma el DOM y la lógica de scroll a partir de
+    // js/datos-mundo.js) y css/styles.css (".escena-mundo-intro-pin",
+    // ".escena-mundo-grilla", ".escena-mundo-cierre-pin").
 
 }); // ← cierre del DOMContentLoaded
 
@@ -386,7 +321,12 @@ document.addEventListener("DOMContentLoaded", () => {
     //--------------------------------------------------------------------------------------
 
 // 1. DIMENSIONES DEL GRÁFICO (Asegúrate de que use la mitad de la pantalla)
-const margin = { top: 50, right: 70, bottom: 100, left: 70 };
+// "bottom" apenas más grande que el alto real de los nombres de ciudad
+// rotados -45° (para que no queden cortados) y "top" ajustado para que
+// quede prácticamente el mismo aire arriba que abajo: el SVG ya ocupa el
+// 100% de la altura de la pantalla, así que lo que centra el contenido
+// verticalmente es que estos dos márgenes sean parecidos entre sí.
+const margin = { top: 95, right: 70, bottom: 110, left: 70 };
 
 // Usamos el 50% del ancho de la ventana para definir el contenedor base
 const width = (window.innerWidth / 2) - margin.left - margin.right;
@@ -423,18 +363,17 @@ d3.csv("grafico-poblacion.csv").then( function(data) {
   ejeXCiudades.selectAll("text")
         .attr("transform", "translate(-10,0)rotate(-45)")
         .style("text-anchor", "end");
-  // Nombre de la variable, como pequeña etiqueta en la esquina superior
-  // derecha del gráfico (arriba del todo, por encima de cualquier barra —
-  // incluida CABA, la más alta) — se desvanece junto con el resto de este
-  // eje cuando cambia de significado (quinta etapa). El grupo ya está
-  // trasladado a (0, height), así que restamos esa distancia para volver
-  // a ubicarnos arriba del todo, a la misma altura que la etiqueta del eje Y.
+  // Nombre de la variable: al lado de la etiqueta de CABA (la última banda,
+  // la más a la derecha), a la misma altura aproximada que esa etiqueta
+  // rotada — no centrada más abajo, para no pedirle más margen inferior
+  // del que ya necesitan los nombres de ciudad. Se desvanece junto con el
+  // resto de este eje cuando cambia de significado (quinta etapa).
   ejeXCiudades.append("text")
-      .attr("x", width)
-      .attr("y", -(height + 18))
+      .attr("x", width + 4)
+      .attr("y", 20)
       .attr("fill", "#94a3b8")
-      .attr("text-anchor", "end")
-      .style("font-size", "0.8rem")
+      .attr("text-anchor", "start")
+      .style("font-size", "0.75rem")
       .text("Ciudades");
 
   // 2. EJE Y: escala lineal de población. No cambia NUNCA a lo largo de
