@@ -121,7 +121,7 @@
    
    .escena-scroll-largo {
        position: relative;
-       height: 680vh; /* sticky (100vh) + 8 disparadores (70vh c/u, sin gap) + buffer chico */
+       height: 540vh; /* sticky (100vh) + 6 disparadores (70vh c/u, sin gap) + buffer chico */
        width: 100%;
    }
    
@@ -189,15 +189,15 @@
        pointer-events: auto;
    }
    
-   /* Las 8 fotos de la Escena 2 */
+   /* Las 6 fotos de la Escena 2 (se sacaron la F4E1 y la F7E1 de las 8
+      originales; los nombres de archivo no cambian, sólo la numeración de
+      las clases que las usan). */
    .foto1 { background-image: url("../fotos/F1E1.png"); }
    .foto2 { background-image: url("../fotos/F2E1.png"); }
    .foto3 { background-image: url("../fotos/F3E1.png"); }
-   .foto4 { background-image: url("../fotos/F4E1.png"); }
-   .foto5 { background-image: url("../fotos/F5E1.png"); }
-   .foto6 { background-image: url("../fotos/F6E1.png"); }
-   .foto7 { background-image: url("../fotos/F7E1.png"); }
-   .foto8 { background-image: url("../fotos/F8E1.png"); }
+   .foto4 { background-image: url("../fotos/F5E1.png"); }
+   .foto5 { background-image: url("../fotos/F6E1.png"); }
+   .foto6 { background-image: url("../fotos/F8E1.png"); }
    
    /* Disparadores de scroll invisibles */
    .disparador {
@@ -220,12 +220,16 @@
       la misma técnica que ya usa js/escena-cielos.js (halo + punto + líneas
       finas, mismos colores) en vez de estar pintado en la foto. */
 
-   .fondo-capa-a, .fondo-capa-b {
-       opacity: 0;
-       transition: opacity .8s ease-in-out;
-   }
-   .fondo-capa-a.foto-visible, .fondo-capa-b.foto-visible {
+   /* Base: siempre opacidad 1, sin transición — nunca deja ver nada detrás. */
+   .fondo-capa-base {
        opacity: 1;
+       z-index: 1;
+   }
+   /* Saliente: va arriba de la base y se desvanece hacia ella. */
+   .fondo-capa-saliente {
+       opacity: 0;
+       z-index: 2;
+       transition: opacity .8s ease-in-out;
    }
 
    #svg-orion-overlay {
@@ -234,6 +238,7 @@
        width: 100%;
        height: 100%;
        pointer-events: none;
+       z-index: 3; /* siempre arriba de fondo-capa-base (1) y fondo-capa-saliente (2) */
    }
 
    /* Aparece suave al entrar a la escena y ya se queda así todo el
@@ -454,6 +459,79 @@
    }
    
    /* ==========================================================================
+      7a-transicion. APAGÓN + ECO DE ORIÓN — puente entre escena-4 y escena-5
+      (ver js/escena-transicion-orion.js)
+      ========================================================================== */
+
+   .escena-orion-apagon {
+       position: relative;
+       width: 100%;
+       height: 420vh; /* sticky (100vh) + 3 disparadores (100vh c/u) + buffer chico */
+       background-color: #0f172a; /* mismo color que .bloque-texto: la escena arranca "adentro" de ese panel */
+   }
+
+   .pin-orion-apagon {
+       position: sticky;
+       top: 0;
+       left: 0;
+       width: 100%;
+       height: 100vh;
+       overflow: hidden;
+       background-color: #0f172a; /* arranca igual al fondo del panel de texto de la escena anterior */
+       transition: background-color 1.6s ease-in-out;
+   }
+   /* Paso 1: recién acá se apaga de verdad, del azul del panel al negro */
+   .pin-orion-apagon.oa-oscurece {
+       background-color: #000000;
+   }
+
+   #svg-orion-apagon {
+       position: absolute;
+       inset: 0;
+       width: 100%;
+       height: 100%;
+       display: block;
+   }
+
+   #capa-orion-apagon {
+       opacity: 0;
+       transition: opacity 1.8s ease-in-out .5s; /* espera a que oscurezca antes de aparecer */
+   }
+   .pin-orion-apagon.oa-orion-visible #capa-orion-apagon {
+       opacity: 1;
+   }
+   /* Se disuelve más lento que como apareció — que se sienta como algo que
+      se apaga, no como algo que se corta */
+   .pin-orion-apagon.oa-orion-disolviendo #capa-orion-apagon {
+       opacity: 0;
+       transition: opacity 2.6s ease-in-out;
+   }
+
+   /* Primer vistazo del cielo frío de la ruta: mismo degradé que usa
+      #ruta-grad-cielo en escena-5 (ver index.html), para que cuando termine
+      esta escena y arranque la sticky de la ruta, el color ya sea el mismo
+      y no se note la costura. */
+   .oa-fondo-ruta {
+       position: absolute;
+       inset: 0;
+       width: 100%;
+       height: 100%;
+       background: linear-gradient(to bottom, #020208, #080a18 65%, #0d1024);
+       opacity: 0;
+       transition: opacity 2.2s ease-in-out;
+   }
+   .pin-orion-apagon.oa-fondo-visible .oa-fondo-ruta {
+       opacity: 1;
+   }
+
+   .oa-disparador {
+       height: 100vh;
+       width: 100%;
+       position: relative;
+       pointer-events: none;
+   }
+
+   /* ==========================================================================
       7a. ESCENA 5 — Ruta con auto (contenedor propio, SVG generado en
       js/escena-ruta.js). El auto se mueve leyendo el scroll directamente en
       cada frame (no por pasos con IntersectionObserver como el resto del
@@ -473,7 +551,7 @@
        width: 100%;
        height: 100vh;
        overflow: hidden;
-       background-color: #0a1220;
+       background-color: #020208;
    }
 
    #escena-ruta {
@@ -487,6 +565,55 @@
        width: 100%;
        height: 100%;
        display: block;
+   }
+
+   /* TEXTO — misma tarjeta que .texto-luz (blur + borde + sombra), pero
+      arriba en vez de abajo: acá no hay panel interactivo que compita por
+      ese espacio, así que la tarjeta queda más cómoda lejos del camino. */
+   .texto-ruta-contenedor {
+       position: absolute;
+       left: 60px;
+       top: 70px;
+       z-index: 2;
+       width: 100%;
+       max-width: 560px;
+       pointer-events: none;
+   }
+
+   .texto-ruta-tarjeta {
+       background: rgba(8, 10, 16, 0.76);
+       -webkit-backdrop-filter: blur(10px);
+       backdrop-filter: blur(10px);
+       border: 1px solid rgba(255, 255, 255, 0.08);
+       border-radius: var(--radio-tarjeta, 10px);
+       padding: 24px 28px;
+       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+
+       opacity: 0;
+       transform: translateY(-14px);
+       animation: ruta-texto-aparece 1s ease-in-out .3s forwards;
+   }
+
+   .texto-ruta-tarjeta p {
+       font-size: 1.15rem;
+       line-height: 1.55;
+       color: #f8fafc;
+   }
+
+   @keyframes ruta-texto-aparece {
+       to { opacity: 1; transform: translateY(0); }
+   }
+
+   @media (max-width: 760px) {
+       .texto-ruta-contenedor {
+           left: 20px;
+           right: 20px;
+           top: 90px;
+           max-width: none;
+       }
+       .texto-ruta-tarjeta p {
+           font-size: 1.05rem;
+       }
    }
 
    /* Cartel: post + tablero, apagado hasta que el auto lo pasa */
@@ -512,37 +639,6 @@
    }
    .ruta-cartel.ruta-cartel-visitado .ruta-cartel-texto {
        fill: #ffd166;
-   }
-
-   /* Texto arriba del todo, sin tarjeta ni recuadro — sólo el texto, para
-      no taparle los carteles al camino que va abajo */
-   .texto-ruta-flotante {
-       position: absolute;
-       z-index: 2;
-       left: 0;
-       top: 0;
-       width: 100%;
-       display: flex;
-       justify-content: center;
-       padding: 48px 60px 0;
-       pointer-events: none;
-   }
-
-   .texto-ruta-simple {
-       max-width: 780px;
-       text-align: center;
-       font-size: 1.25rem;
-       line-height: 1.7;
-       color: #f8fafc;
-       text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7), 0 1px 4px rgba(0, 0, 0, 0.85);
-       margin: 0;
-       opacity: 0;
-       transform: translateY(-14px);
-       animation: ruta-texto-aparece 1s ease-in-out .3s forwards;
-   }
-
-   @keyframes ruta-texto-aparece {
-       to { opacity: 1; transform: translateY(0); }
    }
 
    /* ==========================================================================
@@ -2048,7 +2144,184 @@
        background-color: #050508;
        background-image: none;
    }
-   
+
+   /* ==========================================================================
+      LÍNEA DE TIEMPO — CÓRDOBA (ver js/escena-cordoba-linea.js)
+      Puente entre escena-luz y escena-mundo: mismo cielo (degradé casi
+      negro + resplandor cálido abajo) y misma tarjeta de texto que
+      escena-luz, aplicados acá a una línea de tiempo con 4 años puntuales
+      en vez de al slider interactivo.
+      ========================================================================== */
+
+   .escena-cordoba-linea {
+       position: relative;
+       width: 100%;
+       height: 720vh; /* sticky (100vh) + 6 disparadores (100vh c/u) + buffer chico */
+       background-color: #020208;
+   }
+
+   .pin-cordoba {
+       position: sticky;
+       top: 0;
+       left: 0;
+       width: 100%;
+       height: 100vh;
+       overflow: hidden;
+       background-color: #020208;
+   }
+
+   #svg-cordoba-linea {
+       position: absolute;
+       inset: 0;
+       width: 100%;
+       height: 100%;
+       display: block;
+   }
+
+   #ct-resplandor {
+       transition: opacity 1.8s ease-in-out;
+   }
+
+   #ct-estrellas-fondo {
+       transition: opacity 1.8s ease-in-out;
+   }
+
+   /* Kicker chico arriba a la izquierda, mismo trato tipográfico que el
+      resto de los kickers del sitio (mayúsculas, letter-spacing, tenue) */
+   .ct-kicker-contenedor {
+       position: absolute;
+       left: 60px;
+       top: 60px;
+       z-index: 2;
+   }
+
+   .ct-kicker {
+       font-size: 0.7rem;
+       font-weight: 700;
+       letter-spacing: 0.12em;
+       text-transform: uppercase;
+       color: rgba(226, 232, 240, 0.5);
+   }
+
+   /* --- Los 4 puntos de la línea de tiempo ------------------------------- */
+   .ct-punto {
+       transform-box: fill-box;
+       transform-origin: center;
+       transition: transform 1s ease-in-out, opacity 1s ease-in-out;
+   }
+
+   .ct-punto-halo {
+       opacity: 0;
+       transition: opacity 1s ease-in-out;
+   }
+
+   .ct-punto-anio {
+       font-family: var(--font-heading, 'Nunito', sans-serif);
+       font-size: 22px;
+       font-weight: 700;
+       fill: rgba(226, 232, 240, 0.6);
+       text-anchor: middle;
+       transition: fill 1s ease-in-out;
+   }
+
+   /* Foco: el punto del año activo crece y se ilumina, el resto se atenúa */
+   .pin-cordoba.ct-foco-1980 #ct-punto-1980 .ct-punto-halo,
+   .pin-cordoba.ct-foco-2000 #ct-punto-2000 .ct-punto-halo,
+   .pin-cordoba.ct-foco-2016 #ct-punto-2016 .ct-punto-halo,
+   .pin-cordoba.ct-foco-2025 #ct-punto-2025 .ct-punto-halo,
+   .pin-cordoba.ct-cierre #ct-punto-2025 .ct-punto-halo {
+       opacity: 0.75;
+   }
+
+   .pin-cordoba.ct-foco-1980 #ct-punto-1980,
+   .pin-cordoba.ct-foco-2000 #ct-punto-2000,
+   .pin-cordoba.ct-foco-2016 #ct-punto-2016,
+   .pin-cordoba.ct-foco-2025 #ct-punto-2025,
+   .pin-cordoba.ct-cierre #ct-punto-2025 {
+       transform: scale(1.65);
+   }
+
+   .pin-cordoba.ct-foco-1980 #ct-punto-1980 .ct-punto-anio,
+   .pin-cordoba.ct-foco-2000 #ct-punto-2000 .ct-punto-anio,
+   .pin-cordoba.ct-foco-2016 #ct-punto-2016 .ct-punto-anio,
+   .pin-cordoba.ct-foco-2025 #ct-punto-2025 .ct-punto-anio,
+   .pin-cordoba.ct-cierre #ct-punto-2025 .ct-punto-anio {
+       fill: var(--acento);
+   }
+
+   /* Con un año en foco, los otros 3 se atenúan para que no compitan */
+   .pin-cordoba.ct-foco-1980 .ct-punto:not(#ct-punto-1980),
+   .pin-cordoba.ct-foco-2000 .ct-punto:not(#ct-punto-2000),
+   .pin-cordoba.ct-foco-2016 .ct-punto:not(#ct-punto-2016),
+   .pin-cordoba.ct-foco-2025 .ct-punto:not(#ct-punto-2025),
+   .pin-cordoba.ct-cierre .ct-punto:not(#ct-punto-2025) {
+       opacity: 0.35;
+   }
+
+   /* --- Texto: misma tarjeta que .texto-luz ------------------------------ */
+   .ct-texto-contenedor {
+       position: absolute;
+       left: 60px;
+       bottom: 80px;
+       z-index: 2;
+       width: 100%;
+       max-width: 560px;
+       pointer-events: none;
+   }
+
+   .ct-texto {
+       position: absolute;
+       left: 0;
+       bottom: 0;
+       right: 0;
+       opacity: 0;
+       background: rgba(8, 10, 16, 0.76);
+       -webkit-backdrop-filter: blur(10px);
+       backdrop-filter: blur(10px);
+       border: 1px solid rgba(255, 255, 255, 0.08);
+       border-radius: var(--radio-tarjeta, 10px);
+       padding: 24px 28px;
+       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+       transition: opacity 0.8s ease-in-out;
+   }
+
+   .ct-texto.ct-texto-activo {
+       opacity: 1;
+   }
+
+   .ct-texto p {
+       font-size: 1.15rem;
+       line-height: 1.55;
+       color: #f8fafc;
+   }
+
+   .ct-texto strong {
+       color: var(--acento);
+   }
+
+   .ct-disparador {
+       height: 100vh;
+       width: 100%;
+       position: relative;
+       pointer-events: none;
+   }
+
+   @media (max-width: 760px) {
+       .ct-texto-contenedor {
+           left: 20px;
+           right: 20px;
+           bottom: 110px;
+           max-width: none;
+       }
+       .ct-texto p {
+           font-size: 1.05rem;
+       }
+       .ct-kicker-contenedor {
+           left: 20px;
+           top: 30px;
+       }
+   }
+
    /* ==========================================================================
       ESCENA MUNDIAL — El mismo patrón, repetido en todo el planeta
       (ver js/escena-mundo.js y js/datos-mundo.js)

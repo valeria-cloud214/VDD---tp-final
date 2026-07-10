@@ -21,12 +21,18 @@
             <div class="contenedor-fijo-split">
                 
                 <div class="bloque-imagen">
-                    <!-- 2 capas para el crossfade (ver js/main.js): la que no se ve
-                         recibe la foto siguiente y recién ahí se le sube la opacidad,
-                         así el cambio de foto anima de verdad ("transition:
-                         background-image" no anima en ningún navegador). -->
-                    <div class="fondo-dinamico fondo-capa-a" id="fondo-jorge-a"></div>
-                    <div class="fondo-dinamico fondo-capa-b" id="fondo-jorge-b"></div>
+                    <!-- 3 capas para el crossfade (ver js/main.js):
+                         - "base" siempre está a opacidad 1 con la foto ACTUAL, sin
+                           transición — es la que garantiza que nunca haya un hueco
+                           negro debajo.
+                         - "saliente" muestra la foto ANTERIOR y se desvanece de 1 a 0,
+                           revelando la base de abajo.
+                         Así el cambio de foto anima de verdad ("transition:
+                         background-image" no anima en ningún navegador) y no depende
+                         de que dos transiciones arranquen exactamente en el mismo
+                         frame. -->
+                    <div class="fondo-dinamico fondo-capa-base" id="fondo-jorge-base"></div>
+                    <div class="fondo-dinamico fondo-capa-saliente" id="fondo-jorge-saliente"></div>
 
                     <!-- Orión, siempre visible, dibujado con la misma técnica que
                          js/escena-cielos.js (halo + punto + líneas finas) en vez de
@@ -41,36 +47,37 @@
                     
                     <div class="parrafo-historia" data-parrafo="1">
                         <p>Me presento, soy Jorge. Podría decir muchas cosas sobre mí, pero hay una sola que me define: a mi vida la marcaron las estrellas.</p>
+                    </div>
+                    <div class="parrafo-historia" data-parrafo="2">
                         <p>Nací en una pequeña localidad del interior. Me crié con mi amada abuela; ella fue quien me inculcó este amor por las historias que cuentan los cielos.</p>
                     </div>
-                    <div class="parrafo-historia " data-parrafo="2">
+                    <div class="parrafo-historia" data-parrafo="3">
                         <p>Todas las noches mirábamos por la ventana y me revelaba los secretos de alguna constelación.</p>
                     </div>
-
-                    <div class="parrafo-historia" data-parrafo="3">
+                    <div class="parrafo-historia" data-parrafo="4">
                         <p>Un día, mis papás me dijeron que por cuestiones de la vida nos mudábamos a Buenos Aires. Yo estaba destruido; no quería alejarme de ella.</p>
                     </div>
-
-                    <div class="parrafo-historia" data-parrafo="4">
-                        <p>La última noche, mi abuela me abrazó y me dijo que cuando la extrañara, mirara a Orión. Que no importaba dónde estuviera, Orión siempre iba a estar ahí para mí, al igual que su amor.</p>
+                    <div class="parrafo-historia" data-parrafo="5">
+                        <p>La última noche, mi abuela me abrazó y me dijo que cuando la extrañara, mirara a Orión.</p>
+                    </div>
+                    <div class="parrafo-historia" data-parrafo="6">
+                        <p>Que no importaba dónde estuviera, Orión siempre iba a estar ahí para mí, al igual que su amor.</p>
                     </div>
 
                 </div>
 
             </div>
 
-            <!-- 8 disparadores de foto (antes 4): cada párrafo de al lado ahora
-                 acompaña 2 fotos en vez de 1 — ver PARRAFO_POR_PASO en
-                 js/main.js, que mapea pasos 1-2→párrafo 1, 3-4→párrafo 2,
-                 5-6→párrafo 3, 7-8→párrafo 4. -->
+            <!-- 6 disparadores de foto (se sacaron la 4 y la 7 de las 8
+                 originales, quedaron: F1, F2, F3, F5, F6, F8). Ahora cada
+                 párrafo acompaña a UNA sola foto — mapeo 1 a 1 en
+                 js/main.js, ya no hace falta PARRAFO_POR_PASO. -->
             <div class="disparador" data-foto="1"></div>
             <div class="disparador" data-foto="2"></div>
             <div class="disparador" data-foto="3"></div>
             <div class="disparador" data-foto="4"></div>
             <div class="disparador" data-foto="5"></div>
             <div class="disparador" data-foto="6"></div>
-            <div class="disparador" data-foto="7"></div>
-            <div class="disparador" data-foto="8"></div>
             
         </section>
 
@@ -134,6 +141,25 @@
         </section>
     </div>
 
+    <!-- ======================================================================
+         TRANSICIÓN — apagón + eco de Orión (ver js/escena-transicion-orion.js)
+         Puente entre la zona-cuento (fotos) y la zona-datos (ruta): la
+         pantalla se va a negro, Orión queda sola unos segundos, y esa misma
+         Orión se disuelve en el cielo con el que arranca la escena-5.
+         ====================================================================== -->
+    <section id="escena-orion-apagon" class="escena-orion-apagon">
+        <div class="pin-orion-apagon">
+            <div class="oa-fondo-ruta"></div>
+            <svg id="svg-orion-apagon" viewBox="0 0 1366 768" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <g id="capa-orion-apagon"></g>
+            </svg>
+        </div>
+
+        <div class="oa-disparador" data-paso-oa="1"></div>
+        <div class="oa-disparador" data-paso-oa="2"></div>
+        <div class="oa-disparador" data-paso-oa="3"></div>
+    </section>
+
     <div class="zona-datos">
        <section id="escena-5" class="escena-scroll-ruta">
 
@@ -150,9 +176,14 @@
                     <svg id="svg-ruta" viewBox="0 0 1400 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
 
                         <defs>
+                            <!-- Mismo cielo oscuro (casi negro arriba, con un
+                                 dejo azulado cerca del horizonte) que usa
+                                 escena-luz — así el tono no cambia entre
+                                 escenas. -->
                             <linearGradient id="ruta-grad-cielo" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="#0a1220" />
-                                <stop offset="100%" stop-color="#1c2a4a" />
+                                <stop offset="0%" stop-color="#020208" />
+                                <stop offset="65%" stop-color="#080a18" />
+                                <stop offset="100%" stop-color="#0d1024" />
                             </linearGradient>
                             <radialGradient id="ruta-grad-halo-cartel" cx="50%" cy="50%" r="50%">
                                 <stop offset="0%" stop-color="#ffd166" stop-opacity="0.55" />
@@ -180,8 +211,14 @@
                     </svg>
                 </div>
 
-                <div class="texto-ruta-flotante">
-                    <p class="texto-ruta-simple">Pero el papel y las aulas pronto me quedaron chicos. Necesitaba ver las estrellas con mis propios ojos, recuperar el asombro perdido. Así fue como armé las valijas y emprendí un viaje persiguiendo la luz por distintas ciudades de Argentina.</p>
+                <!-- TEXTO: misma identidad visual que .texto-luz-contenedor
+                     (tarjeta con blur, borde chico y sombra), pero arriba en
+                     vez de abajo — para no taparle nunca el camino ni el
+                     auto, que quedan más abajo en el encuadre. -->
+                <div class="texto-ruta-contenedor">
+                    <div class="texto-ruta-tarjeta">
+                        <p>Pero el papel y las aulas pronto me quedaron chicos. Necesitaba ver las estrellas con mis propios ojos, recuperar el asombro perdido. Así fue como armé las valijas y emprendí un viaje persiguiendo la luz por distintas ciudades de Argentina.</p>
+                    </div>
                 </div>
 
             </div>
@@ -961,6 +998,86 @@
     </section>
 
     <!-- =============================================
+        LÍNEA DE TIEMPO — Córdoba (ver js/escena-cordoba-linea.js)
+        Puente entre la explicación general del mecanismo (escena-luz) y la
+        vuelta a "esto pasa en todo el mundo" (escena-mundo): un caso local
+        y concreto, con años puntuales, antes de abrir a la comparación
+        internacional. Misma paleta y misma tipografía de tarjeta que
+        escena-luz (cielo casi negro con resplandor cálido abajo, estrellas
+        #f5f7ff, tarjeta con blur).
+    ============================================= -->
+    <section id="escena-cordoba-linea" class="escena-cordoba-linea">
+
+        <div class="pin-cordoba">
+
+            <svg id="svg-cordoba-linea" viewBox="0 0 1400 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <defs>
+                    <linearGradient id="ct-grad-cielo" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#020208" />
+                        <stop offset="65%" stop-color="#080a18" />
+                        <stop offset="100%" stop-color="#0d1024" />
+                    </linearGradient>
+                    <radialGradient id="ct-grad-resplandor" cx="50%" cy="100%" r="75%">
+                        <stop offset="0%" stop-color="#ffb45e" stop-opacity="0.9" />
+                        <stop offset="55%" stop-color="#ffb45e" stop-opacity="0.35" />
+                        <stop offset="100%" stop-color="#ffb45e" stop-opacity="0" />
+                    </radialGradient>
+                </defs>
+
+                <rect x="0" y="0" width="1400" height="700" fill="url(#ct-grad-cielo)" />
+
+                <!-- Resplandor de ciudad: arranca invisible y va creciendo a
+                     medida que avanzan los años (ver escena-cordoba-linea.js) -->
+                <ellipse id="ct-resplandor" cx="700" cy="760" rx="900" ry="360" fill="url(#ct-grad-resplandor)" opacity="0" />
+
+                <!-- Campo de estrellas de fondo: se va apagando en paralelo
+                     al resplandor -->
+                <g id="ct-estrellas-fondo"></g>
+
+                <!-- Línea de tiempo + los 4 círculos (uno por año), armados
+                     por JS a partir de CORDOBA en escena-cordoba-linea.js -->
+                <line id="ct-linea-tiempo" x1="150" y1="420" x2="1150" y2="420" stroke="#4a4560" stroke-width="3" />
+                <g id="ct-puntos"></g>
+            </svg>
+
+            <div class="ct-kicker-contenedor">
+                <div class="ct-kicker">Un caso cercano</div>
+            </div>
+
+            <!-- TEXTO: misma tarjeta que .texto-luz (blur + borde + sombra) -->
+            <div class="ct-texto-contenedor">
+                <div class="ct-texto" data-paso-ct="1">
+                    <p>En Córdoba pasó exactamente lo mismo que en cualquier otra ciudad: hagamos foco en cuatro años puntuales para verlo de cerca.</p>
+                </div>
+                <div class="ct-texto" data-paso-ct="2">
+                    <p><strong>1980.</strong> Magnitud límite ≈6,1 — se distinguían miles de estrellas a simple vista, casi sin resplandor artificial en el cielo.</p>
+                </div>
+                <div class="ct-texto" data-paso-ct="3">
+                    <p><strong>2000.</strong> La ciudad ya había crecido en población y en construcción. El resplandor empezaba a taparse las estrellas más débiles.</p>
+                </div>
+                <div class="ct-texto" data-paso-ct="4">
+                    <p><strong>2016.</strong> Más edificios, más luces encendidas toda la noche. Del cielo original quedaban apenas las estrellas más brillantes.</p>
+                </div>
+                <div class="ct-texto" data-paso-ct="5">
+                    <p><strong>2025.</strong> Hoy, en pleno centro, el resplandor de la ciudad opaca casi todo lo demás.</p>
+                </div>
+                <div class="ct-texto" data-paso-ct="6">
+                    <p>El patrón es siempre el mismo: a más población y más edificación, más luz artificial escapa hacia el cielo — y menos estrellas quedan para ver.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="ct-disparador" data-paso-ct="1"></div>
+        <div class="ct-disparador" data-paso-ct="2"></div>
+        <div class="ct-disparador" data-paso-ct="3"></div>
+        <div class="ct-disparador" data-paso-ct="4"></div>
+        <div class="ct-disparador" data-paso-ct="5"></div>
+        <div class="ct-disparador" data-paso-ct="6"></div>
+
+    </section>
+
+    <!-- =============================================
         ESCENA MUNDIAL — El mismo patrón, repetido en todo el planeta
         (ver js/escena-mundo.js y js/datos-mundo.js)
 
@@ -1166,6 +1283,8 @@
     <script src="js/escena-cielos.js"></script>
     <script src="js/escena-transicion-datos.js"></script>
     <script src="js/escena-transicion-fisica.js"></script>
+    <script src="js/escena-transicion-orion.js"></script>
+    <script src="js/escena-cordoba-linea.js"></script>
 
     <script>
         window.Flourish = { disable_autoload: true };

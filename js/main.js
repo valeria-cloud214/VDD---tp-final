@@ -1,30 +1,33 @@
 document.addEventListener("DOMContentLoaded", () => {
     
     // ==========================================
-    // LÓGICA ESCENA 2 (Fotos con crossfade real, 8 fotos / 4 párrafos)
+    // LÓGICA ESCENA 2 (Fotos con crossfade real, 6 fotos / 6 párrafos)
     // ==========================================
     // "transition: background-image" no anima en ningún navegador, así que
-    // el corte entre fotos era siempre seco. Con 2 capas superpuestas sí
-    // hay una transición real: a la capa que está OCULTA se le pone la
-    // foto que sigue, y recién ahí se le sube la opacidad mientras la otra
-    // baja la suya.
+    // el corte entre fotos era siempre seco. Antes esto se resolvía con 2
+    // capas que se cruzaban (una subía opacidad mientras la otra bajaba),
+    // pero si esas dos transiciones no arrancaban en el MISMO frame exacto
+    // (algo que el navegador no garantiza), la suma de opacidades caía por
+    // debajo de 1 por un instante y se veía un flash negro del fondo del
+    // contenedor.
     //
-    // Ahora hay 8 fotos pero el texto sigue siendo el mismo de 4 párrafos:
-    // cada párrafo acompaña 2 fotos seguidas (pasos 1-2 → párrafo 1,
-    // 3-4 → párrafo 2, 5-6 → párrafo 3, 7-8 → párrafo 4).
-    const capaFotoA = document.getElementById("fondo-jorge-a");
-    const capaFotoB = document.getElementById("fondo-jorge-b");
+    // Ahora son 2 capas con roles distintos, no simétricos:
+    // - "base": SIEMPRE a opacidad 1, sin transición. Muestra la foto
+    //   actual. Es la que impide que se vea negro debajo, pase lo que pase.
+    // - "saliente": muestra la foto ANTERIOR y se desvanece de 1 a 0,
+    //   revelando la base de abajo. Si esta transición se traba o arranca
+    //   tarde, lo único que pasa es que se ve la foto vieja un toque más -
+    //   nunca un hueco negro.
+    //
+    // 6 fotos (se sacaron la 4 y la 7 de las 8 originales) y ahora cada
+    // párrafo acompaña a una sola foto — mapeo 1 a 1, ya no hace falta
+    // repartir un párrafo entre 2 pasos.
+    const capaBase = document.getElementById("fondo-jorge-base");
+    const capaSaliente = document.getElementById("fondo-jorge-saliente");
     const disparadoresE2 = document.querySelectorAll(".disparador");
     const parrafos = document.querySelectorAll(".parrafo-historia");
 
-    const PARRAFO_POR_PASO = { 1: 1, 2: 1, 3: 2, 4: 2, 5: 3, 6: 3, 7: 4, 8: 4 };
-
-    let capaVisible = capaFotoA;
-    let capaOculta = capaFotoB;
-
-    if (capaFotoA && capaFotoB) {
-        capaFotoA.classList.add("foto1", "foto-visible");
-    }
+    if (capaBase) capaBase.classList.add("foto1");
 
     const opcionesE2 = {
         root: null,
@@ -36,21 +39,33 @@ document.addEventListener("DOMContentLoaded", () => {
         entradas.forEach(entrada => {
             if (entrada.isIntersecting) {
                 const paso = Number(entrada.target.getAttribute("data-foto"));
+                const claseFoto = `foto${paso}`;
 
-                if (capaFotoA && capaFotoB) {
-                    const claseFoto = `foto${paso}`;
-                    if (!capaVisible.classList.contains(claseFoto)) {
-                        capaOculta.className = `fondo-dinamico fondo-capa-${capaOculta === capaFotoA ? "a" : "b"} ${claseFoto}`;
-                        // Fuerza un reflow antes de subir la opacidad, si no
-                        // el navegador puede saltarse la transición.
-                        void capaOculta.offsetWidth;
-                        capaOculta.classList.add("foto-visible");
-                        capaVisible.classList.remove("foto-visible");
-                        [capaVisible, capaOculta] = [capaOculta, capaVisible];
-                    }
+                if (capaBase && capaSaliente && !capaBase.classList.contains(claseFoto)) {
+                    // 1) la foto que se estaba viendo (la de la base, hasta
+                    //    ahora) pasa a la capa saliente, de una, a opacidad 1
+                    //    y sin transición — todavía se sigue viendo igual.
+                    capaSaliente.style.transition = "none";
+                    capaSaliente.className = `fondo-dinamico fondo-capa-saliente ${capaBase.className.replace(/fondo-dinamico|fondo-capa-base/g, "").trim()}`;
+                    capaSaliente.style.opacity = "1";
+
+                    // 2) la base se actualiza a la foto nueva instantáneamente.
+                    //    Como la base no tiene transición, ese cambio no se
+                    //    ve: lo que se sigue viendo es la capa saliente, que
+                    //    todavía está tapándola por completo.
+                    capaBase.className = `fondo-dinamico fondo-capa-base ${claseFoto}`;
+
+                    // Fuerza un reflow para que el navegador registre el
+                    // estado de arriba antes de animar.
+                    void capaSaliente.offsetWidth;
+
+                    // 3) recién ahora la capa saliente se desvanece,
+                    //    revelando la base (ya con la foto nueva) de abajo.
+                    capaSaliente.style.transition = "";
+                    capaSaliente.style.opacity = "0";
                 }
 
-                const parrafoActivo = String(PARRAFO_POR_PASO[paso]);
+                const parrafoActivo = String(paso);
                 parrafos.forEach(parrafo => {
                     parrafo.classList.toggle("activo", parrafo.getAttribute("data-parrafo") === parrafoActivo);
                 });
@@ -271,7 +286,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     const telon = document.getElementById("telon");
     const disparadoresTelon = document.querySelectorAll(".disparador-telon");
-    const escena8 = document.getElementById("escena-8-transicion");
+    // El telón se levanta al llegar a la línea de tiempo de Córdoba (que
+    // ahora se insertó ANTES de la escena mundial) — de ahí en más, el
+    // fondo oscuro compartido entre las dos escenas alcanza para que el
+    // paso de una a otra se sienta continuo, sin hacer falta un segundo
+    // telón.
+    const escena8 = document.getElementById("escena-cordoba-linea");
 
     const observadorTelon = new IntersectionObserver((entradas) => {
         entradas.forEach(entrada => {

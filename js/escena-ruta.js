@@ -46,10 +46,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // ======================================================================
     (function generarEstrellas() {
         const capa = document.getElementById("ruta-estrellas");
+        // Mismo radio y opacidad que usa escena-luz.js (CONFIG.estrellas):
+        // r entre 1.3 y 3.6, opacidad entre 0.55 y 1 — para que el cielo se
+        // sienta parte del mismo sistema visual en las dos escenas.
         for (let i = 0; i < 90; i++) {
             capa.appendChild(crearSVG("circle", {
-                cx: entre(0, 1400), cy: entre(15, 380), r: entre(0.8, 2.2),
-                fill: "#f5f7ff", opacity: entre(0.3, 0.9)
+                cx: entre(0, 1400), cy: entre(15, 380), r: entre(1.3, 3.6),
+                fill: "#f5f7ff", opacity: entre(0.55, 1)
             }));
         }
     })();
@@ -123,56 +126,115 @@ document.addEventListener("DOMContentLoaded", () => {
     })();
 
     // ======================================================================
-    // 4. EL AUTO — réplica del ícono de auto de juguete que pasó el usuario,
-    //    en rojo: una sola silueta sólida (sin bordes ni piezas sueltas),
-    //    dos ventanas blancas, ruedas simples tipo "dona" (negro-blanco-
-    //    negro, sin rayos) y una sombra ovalada abajo. Se arma una sola vez;
-    //    su posición se actualiza con el scroll.
+    // 4. EL AUTO — hecho de cero, calcado de la referencia que pasó el
+    //    usuario: silueta bien redondeada tipo "auto de juguete", contorno
+    //    negro grueso uniforme (look sticker/dibujado a mano), una sola
+    //    ventana grande partida al medio por un parante fino, ruedas
+    //    simples (aro claro + centro oscuro, sin rayos) y espejo lateral.
+    //    Acá va en rojo en vez del celeste original.
+    //
+    //    Todo el dibujo va adentro de un grupo escalado (CUERPO_ESCALA) para
+    //    que el auto se vea más chico sin tener que recalcular a mano cada
+    //    coordenada; el ancla de esa escala es el punto donde tocan el piso
+    //    las ruedas (RUEDA_CY), así el auto se achica "desde abajo" y no
+    //    queda flotando ni hundido en la ruta.
     // ======================================================================
     const RUEDA_CY = 458;
-    const RUEDA_TRASERA_CX = -62;
+    const RUEDA_R = 27;
+    const RUEDA_TRASERA_CX = -58;
     const RUEDA_DELANTERA_CX = 58;
-    const FITITO_ROJO = "#d32f2f";
+    const FITITO_ROJO = "#e6392f";
+    const FITITO_ROJO_SOMBRA = "#a8241c";
+    const CONTORNO = "#1a1512";
+    const CUERPO_ESCALA = 0.72;
+
+    const grupoCuerpo = crearSVG("g", {
+        transform: `translate(0, ${RUEDA_CY * (1 - CUERPO_ESCALA)}) scale(${CUERPO_ESCALA})`
+    });
+    grupoAuto.appendChild(grupoCuerpo);
+
+    // Cada rueda es un grupo "eje" fijo (no rota) + un grupo "disco" adentro
+    // que sí rota — así el aro y el centro giran juntos como una rueda de
+    // verdad, sin desarmarse. Simples, como en la referencia: sin rayos,
+    // sólo aro claro + centro oscuro + una marquita que delata el giro.
+    const ruedas = []; // { disco, cx } — se usa en el scroll más abajo
 
     function generarRueda(cx) {
-        const g = crearSVG("g", {});
-        g.appendChild(crearSVG("circle", { cx, cy: RUEDA_CY, r: 26, fill: "#1a1a1a" }));
-        g.appendChild(crearSVG("circle", { cx, cy: RUEDA_CY, r: 19, fill: "#ffffff" }));
-        g.appendChild(crearSVG("circle", { cx, cy: RUEDA_CY, r: 11, fill: "#1a1a1a" }));
-        return g;
+        const eje = crearSVG("g", {});
+        const disco = crearSVG("g", {});
+        disco.appendChild(crearSVG("circle", {
+            cx, cy: RUEDA_CY, r: RUEDA_R, fill: "#1c1a1a", stroke: CONTORNO, "stroke-width": 3
+        }));
+        disco.appendChild(crearSVG("circle", { cx, cy: RUEDA_CY, r: 15, fill: "#d9dade" }));
+        disco.appendChild(crearSVG("circle", { cx, cy: RUEDA_CY, r: 15, fill: "none", stroke: CONTORNO, "stroke-width": 2 }));
+        // Marquita que gira con la rueda — sin ella, aunque gire, se ve
+        // igual en cada frame.
+        disco.appendChild(crearSVG("line", {
+            x1: cx - 9, y1: RUEDA_CY - 9, x2: cx + 9, y2: RUEDA_CY + 9,
+            stroke: CONTORNO, "stroke-width": 2.5, "stroke-linecap": "round", opacity: 0.5
+        }));
+        eje.appendChild(disco);
+        ruedas.push({ disco, cx });
+        return eje;
     }
 
     (function generarAuto() {
-        // Sombra ovalada, como en el ícono original
+        // Sombra ovalada en el piso — afuera del grupo escalado, para que no
+        // se achique junto con la carrocería.
         grupoAuto.appendChild(crearSVG("ellipse", {
-            cx: -2, cy: 494, rx: 98, ry: 13, fill: "#000000", opacity: 0.3
+            cx: -2, cy: 494, rx: 78, ry: 11, fill: "#000000", opacity: 0.3
         }));
 
-        // Carrocería: UNA sola silueta cerrada (nada de piezas sueltas con
-        // su propio borde superpuesto), igual que el ícono de referencia —
-        // atrás sube casi vertical hacia el techo, el techo es una curva
-        // suave arriba, y adelante baja en una pendiente larga hasta el
-        // paragolpes. Sin contorno: el ícono original tampoco tiene.
-        grupoAuto.appendChild(crearSVG("path", {
-            d: "M-105,466 L-105,436 C-105,388 -88,346 -50,330 " +
-               "C-24,319 22,319 46,329 C74,341 98,373 103,410 " +
-               "C106,428 106,448 104,466 Z",
-            fill: FITITO_ROJO
+        // Arcos sobre las ruedas: sombra semicircular oscura detrás de cada
+        // rueda, dibujada ANTES que la carrocería — da la sensación de un
+        // hueco recortado en la chapa (igual que en la referencia, donde se
+        // ve un huequito alrededor de cada rueda) sin necesitar un path con
+        // boolean/evenodd.
+        [RUEDA_TRASERA_CX, RUEDA_DELANTERA_CX].forEach(cx => {
+            grupoCuerpo.appendChild(crearSVG("path", {
+                d: `M ${cx - 36},460 A 36 36 0 0 1 ${cx + 36},460 Z`,
+                fill: FITITO_ROJO_SOMBRA
+            }));
+        });
+
+        // Carrocería: silueta única bien redondeada (nada de esquinas duras,
+        // como el ícono de referencia), con contorno negro grueso uniforme
+        // tipo sticker. Techo curvo de punta a punta, trompa redondeada
+        // adelante (derecha, hacia donde avanza), parte trasera también
+        // curva (no vertical seca) para que se lea "de juguete".
+        grupoCuerpo.appendChild(crearSVG("path", {
+            d: "M-112,460 " +
+               "C-95,436 -140,408 -65,388 " +
+               "C-50,368 -48,349 -40,336 " +
+               "C-14,325 20,323 46,328 " +
+               "C70,333 92,349 102,370 " +
+               "C110,388 113,410 110,432 " +
+               "C108,446 110,454 108,460 Z",
+            fill: FITITO_ROJO, stroke: CONTORNO, "stroke-width": 5, "stroke-linejoin": "round"
         }));
 
-        // Ventanas: dos rectángulos blancos separados por un parantito
-        // (que es, simplemente, el rojo de la carrocería asomando en el
-        // medio — no hace falta dibujarlo aparte)
-        grupoAuto.appendChild(crearSVG("rect", {
-            x: -58, y: 342, width: 44, height: 48, rx: 8, fill: "#ffffff"
+        // Ventana: un solo vidrio grande (como en la referencia, casi todo
+        // el ancho de la cabina), marco propio con contorno y un parante
+        // central fino que lo separa en dos.
+        grupoCuerpo.appendChild(crearSVG("rect", {
+            x: -22, y: 345, width: 45, height: 37, rx: 8,
+            fill: "#0f1622", stroke: CONTORNO, "stroke-width": 10
         }));
-        grupoAuto.appendChild(crearSVG("rect", {
-            x: -4, y: 342, width: 50, height: 48, rx: 8, fill: "#ffffff"
+        grupoCuerpo.appendChild(crearSVG("rect", {
+            x: -22, y: 345, width: 45, height: 37, rx: 8, fill: "#f9f9f9d6"
         }));
 
-        // Ruedas
-        grupoAuto.appendChild(generarRueda(RUEDA_TRASERA_CX));
-        grupoAuto.appendChild(generarRueda(RUEDA_DELANTERA_CX));
+        grupoCuerpo.appendChild(crearSVG("rect", {
+            x: -34, y: 393, width: 16, height: 5, rx: 2.5, fill: CONTORNO, opacity: 0.55
+        }));
+
+        // Faro delantero — puntito claro cerca de la trompa.
+        grupoCuerpo.appendChild(crearSVG("circle", { cx: -98, cy: 415, r: 7, fill: "#ffe9b0" }));
+
+        // Ruedas — adentro del mismo grupo escalado que la carrocería, para
+        // que achiquen en la misma proporción y no queden desbalanceadas.
+        grupoCuerpo.appendChild(generarRueda(RUEDA_TRASERA_CX));
+        grupoCuerpo.appendChild(generarRueda(RUEDA_DELANTERA_CX));
     })();
 
 
@@ -190,6 +252,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const x = X_INICIO + progreso * (X_FIN - X_INICIO);
         grupoAuto.setAttribute("transform", `translate(${x}, 0)`);
+
+        // Rotación de ruedas: ángulo = distancia recorrida / radio (en
+        // radianes), así que a más avanza el auto, más vueltas dan — con
+        // ruedas más chicas girarían más rápido para la misma distancia,
+        // que es exactamente lo que pasa con ruedas de verdad.
+        const distanciaRecorrida = x - X_INICIO;
+        const angulo = (distanciaRecorrida / (RUEDA_R * CUERPO_ESCALA)) * (180 / Math.PI);
+        ruedas.forEach(r => {
+            r.disco.setAttribute("transform", `rotate(${angulo} ${r.cx} ${RUEDA_CY})`);
+        });
 
         carteles.forEach(c => {
             c.el.classList.toggle("ruta-cartel-visitado", x >= c.umbral);
