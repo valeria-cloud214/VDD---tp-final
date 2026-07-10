@@ -2,24 +2,21 @@
    ESCENA 6A — De la observación a la investigación
    ==========================================================================
    Hasta acá Jorge sólo estuvo mirando. Esta escena es el momento en que
-   empieza a querer entender. El cielo que se ve es el mismo de Junín con el
-   que terminó la escena 6 (misma composición, mismo tono — se regenera acá
-   con la misma técnica de js/escena-cielos.js), pero ya a pantalla completa:
-   el panel lateral de la escena 6 no se duplica acá, así que no hay ningún
-   recuadro que aparezca y vuelva a desaparecer.
+   empieza a querer entender. El fondo ya no es la silueta de una ciudad en
+   particular (antes era Junín): es sólo un campo de estrellas — esta escena
+   ya no pasa "en" ningún lugar puntual, es el momento en que Jorge deja de
+   mirar el cielo de una ciudad y empieza a pensar en los datos en general.
 
-   4 partes en 9 pasos de scroll (antes eran 13 pasos para la misma idea —
-   demasiados cambios de texto para lo que en el fondo es un solo
-   razonamiento). El texto ya no siempre reemplaza al anterior: en las
-   partes 1 y 3 se va ACUMULANDO, para que se sienta como una idea que se
-   arma de a poco y no como pantallas sueltas:
+   4 partes en 9 pasos de scroll. El texto no siempre reemplaza al anterior:
+   en las partes 1 y 3 se va ACUMULANDO, para que se sienta como una idea
+   que se arma de a poco y no como pantallas sueltas:
    1) el razonamiento inicial se arma línea por línea (pasos 1-3);
    2) un único bloque editorial, con mucho aire (paso 4);
    3) las hipótesis se acumulan una debajo de otra (pasos 5-8);
    4) todo se disuelve y queda sólo la frase de cierre (paso 9).
-   En paralelo, el paisaje se sigue simplificando hasta convertirse en
-   información — mismos disparadores visuales de antes (simplifica /
-   anotado / patrón / final), sólo remapeados a los pasos nuevos.
+   En paralelo, las estrellas se van convirtiendo en información (nodos y
+   líneas finas) y un velo oscurece el fondo hacia el final — mismos
+   disparadores visuales de siempre (anotado / patrón / final).
 
    El cambio de paso lo dispara el scroll (9 disparadores de 100vh, ver
    #escena-6a en index.html), con el mismo patrón de IntersectionObserver que
@@ -53,23 +50,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const entre = (min, max) => min + azar() * (max - min);
 
     const ANCHO_MUNDO = 1300;
-    const frac = (f) => ANCHO_MUNDO * f;
 
     // ======================================================================
-    // 1. ESTRELLAS — misma densidad que el cielo de Junín en escena 6. Cada
-    //    tantas estrellas queda "emparejada" con un pequeño marcador
-    //    geométrico en las mismas coordenadas (capa #td-nodos, oculta hasta
-    //    el paso "patrón"): así, cuando llega ese momento, no aparece nada
-    //    nuevo — la propia estrella se revela como dato.
+    // 1. ESTRELLAS — todo el fondo de la escena, sin horizonte que reservar
+    //    abajo. Cada tantas estrellas queda "emparejada" con un pequeño
+    //    marcador geométrico en las mismas coordenadas (capa #td-nodos,
+    //    oculta hasta el paso "patrón"): así, cuando llega ese momento, no
+    //    aparece nada nuevo — la propia estrella se revela como dato.
     // ======================================================================
     const capaEstrellas = document.getElementById("td-estrellas");
     const capaNodos = document.getElementById("td-nodos");
-    const TOTAL_ESTRELLAS = 170;
+    const TOTAL_ESTRELLAS = 190;
     const nodosCoords = [];
 
     for (let i = 0; i < TOTAL_ESTRELLAS; i++) {
         const cx = entre(25, ANCHO_MUNDO - 25);
-        const cy = entre(15, 815);
+        const cy = entre(15, 985);
         const r = entre(1, 2.5);
         capaEstrellas.appendChild(crearSVG("circle", {
             cx, cy, r, fill: "#f5f7ff", opacity: entre(0.5, 1)
@@ -97,122 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ======================================================================
-    // 2. VÍA LÁCTEA — misma franja diagonal tenue que en Junín
-    // ======================================================================
-    (function generarViaLactea() {
-        const capa = document.getElementById("td-via-lactea");
-        const centroX = ANCHO_MUNDO * 0.5;
-        capa.appendChild(crearSVG("ellipse", {
-            cx: centroX, cy: 430, rx: 750, ry: 65,
-            fill: "#cfd9ff", opacity: 0.05,
-            transform: `rotate(-28 ${centroX} 430)`
-        }));
-
-        const angulo = (-28 * Math.PI) / 180;
-        const dx = Math.cos(angulo), dy = Math.sin(angulo);
-        for (let i = 0; i < 90; i++) {
-            const t = entre(-430, 430);
-            const jitter = entre(-40, 40);
-            const x = centroX + dx * t - dy * jitter;
-            const y = 430 + dy * t + dx * jitter;
-            capa.appendChild(crearSVG("circle", {
-                cx: x, cy: y, r: entre(0.5, 1.3),
-                fill: "#eef2ff", opacity: entre(0.25, 0.6)
-            }));
-        }
-    })();
-
-    // ======================================================================
-    // 3. HORIZONTE DE JUNÍN — árboles y casitas, misma estética que escena 6
-    // ======================================================================
-    function generarCasa(contenedor, cx, { ancho, alto, altoTecho, colorCuerpo, colorTecho, probVentana = 0.55 }) {
-        const x = cx - ancho / 2, y = 850 - alto;
-        contenedor.appendChild(crearSVG("rect", { x, y, width: ancho, height: alto, fill: colorCuerpo }));
-        contenedor.appendChild(crearSVG("polygon", {
-            points: `${x - 6},${y} ${x + ancho + 6},${y} ${x + ancho / 2},${y - altoTecho}`,
-            fill: colorTecho
-        }));
-        if (azar() < probVentana) {
-            contenedor.appendChild(crearSVG("rect", {
-                x: x + ancho / 2 - 3, y: y + alto * 0.35, width: 6, height: 6, fill: "#ffb454"
-            }));
-        }
-    }
-
-    function generarArbol(contenedor, x, altura, colorCopa) {
-        const anchoCopa = altura * 0.55;
-        const altoTronco = altura * 0.2;
-        contenedor.appendChild(crearSVG("rect", {
-            x: x - 2, y: 850 - altoTronco, width: 4, height: altoTronco, fill: "#1c1712"
-        }));
-        const capas = 3;
-        for (let i = 0; i < capas; i++) {
-            const factor = 1 - i * 0.24;
-            const wCapa = anchoCopa * factor;
-            const yBase = 850 - altoTronco - (i * altura * 0.62) / capas;
-            const yPico = yBase - altura * 0.42;
-            contenedor.appendChild(crearSVG("polygon", {
-                points: `${x - wCapa / 2},${yBase} ${x + wCapa / 2},${yBase} ${x},${yPico}`,
-                fill: colorCopa
-            }));
-        }
-    }
-
-    (function generarHorizonteJunin() {
-        const capa = document.getElementById("td-horizonte");
-        capa.appendChild(crearSVG("rect", { x: 0, y: 800, width: ANCHO_MUNDO, height: 200, fill: "#0d1c12", opacity: 0.55 }));
-
-        [0.045, 0.111, 0.183, 0.278, 0.333, 0.389, 0.478, 0.555, 0.622, 0.689, 0.767, 0.833, 0.889, 0.955]
-            .map(frac)
-            .forEach((x, i) => generarArbol(capa, x, entre(44, 80), i % 2 === 0 ? "#122417" : "#0f1e13"));
-
-        [frac(0.235), frac(0.665)].forEach(cx => {
-            generarCasa(capa, cx, { ancho: 62, alto: 22, altoTecho: 18, colorCuerpo: "#181328", colorTecho: "#120e1e", probVentana: 0.6 });
-        });
-        [frac(0.412), frac(0.812)].forEach(cx => {
-            generarCasa(capa, cx, { ancho: 44, alto: 26, altoTecho: 30, colorCuerpo: "#1a1712", colorTecho: "#100c08", probVentana: 0.45 });
-        });
-
-        [0.212, 0.288, 0.377, 0.465, 0.554, 0.642, 0.735, 0.865].map(frac)
-            .forEach(x => generarArbol(capa, x, entre(28, 48), "#0f1e13"));
-    })();
-
-    // ======================================================================
-    // 4. ORIÓN — la misma figura de siempre, ya completa (estamos en Junín)
-    // ======================================================================
-    const CENTRO_ORION = ANCHO_MUNDO / 2;
-    const ESTRELLAS_ORION = [
-        { x: CENTRO_ORION - 88, y: 460, r: 6, color: "#cfe3ff" },
-        { x: CENTRO_ORION - 70, y: 295, r: 5.4, color: "#ffb37a" },
-        { x: CENTRO_ORION + 80, y: 280, r: 4, color: "#eaf1ff" },
-        { x: CENTRO_ORION, y: 366, r: 3.6, color: "#ffffff" },
-        { x: CENTRO_ORION + 36, y: 374, r: 3.5, color: "#ffffff" },
-        { x: CENTRO_ORION + 88, y: 462, r: 4.2, color: "#cfe3ff" },
-        { x: CENTRO_ORION - 32, y: 358, r: 3.4, color: "#ffffff" }
-    ];
-    const LINEAS_ORION = [
-        [CENTRO_ORION - 70, 295, CENTRO_ORION - 32, 358],
-        [CENTRO_ORION + 80, 280, CENTRO_ORION + 36, 374],
-        [CENTRO_ORION - 32, 358, CENTRO_ORION, 366],
-        [CENTRO_ORION, 366, CENTRO_ORION + 36, 374],
-        [CENTRO_ORION - 32, 358, CENTRO_ORION - 88, 460],
-        [CENTRO_ORION + 36, 374, CENTRO_ORION + 88, 462]
-    ];
-
-    (function generarOrion() {
-        const capa = document.getElementById("td-orion");
-        const lineas = crearSVG("g", { stroke: "#cfe0ff", "stroke-opacity": "0.4", "stroke-width": "1.2" });
-        LINEAS_ORION.forEach(([x1, y1, x2, y2]) => lineas.appendChild(crearSVG("line", { x1, y1, x2, y2 })));
-        capa.appendChild(lineas);
-
-        ESTRELLAS_ORION.forEach(e => {
-            capa.appendChild(crearSVG("circle", { cx: e.x, cy: e.y, r: e.r * 2.4, fill: e.color, "fill-opacity": 0.18 }));
-            capa.appendChild(crearSVG("circle", { cx: e.x, cy: e.y, r: e.r, fill: e.color }));
-        });
-    })();
-
-    // ======================================================================
-    // 5. ANOTACIONES — trazos finos, como si Jorge empezara a analizar lo
+    // 2. ANOTACIONES — trazos finos, como si Jorge empezara a analizar lo
     //    que vio. No son un gráfico: son apuntes sueltos sobre el cielo.
     // ======================================================================
     (function generarAnotaciones() {
@@ -230,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })();
 
     // ======================================================================
-    // 6. SCROLL — los 9 pasos de la escena (ver el desglose por partes en
+    // 3. SCROLL — los 9 pasos de la escena (ver el desglose por partes en
     //    el comentario del encabezado del archivo)
     // ======================================================================
     const lineasRazonamiento = document.querySelectorAll("[data-linea-td]");
@@ -246,9 +127,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const FRASE_POR_PASO = { 4: 1, 9: 2 };
 
     function actualizarPaso(paso) {
-        // Transformación visual progresiva del paisaje (mismos disparadores
+        // Transformación visual progresiva del cielo (mismos disparadores
         // de siempre, remapeados a los 9 pasos nuevos).
-        cielo.classList.toggle("td-simplifica", paso >= 3);
         cielo.classList.toggle("td-anotado", paso >= 4 && paso < 8);
         cielo.classList.toggle("td-patron", paso >= 8);
         cielo.classList.toggle("td-final", paso >= 9);

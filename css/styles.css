@@ -1104,13 +1104,12 @@
 
    /* ==========================================================================
       ESCENA 6A — De la observación a la investigación
-      El cielo de Junín (ver js/escena-transicion-datos.js) sigue exactamente
-      igual que al terminar la escena 6: misma composición, mismo tono. No hay
-      foto nueva ni corte — sólo se apaga el panel lateral heredado, el
-      paisaje se va simplificando de a poco con el scroll, y el texto flota
-      sin tarjeta (sólo tipografía y aire) sobre el cielo. El final ya casi no
-      tiene paisaje: unos pocos puntos geométricos sobre fondo oscuro,
-      anticipando el lenguaje visual del scatter plot que viene después.
+      Fondo simple (ver js/escena-transicion-datos.js): sólo un campo de
+      estrellas, sin horizonte ni resplandor de ninguna ciudad puntual — el
+      texto flota sin tarjeta (sólo tipografía y aire) sobre el cielo. El
+      final ya casi no tiene paisaje: unos pocos puntos geométricos sobre
+      fondo oscuro, anticipando el lenguaje visual del scatter plot que
+      viene después.
       ========================================================================== */
 
    .escena-transicion-datos {
@@ -1145,16 +1144,9 @@
 
    /* Capas que se transforman con el scroll: cada una a su propio ritmo, para
       que el cambio se sienta como un lento correr de cortina, no como un corte */
-   #td-via-lactea,
-   #td-resplandor,
    #td-estrellas {
        opacity: 1;
        transition: opacity 2.4s ease;
-   }
-
-   #td-horizonte {
-       opacity: 1;
-       transition: filter 2.4s ease, opacity 2.4s ease;
    }
 
    #td-anotaciones,
@@ -1168,27 +1160,13 @@
        transition: opacity 2.6s ease;
    }
 
-   /* Paso "Pero todavía no entendía por qué": el paisaje empieza a perder
-      color y detalle, muy sutilmente — nada desaparece todavía */
-   .td-cielo.td-simplifica #td-horizonte {
-       filter: brightness(0.62) saturate(0.4);
-   }
-   .td-cielo.td-simplifica #td-via-lactea {
-       opacity: 0.45;
-   }
-
    /* Primeras anotaciones: trazos de astrónomo, no de gráfico estadístico */
    .td-cielo.td-anotado #td-anotaciones {
        opacity: 1;
    }
 
-   /* Paso "¿Existía algún patrón...?": el cambio más importante — el paisaje
-      se retira y el cielo empieza a leerse como información */
-   .td-cielo.td-patron #td-horizonte,
-   .td-cielo.td-patron #td-resplandor,
-   .td-cielo.td-patron #td-via-lactea {
-       opacity: 0;
-   }
+   /* Paso "¿Existía algún patrón...?": el cambio más importante — las
+      estrellas se atenúan y el cielo empieza a leerse como información */
    .td-cielo.td-patron #td-nodos {
        opacity: 1;
    }
@@ -1534,7 +1512,7 @@
      margin: 70vh 0; 
      
      /* --- EFECTO DE FONDO (BACKGROUND): tarjeta oscura, igual al resto de la zona de datos --- */
-     background-color: rgba(8, 10, 16, 0.78);
+     background-color: #0b0e24;
      -webkit-backdrop-filter: blur(10px);
      backdrop-filter: blur(10px);
      padding: 30px;

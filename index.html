@@ -426,14 +426,12 @@
     </section>
     <!-- =============================================
         ESCENA 6A — De la observación a la investigación
-        El cielo de Junín sigue exactamente igual que al terminar la escena 6
-        (misma composición, regenerada acá en js/escena-transicion-datos.js
-        para que no haya foto nueva ni corte), ya a pantalla completa — el
-        panel lateral de la escena 6 no se duplica ni se vuelve a mostrar acá,
-        directamente no aparece.
+        Fondo simple: sólo un campo de estrellas (ver js/escena-transicion-
+        datos.js), sin la silueta de ninguna ciudad puntual — esta escena ya
+        no está "en" Junín, es el momento en que Jorge deja de mirar un
+        lugar concreto y empieza a pensar en los datos en general.
 
-        4 partes, 9 pasos de scroll en total (antes eran 13: el ritmo estaba
-        repartido en demasiados cambios de texto para una sola idea):
+        4 partes, 9 pasos de scroll en total:
         1) el razonamiento de Jorge se arma de a poco — cada línea se SUMA a
            las anteriores en vez de reemplazarlas (pasos 1-3);
         2) un único bloque editorial, con mucho aire, resume que ya no le
@@ -442,9 +440,10 @@
            la más nueva se lee más fuerte que las anteriores (pasos 5-8);
         4) todo eso se disuelve y sólo queda una frase enorme y centrada
            que conecta con los datos (paso 9).
-        En paralelo, el paisaje se va simplificando hasta convertirse en
-        información: de ahí nace el lenguaje visual (puntos, líneas finas)
-        que retoma el scatter plot que sigue después de esta escena.
+        En paralelo, el cielo se va convirtiendo en información: de ahí nace
+        el lenguaje visual (puntos, líneas finas) que retoma el scatter plot
+        que sigue después de esta escena, y el velo que lo oscurece del todo
+        hacia el final.
         ============================================= -->
     <section id="escena-6a" class="escena-transicion-datos">
 
@@ -453,33 +452,10 @@
             <div class="td-cielo" id="td-cielo">
                 <svg id="svg-transicion-datos" viewBox="0 0 1300 1000" preserveAspectRatio="none" aria-hidden="true">
 
-                    <defs>
-                        <radialGradient id="grad-resplandor-td" cx="50%" cy="100%" r="75%">
-                            <stop offset="0%" stop-color="#ffb45e" stop-opacity="0.7" />
-                            <stop offset="60%" stop-color="#ff9d4d" stop-opacity="0.28" />
-                            <stop offset="100%" stop-color="#ff9d4d" stop-opacity="0" />
-                        </radialGradient>
-                    </defs>
-
                     <rect x="0" y="0" width="1300" height="1000" fill="#070912" />
 
-                    <!-- Estrellas de Junín + Vía Láctea: idéntica densidad a la
-                         escena anterior -->
+                    <!-- Campo de estrellas: todo el fondo de esta escena -->
                     <g id="td-estrellas"></g>
-                    <g id="td-via-lactea"></g>
-
-                    <!-- Resplandor tenue del pueblo, en el horizonte -->
-                    <g id="td-resplandor">
-                        <ellipse cx="650" cy="900" rx="460" ry="150" fill="url(#grad-resplandor-td)" />
-                    </g>
-
-                    <!-- Orión: la misma figura de siempre, ya completa -->
-                    <g id="td-orion"></g>
-
-                    <rect x="0" y="850" width="1300" height="150" fill="#0b0c14" />
-
-                    <!-- Montañas, árboles y casitas de Junín -->
-                    <g id="td-horizonte"></g>
 
                     <!-- Anotaciones sutiles: Jorge empieza a analizar lo que vio -->
                     <g id="td-anotaciones"></g>
