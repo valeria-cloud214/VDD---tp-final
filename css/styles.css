@@ -1914,46 +1914,66 @@
    }
    
    /* Mensaje final: mismo lugar que las frases centradas, más abajo en la
-      pantalla para no pisar el cielo/Orión. */
+      pantalla para no pisar el cielo/Orión, pero no tan pegado al borde
+      inferior como para quedar cortado. */
    .mensaje-final-contenedor {
        position: absolute;
        left: 0;
        right: 0;
-       bottom: 12%;
+       bottom: 22%;
        z-index: 5;
        display: flex;
        justify-content: center;
        pointer-events: none;
    }
-   
+
    .mensaje-final {
+       /* "bottom: 0" (en vez de dejar que la altura crezca desde arriba,
+          el comportamiento por defecto acá) ancla el borde INFERIOR de cada
+          mensaje al piso del contenedor: el texto crece hacia arriba. Así,
+          el mensaje 3 (dos líneas más de texto chico que los mensajes 1 y 2)
+          nunca empuja su última línea fuera de la pantalla — antes se
+          cortaba en viewports más bajos. */
        position: absolute;
+       bottom: 0;
        max-width: 640px;
        padding: 0 40px;
        text-align: center;
        opacity: 0;
    }
-   
+
    .mensaje-final p {
        color: #f8fafc;
        text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
    }
-   
+
+   /* Los dos primeros mensajes ("las estrellas nunca dejaron de estar
+      ahí"/"solo dejamos de poder verlas") son el corazón emocional del
+      cierre: van más grandes que el resto. */
+   .mensaje-final-protagonista {
+       font-family: var(--font-heading, 'Quicksand', sans-serif);
+       font-size: 2.1rem;
+       line-height: 1.5;
+   }
+
    .mensaje-final-grande {
        font-family: var(--font-heading, 'Quicksand', sans-serif);
        font-size: 1.6rem;
        line-height: 1.6;
-       margin-bottom: 14px;
+       margin-bottom: 16px;
    }
-   
+
    .mensaje-final-chico {
        font-size: 1rem;
        line-height: 1.6;
        color: rgba(248, 250, 252, 0.75);
    }
-   
+
    @media (max-width: 760px) {
        .frase-cierre p {
+           font-size: 1.5rem;
+       }
+       .mensaje-final-protagonista {
            font-size: 1.5rem;
        }
        .mensaje-final-grande {

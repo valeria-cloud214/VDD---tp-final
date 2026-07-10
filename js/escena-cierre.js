@@ -125,11 +125,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // --- La casa del pueblo: mismo encuadre que al principio de la historia -
+    // Violeta más claro que el resto de la ilustración a propósito: sin
+    // protagonismo, pero tiene que distinguirse contra el cielo, no fundirse
+    // en él (antes casi no se veía, con el mismo tono oscuro que el fondo).
     (function generarCasa() {
         // Cuerpo y techo
-        capaCasa.appendChild(crearSVG("rect", { x: 545, y: 1130, width: 210, height: 190, fill: "#241c38" }));
-        capaCasa.appendChild(crearSVG("polygon", { points: "535,1130 765,1130 650,980", fill: "#181328" }));
-        capaCasa.appendChild(crearSVG("rect", { x: 705, y: 1010, width: 20, height: 50, fill: "#181328" }));
+        capaCasa.appendChild(crearSVG("rect", { x: 545, y: 1130, width: 210, height: 190, fill: "#4a3a72" }));
+        capaCasa.appendChild(crearSVG("polygon", { points: "535,1130 765,1130 650,980", fill: "#372a57" }));
+        capaCasa.appendChild(crearSVG("rect", { x: 705, y: 1010, width: 20, height: 50, fill: "#372a57" }));
 
         // Marco de la ventana + luz interior (toggleable) + cruz de la ventana
         capaCasa.appendChild(crearSVG("rect", { x: 600, y: 1165, width: 100, height: 90, fill: "#100c1c" }));
@@ -237,21 +240,42 @@ document.addEventListener("DOMContentLoaded", () => {
     // 2. NIVEL DE ESTRELLAS — reveal por scroll + reveal por interruptor
     // ======================================================================
     // "revealScroll" (0→1): cuánto se reveló el campo de estrellas al subir
-    // la cámara. "nivelLuces" (0→1, 1=contaminación total): lo controla el
-    // interruptor. El nivel final de cada estrella es una combinación de
-    // ambos, igual que en la escena de contaminación lumínica.
+    // la cámara (gatillo: sin esto, las estrellas podrían aparecer antes de
+    // que la cámara termine de mirar hacia arriba). "nivelLuces" (0→nivelInicial,
+    // nivelInicial=contaminación de partida): lo controla el interruptor.
+    //
+    // La fracción de estrellas visibles interpola entre dos extremos bien
+    // separados —con contaminación se ve apenas un puñado; apagada del todo
+    // se ve casi el cielo completo— para que apagar el interruptor sea un
+    // cambio MUY notorio, no un matiz. Antes "revealScroll" tenía un techo de
+    // apenas 0.16 y sólo lo multiplicaba: aun con las luces apagadas del
+    // todo, nunca se revelaba más del 16% de las estrellas.
+    const FRACCION_ESTRELLAS_ENCENDIDO = 0.1;  // con el pueblo iluminado: unas pocas
+    const FRACCION_ESTRELLAS_APAGADO = 0.97;   // con las luces apagadas: casi todo el cielo
+
     let revealScroll = 0;
     let nivelLuces = CONFIG.nivelInicial / 100;
 
+    // La asigna conectarInterruptor() (sección 4, más abajo) y la llama
+    // timelinePrincipal() (sección 3) cuando el scroll cruza hacia atrás el
+    // punto donde aparece el panel del interruptor — ver ambas secciones.
+    let reiniciarAlScrollearArriba = () => {};
+
     function nivelEstrellasActual() {
-        return revealScroll * (1 - nivelLuces * 0.85); // nunca llega a 0 del todo
+        const t = Math.min(1, nivelLuces / (CONFIG.nivelInicial / 100)); // 1 = prendido del todo, 0 = apagado
+        const fraccion = FRACCION_ESTRELLAS_APAGADO + (FRACCION_ESTRELLAS_ENCENDIDO - FRACCION_ESTRELLAS_APAGADO) * t;
+        return revealScroll * fraccion;
     }
     function actualizarEstrellas() {
         const nivel = nivelEstrellasActual();
         estrellas.forEach(e => {
             e.el.style.opacity = e.seed < nivel ? e.opacidadBase : 0.03;
         });
-        gsap.set(capaOrion, { opacity: 0.55 + (1 - nivelLuces) * 0.4 * revealScroll });
+        // Orión es el protagonista: casi invisible con contaminación total
+        // ya no tendría sentido (siempre "se lo encuentra"), pero acá sí
+        // tiene que notarse fuerte el salto al apagar las luces.
+        const t = Math.min(1, nivelLuces / (CONFIG.nivelInicial / 100));
+        gsap.set(capaOrion, { opacity: (0.5 + 0.5 * (1 - t)) * revealScroll });
     }
 
     // ======================================================================
@@ -277,13 +301,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const DURACION_SCRUB_VH = 1800;
 
+        // Duración total de "tl" en unidades de tiempo de GSAP: la última
+        // tween (el colchón final) termina en 30.2 + 4 = 34.2. Se usa para
+        // ubicar, en progreso de scroll (0-1), un punto un poco antes de que
+        // aparezca el panel del interruptor (29.0) — cruzarlo hacia atrás
+        // dispara reiniciarAlScrollearArriba().
+        const DURACION_TOTAL_TL = 34.2;
+        const TIEMPO_UMBRAL_RESET = 28.0;
+        const PROGRESO_UMBRAL_RESET = TIEMPO_UMBRAL_RESET / DURACION_TOTAL_TL;
+        let yaSeReinicio = false;
+
         const tl = gsap.timeline({
             scrollTrigger: {
                 trigger: seccion,
                 start: "top top",
                 end: () => "+=" + window.innerHeight * (DURACION_SCRUB_VH / 100),
                 scrub: 0.8,
-                pin: false // el "pin" visual lo hace el position:sticky del CSS (mismo método que la escena de luz)
+                pin: false, // el "pin" visual lo hace el position:sticky del CSS (mismo método que la escena de luz)
+                onUpdate: (self) => {
+                    if (self.direction === -1 && self.progress < PROGRESO_UMBRAL_RESET) {
+                        if (!yaSeReinicio) {
+                            yaSeReinicio = true;
+                            reiniciarAlScrollearArriba();
+                        }
+                    } else if (self.progress >= PROGRESO_UMBRAL_RESET) {
+                        yaSeReinicio = false; // vuelve a armarse para la próxima vez que se cruce el umbral
+                    }
+                }
             }
         });
 
@@ -306,12 +350,15 @@ document.addEventListener("DOMContentLoaded", () => {
         // (el hueco entre 13.6 y 17.0 es intencional: sólo scroll, sin cambios)
 
         // --- FASE 3: la cámara sube siguiendo la mirada de Jorge -----------
+        // revealScroll sube hasta 1 (antes llegaba sólo a 0.16, un techo que
+        // apagaba cualquier diferencia entre "luces prendidas" y "apagadas"
+        // más adelante): a partir de acá el techo real de estrellas/Orión
+        // visibles lo pone únicamente nivelLuces (ver actualizarEstrellas).
         tl.to(mundo, { y: CONFIG.camara.cieloY, duration: 2.2, ease: "power1.inOut" }, 17.0)
           .to({ v: 0 }, {
-              v: 0.16, duration: 2,
+              v: 1, duration: 2,
               onUpdate: function () { revealScroll = this.targets()[0].v; actualizarEstrellas(); }
-          }, 17.2)
-          .to(capaOrion, { opacity: 0.5, duration: 1.6 }, 18.0);
+          }, 17.2);
 
         // 3 frases, una por vez, sin acumularse (cada una dura ~2.7 unidades
         // de principio a fin — ver mostrarFrase — así que se espacian 3
@@ -336,29 +383,43 @@ document.addEventListener("DOMContentLoaded", () => {
     (function conectarInterruptor() {
         const boton = document.getElementById("interruptor-luz");
         const estado = document.getElementById("interruptor-estado");
+        const panel = document.getElementById("panel-interruptor-cierre");
         if (!boton || !estado) return;
+
+        const mensajes = document.querySelectorAll(".mensaje-final");
 
         let encendido = true;
         let mensajeYaMostrado = false;
+        let tlLuces = null;   // timeline activa de apagarLuces()/prenderLuces()
+        let tlMensaje = null; // timeline activa de programarMensajeFinal()
 
+        // Apagado ~40% más rápido que antes (2.6s → 1.5s el tramo del cielo,
+        // y el resto de la secuencia acortado en la misma proporción): el
+        // cambio tiene que sentirse inmediato, no una transición lenta.
         function apagarLuces() {
-            const tl = gsap.timeline();
-            tl.to("#cartel-glow-cierre", { opacity: 0, duration: 0.4 }, 0)
-              .to("#ventana-luz-cierre", { opacity: 0, duration: 0.5 }, 0.35)
-              .to("#farol-halo-cierre, #farol-bulbo-cierre", { opacity: 0, duration: 0.5 }, 0.75)
-              .to("#capa-halo-casa-cierre ellipse", { opacity: 0, duration: 1 }, 1.15)
-              .to("#capa-resplandor-horizonte-cierre ellipse", { opacity: 0, duration: 1.3 }, 1.5)
+            if (tlLuces) tlLuces.kill();
+            tlLuces = gsap.timeline();
+            tlLuces.to("#cartel-glow-cierre", { opacity: 0, duration: 0.3 }, 0)
+              .to("#ventana-luz-cierre", { opacity: 0, duration: 0.35 }, 0.2)
+              .to("#farol-halo-cierre, #farol-bulbo-cierre", { opacity: 0, duration: 0.35 }, 0.45)
+              .to("#capa-halo-casa-cierre ellipse", { opacity: 0, duration: 0.7 }, 0.7)
+              .to("#capa-resplandor-horizonte-cierre ellipse", { opacity: 0, duration: 0.9 }, 0.95)
               .to({ v: nivelLuces }, {
-                  v: 0, duration: 2.6, ease: "sine.inOut",
+                  v: 0, duration: 1.5, ease: "sine.inOut",
                   onUpdate: function () { nivelLuces = this.targets()[0].v; actualizarEstrellas(); }
-              }, 1.9)
-              .to("#capa-via-lactea-cierre", { opacity: 1, duration: 1.6 }, 3.6)
-              .call(() => programarMensajeFinal(), null, "+=1.2");
+              }, 1.15)
+              .to("#capa-via-lactea-cierre", { opacity: 1, duration: 1.1 }, 2.15)
+              // El panel se retira apenas se usa una vez: ya cumplió su
+              // función, y dejarlo visible/clickeable invita a tocarlo de
+              // nuevo y "deshacer" el momento que se acaba de revelar.
+              .to(panel, { opacity: 0, duration: 0.6, pointerEvents: "none" }, 2.3)
+              .call(() => programarMensajeFinal(), null, "+=0.6");
         }
 
         function prenderLuces() {
-            const tl = gsap.timeline();
-            tl.to("#capa-via-lactea-cierre", { opacity: 0, duration: 0.8 }, 0)
+            if (tlLuces) tlLuces.kill();
+            tlLuces = gsap.timeline();
+            tlLuces.to("#capa-via-lactea-cierre", { opacity: 0, duration: 0.8 }, 0)
               .to({ v: nivelLuces }, {
                   v: CONFIG.nivelInicial / 100, duration: 1.8, ease: "sine.inOut",
                   onUpdate: function () { nivelLuces = this.targets()[0].v; actualizarEstrellas(); }
@@ -388,14 +449,49 @@ document.addEventListener("DOMContentLoaded", () => {
             const m2 = document.querySelector('[data-mensaje-final="2"]');
             const m3 = document.querySelector('[data-mensaje-final="3"]');
 
-            gsap.timeline({ delay: 2.5 }) // silencio de contemplación primero
+            tlMensaje = gsap.timeline({ delay: 2.5 }) // silencio de contemplación primero
                 .to(m1, { opacity: 1, duration: 2 })
                 .to(m1, { opacity: 0, duration: 1.5 }, "+=3")
                 .to(m2, { opacity: 1, duration: 2 }, "+=0.6")
                 .to(m2, { opacity: 0, duration: 1.5 }, "+=3")
                 .to(m3, { opacity: 1, duration: 2.5 }, "+=1");
-            // El mensaje 3 (el de cierre) se queda en pantalla: no se retira.
+            // El mensaje 3 (el de cierre) se queda en pantalla: no se retira
+            // solo — pero si el usuario vuelve a scrollear hacia arriba, sí
+            // (ver reiniciarInterruptorCierre, más abajo).
         }
+
+        // ==================================================================
+        // 6. REINICIO — si el usuario scrollea hacia atrás después de haber
+        //    tocado el interruptor, todo esto (mensaje final, luces
+        //    apagadas, panel escondido) quedaba "pegado" en pantalla aunque
+        //    la cámara y las frases sí volvían para atrás con el scroll —
+        //    porque esta secuencia corre en timelines propias, no atadas al
+        //    scroll. Se llama desde el ScrollTrigger principal (ver más
+        //    arriba) apenas el scroll cruza hacia atrás el punto donde
+        //    aparece el panel.
+        // ==================================================================
+        function reiniciarInterruptorCierre() {
+            if (tlLuces) tlLuces.kill();
+            if (tlMensaje) tlMensaje.kill();
+
+            mensajes.forEach(m => gsap.set(m, { opacity: 0 }));
+
+            encendido = true;
+            mensajeYaMostrado = false;
+            boton.setAttribute("aria-checked", "true");
+            estado.textContent = "ON";
+
+            nivelLuces = CONFIG.nivelInicial / 100;
+            actualizarEstrellas();
+            gsap.set("#cartel-glow-cierre, #ventana-luz-cierre, #farol-halo-cierre, #farol-bulbo-cierre, #capa-halo-casa-cierre ellipse, #capa-resplandor-horizonte-cierre ellipse", { opacity: 1 });
+            gsap.set("#capa-via-lactea-cierre", { opacity: 0 });
+            // El panel NO se toca acá: su opacidad/pointerEvents ya los
+            // controla el scrub de la timeline principal (FASE 4), que al
+            // volver para atrás de su propio punto de aparición los deja
+            // en su estado inicial (oculto, no interactivo) solo.
+        }
+
+        reiniciarAlScrollearArriba = reiniciarInterruptorCierre;
     })();
 
 });
