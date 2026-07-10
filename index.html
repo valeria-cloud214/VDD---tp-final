@@ -265,32 +265,152 @@
 
             </div>
 
-            <!-- TEXTO A LA DERECHA -->
+            <!-- PANEL A LA DERECHA — acompaña la visualización, nunca compite
+                 con ella: sin cajas, mucho aire, jerarquía tipográfica en vez
+                 de bordes. Misma identidad que el scatter plot / escena-6c /
+                 escena-luz. Los [data-count-hasta] hacen count-up (ver
+                 js/main.js); la barra y los puntos de contaminación son el
+                 único elemento visual que conecta el dato con el cielo, y
+                 se re-animan cada vez que cambia la ciudad. -->
             <div id="panel-ciudad">
-                        <div class="info-ciudad bsas-info">
+
+                <div class="ic-stack">
+
+                    <div class="info-ciudad bsas-info">
+                        <div class="ic-header">
+                            <span class="ic-provincia">CABA</span>
                             <h2>Buenos Aires</h2>
-                            <p class="dato">Magnitud límite: 4.1</p>
-                            <p>
-                                Todavía podía encontrar a Orión, pero el resto del cielo parecía haberse desvanecido.
-                                Apenas unas pocas estrellas lograban atravesar el brillo de la ciudad.
-                            </p>
-                        </div>      
-                <div class="info-ciudad firmat-info">
-                    <h2>Firmat</h2>
-                    <p class="dato">Magnitud límite: 5.4</p>
-                    <p>
-                        Al alejarme de la gran ciudad comenzaron a reaparecer estrellas que llevaba años sin ver.
-                        El cielo recuperaba profundidad.
-                    </p>
+                        </div>
+
+                        <div class="ic-metrica-principal">
+                            <span class="ic-metrica-label">Magnitud límite</span>
+                            <span class="ic-metrica-valor" data-count-hasta="4.1" data-count-decimales="1">0.0</span>
+                            <span class="ic-metrica-nota">≈<span data-count-hasta="14" data-count-decimales="0">0</span> estrellas visibles</span>
+                        </div>
+
+                        <div class="ic-indicador">
+                            <span class="ic-fila-label">Oscuridad del cielo</span>
+                            <div class="ic-barra"><div class="ic-barra-fill ic-barra-fill-bsas"></div></div>
+                        </div>
+
+                        <div class="ic-contaminacion">
+                            <span class="ic-fila-label">Contaminación lumínica</span>
+                            <div class="ic-nivel">
+                                <div class="ic-puntos-nivel ic-puntos-nivel-alta">
+                                    <span class="ic-punto-nivel"></span><span class="ic-punto-nivel"></span><span class="ic-punto-nivel"></span><span class="ic-punto-nivel"></span><span class="ic-punto-nivel"></span>
+                                </div>
+                                <span class="ic-nivel-texto">Alta</span>
+                            </div>
+                        </div>
+
+                        <div class="ic-datos-secundarios">
+                            <div class="ic-dato-chico">
+                                <span class="ic-fila-label">Población</span>
+                                <span class="ic-fila-valor" data-count-hasta="3000000" data-count-decimales="0" data-count-formato="miles">0</span>
+                            </div>
+                            <div class="ic-dato-chico">
+                                <span class="ic-fila-label">Altitud</span>
+                                <span class="ic-fila-valor" data-count-hasta="25" data-count-decimales="0">0</span><span class="ic-unidad"> m</span>
+                            </div>
+                        </div>
+
+                        <p class="ic-mensaje">“Apenas podía reconocer a Orión.”</p>
+                    </div>
+
+                    <div class="info-ciudad firmat-info">
+                        <div class="ic-header">
+                            <span class="ic-provincia">Santa Fe</span>
+                            <h2>Firmat</h2>
+                        </div>
+
+                        <div class="ic-metrica-principal">
+                            <span class="ic-metrica-label">Magnitud límite</span>
+                            <span class="ic-metrica-valor" data-count-hasta="5.4" data-count-decimales="1">0.0</span>
+                            <span class="ic-metrica-nota">≈<span data-count-hasta="55" data-count-decimales="0">0</span> estrellas visibles</span>
+                        </div>
+
+                        <div class="ic-indicador">
+                            <span class="ic-fila-label">Oscuridad del cielo</span>
+                            <div class="ic-barra"><div class="ic-barra-fill ic-barra-fill-firmat"></div></div>
+                        </div>
+
+                        <div class="ic-contaminacion">
+                            <span class="ic-fila-label">Contaminación lumínica</span>
+                            <div class="ic-nivel">
+                                <div class="ic-puntos-nivel ic-puntos-nivel-media">
+                                    <span class="ic-punto-nivel"></span><span class="ic-punto-nivel"></span><span class="ic-punto-nivel"></span><span class="ic-punto-nivel"></span><span class="ic-punto-nivel"></span>
+                                </div>
+                                <span class="ic-nivel-texto">Media</span>
+                            </div>
+                        </div>
+
+                        <div class="ic-datos-secundarios">
+                            <div class="ic-dato-chico">
+                                <span class="ic-fila-label">Población</span>
+                                <span class="ic-fila-valor" data-count-hasta="20000" data-count-decimales="0" data-count-formato="miles">0</span>
+                            </div>
+                            <div class="ic-dato-chico">
+                                <span class="ic-fila-label">Altitud</span>
+                                <span class="ic-fila-valor" data-count-hasta="66" data-count-decimales="0">0</span><span class="ic-unidad"> m</span>
+                            </div>
+                        </div>
+
+                        <p class="ic-mensaje">“Las estrellas empezaban a volver.”</p>
+                    </div>
+
+                    <div class="info-ciudad junin-info">
+                        <div class="ic-header">
+                            <span class="ic-provincia">Neuquén</span>
+                            <h2>Junín de los Andes</h2>
+                        </div>
+
+                        <div class="ic-metrica-principal">
+                            <span class="ic-metrica-label">Magnitud límite</span>
+                            <span class="ic-metrica-valor" data-count-hasta="6.3" data-count-decimales="1">0.0</span>
+                            <span class="ic-metrica-nota">≈<span data-count-hasta="170" data-count-decimales="0">0</span> estrellas visibles</span>
+                        </div>
+
+                        <div class="ic-indicador">
+                            <span class="ic-fila-label">Oscuridad del cielo</span>
+                            <div class="ic-barra"><div class="ic-barra-fill ic-barra-fill-junin"></div></div>
+                        </div>
+
+                        <div class="ic-contaminacion">
+                            <span class="ic-fila-label">Contaminación lumínica</span>
+                            <div class="ic-nivel">
+                                <div class="ic-puntos-nivel ic-puntos-nivel-baja">
+                                    <span class="ic-punto-nivel"></span><span class="ic-punto-nivel"></span><span class="ic-punto-nivel"></span><span class="ic-punto-nivel"></span><span class="ic-punto-nivel"></span>
+                                </div>
+                                <span class="ic-nivel-texto">Baja</span>
+                            </div>
+                        </div>
+
+                        <div class="ic-datos-secundarios">
+                            <div class="ic-dato-chico">
+                                <span class="ic-fila-label">Población</span>
+                                <span class="ic-fila-valor" data-count-hasta="15000" data-count-decimales="0" data-count-formato="miles">0</span>
+                            </div>
+                            <div class="ic-dato-chico">
+                                <span class="ic-fila-label">Altitud</span>
+                                <span class="ic-fila-valor" data-count-hasta="779" data-count-decimales="0">0</span><span class="ic-unidad"> m</span>
+                            </div>
+                        </div>
+
+                        <p class="ic-mensaje">“El cielo volvía a parecer infinito.”</p>
+                    </div>
+
                 </div>
 
-                <div class="info-ciudad junin-info">
-                    <h2>Junín de los Andes</h2>
-                    <p class="dato">Magnitud límite: 6.3</p>
-                    <p>
-                        Por primera vez en mucho tiempo sentí que estaba mirando el mismo cielo de mi infancia.
-                        La Vía Láctea volvía a ser visible.
-                    </p>
+                <!-- Explicación de la magnitud límite: oculta por defecto,
+                     un pequeño link la revela (hover en desktop, click en
+                     mobile) — ver .ic-info-fija en styles.css y su handler
+                     en main.js. Es la misma para las tres ciudades, así que
+                     vive una sola vez, afuera del cruce de tarjetas. -->
+                <div class="ic-info-fija" id="ic-info-fija">
+                    <button type="button" class="ic-info-boton" id="ic-info-boton" aria-expanded="false">¿Qué significa la magnitud límite?</button>
+                    <div class="ic-info-panel" role="tooltip">
+                        <p>Representa la estrella más tenue que puede observarse a simple vista desde ese lugar. Cuanto mayor es este valor, más oscuro es el cielo y mayor cantidad de estrellas pueden verse.</p>
+                    </div>
                 </div>
 
             </div>

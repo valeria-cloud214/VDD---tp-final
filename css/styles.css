@@ -627,7 +627,33 @@
        opacity: 0;
        transition: opacity 1.2s ease;
    }
-   
+
+   /* Cielo vivo: un desplazamiento casi imperceptible del campo de estrellas
+      y de la Vía Láctea (nunca de Orión, que se queda fijo — es la figura
+      que Jorge siempre reencuentra) más un parpadeo muy sutil en algunas
+      estrellas, para que no se sienta como una imagen fija. */
+   @keyframes cielos-deriva {
+       0%, 100% { transform: translateX(0); }
+       50% { transform: translateX(6px); }
+   }
+   .estrellas-ciudad,
+   .via-lactea {
+       animation: cielos-deriva 90s ease-in-out infinite;
+   }
+
+   /* --op-base lo fija cada estrella individualmente en escena-cielos.js
+      (su propia opacidad de base): así el parpadeo oscila alrededor del
+      brillo real de esa estrella en vez de saltar todas al mismo valor. */
+   @keyframes cielos-titileo {
+       0%, 100% { opacity: var(--op-base, 1); }
+       50% { opacity: calc(var(--op-base, 1) * 0.35); }
+   }
+   .estrella-titila {
+       animation-name: cielos-titileo;
+       animation-timing-function: ease-in-out;
+       animation-iteration-count: infinite;
+   }
+
    /* Orión: la figura nunca desaparece del todo (hover siempre funciona),
       pero cada estrella arranca tenue y sólo llega a su brillo real una vez
       que la ciudad activa la "reveló" — ver las reglas .revela-* más abajo. */
@@ -713,82 +739,369 @@
        flex-direction:row;
    }
    
-   #panel-ciudad{
-       width:25%;
-       height:100%;
-   
-       background-color:#0f172a;
-       border-left:2px solid var(--acento);
-   
-       position:relative;
-   
-       display:flex;
-       align-items:center;
-   
-       padding:30px;
-   
-       overflow:hidden;
+   /* ==========================================================================
+      PANEL DE CIUDAD (panel-ciudad) — editorial, no dashboard. Acompaña al
+      cielo (que sigue ocupando ~75% del ancho): tipografía y espacio en vez
+      de cajas y bordes, un solo color de acento para los datos, jerarquía
+      clara. Misma identidad que el scatter plot / escena-6c / escena-luz.
+      ========================================================================== */
+
+   #panel-ciudad {
+       width: 25%;
+       height: 100%;
+
+       background: rgba(10, 14, 26, 0.55);
+       -webkit-backdrop-filter: blur(14px);
+       backdrop-filter: blur(14px);
+       border-left: 1px solid rgba(77, 178, 255, 0.22);
+       box-shadow: -20px 0 50px rgba(0, 0, 0, 0.35);
+
+       position: relative;
+
+       display: flex;
+       flex-direction: column;
+       justify-content: center;
+
+       padding: 34px;
+
+       overflow: hidden;
    }
-   
-   .info-ciudad{
-       position:absolute;
-   
-       width:calc(100% - 60px);
-   
-       opacity:0;
-       transform:translateY(30px);
-   
+
+   /* Envoltorio donde cruzan (fade + translateY) las tres tarjetas de
+      ciudad; el link de "¿qué significa?" queda afuera, así no cambia con
+      el scroll. */
+   .ic-stack {
+       position: relative;
+       width: 100%;
+       flex: 1 1 auto;
+       display: flex;
+       align-items: center;
+   }
+
+   .info-ciudad {
+       position: absolute;
+       width: 100%;
+
+       opacity: 0;
+       transform: translateY(18px);
+
        transition:
            opacity 0.8s ease,
            transform 0.8s ease;
-   
-       pointer-events:none;
+
+       pointer-events: none;
    }
-   
-   .info-ciudad.activa{
-       opacity:1;
-       transform:translateY(0);
+
+   .info-ciudad.activa {
+       opacity: 1;
+       transform: translateY(0);
    }
-   
-   .info-ciudad h2{
-       color:var(--acento);
-       font-size:2rem;
-       margin-bottom:16px;
-   }
-   
-   .info-ciudad .dato{
-       display: inline-block;
-       color: var(--acento);
-       font-weight: 700;
-       font-size: 1rem;
-       letter-spacing: 0.02em;
-       background: var(--acento-suave);
-       border-radius: 999px;
-       padding: 6px 14px;
+
+   /* --- Encabezado: provincia (kicker chico) + nombre de la ciudad ------- */
+   .ic-header {
        margin-bottom: 18px;
    }
-   
-   .info-ciudad p{
-       font-size:1.2rem;
-       line-height:1.6;
-       color:#f8fafc;
+
+   .ic-provincia {
+       display: block;
+       font-size: 0.7rem;
+       font-weight: 700;
+       letter-spacing: 0.12em;
+       text-transform: uppercase;
+       color: rgba(226, 232, 240, 0.5);
+       margin-bottom: 5px;
    }
-   
+
+   .info-ciudad h2 {
+       font-family: var(--font-heading, 'Nunito', sans-serif);
+       color: #ffffff;
+       font-size: 1.9rem;
+       font-weight: 700;
+       line-height: 1.2;
+   }
+
+   /* --- Métrica principal: tipografía, no tarjeta. El número sigue siendo
+      grande, pero sin borde/fondo/relleno no compite con el cielo. -------- */
+   .ic-metrica-principal {
+       margin-bottom: 20px;
+   }
+
+   .ic-metrica-label {
+       display: block;
+       font-size: 0.68rem;
+       font-weight: 700;
+       letter-spacing: 0.1em;
+       text-transform: uppercase;
+       color: rgba(226, 232, 240, 0.5);
+       margin-bottom: 6px;
+   }
+
+   .ic-metrica-valor {
+       display: block;
+       font-family: var(--font-heading, 'Nunito', sans-serif);
+       font-size: 3.4rem;
+       font-weight: 700;
+       line-height: 1.1;
+       color: var(--acento);
+       font-variant-numeric: tabular-nums;
+       letter-spacing: -0.01em;
+   }
+
+   .ic-metrica-nota {
+       display: block;
+       margin-top: 6px;
+       font-size: 0.82rem;
+       color: rgba(226, 232, 240, 0.55);
+   }
+
+   .ic-metrica-nota span {
+       font-variant-numeric: tabular-nums;
+   }
+
+   /* --- Indicador visual (oscuridad del cielo): la única barra del panel,
+      conecta directamente el dato con lo que se ve al lado. El track
+      siempre está al 100%, el relleno tiene su ancho final ya fijo por
+      ciudad (.ic-barra-fill-*) y sólo se revela con un scaleX — así "crece"
+      cada vez que la tarjeta se activa, sin JS. -------------------------- */
+   .ic-indicador {
+       margin-bottom: 16px;
+   }
+
+   .ic-indicador .ic-fila-label {
+       display: block;
+       margin-bottom: 9px;
+   }
+
+   .ic-barra {
+       width: 100%;
+       height: 3px;
+       border-radius: 999px;
+       background: rgba(255, 255, 255, 0.1);
+       overflow: hidden;
+   }
+
+   .ic-barra-fill {
+       height: 100%;
+       border-radius: 999px;
+       background: var(--acento);
+       transform: scaleX(0);
+       transform-origin: left center;
+       transition: transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+   }
+
+   .info-ciudad.activa .ic-barra-fill {
+       transform: scaleX(1);
+   }
+
+   .ic-barra-fill-bsas { width: 8%; }
+   .ic-barra-fill-firmat { width: 32%; }
+   .ic-barra-fill-junin { width: 100%; }
+
+   /* --- Nivel de contaminación: puntos en vez de "pill", nada de caja ---- */
+   .ic-contaminacion {
+       margin-bottom: 16px;
+   }
+
+   .ic-contaminacion .ic-fila-label {
+       display: block;
+       margin-bottom: 9px;
+   }
+
+   .ic-nivel {
+       display: flex;
+       align-items: center;
+       gap: 10px;
+   }
+
+   .ic-puntos-nivel {
+       display: inline-flex;
+       gap: 5px;
+   }
+
+   .ic-punto-nivel {
+       width: 7px;
+       height: 7px;
+       border-radius: 50%;
+       background: rgba(255, 255, 255, 0.14);
+       transition: background 0.6s ease, box-shadow 0.6s ease;
+   }
+
+   .ic-puntos-nivel-alta .ic-punto-nivel:nth-child(-n+4) { background: #ff6b6b; box-shadow: 0 0 6px rgba(255, 107, 107, 0.55); }
+   .ic-puntos-nivel-media .ic-punto-nivel:nth-child(-n+2) { background: #ffd166; box-shadow: 0 0 6px rgba(255, 209, 102, 0.55); }
+   .ic-puntos-nivel-baja .ic-punto-nivel:nth-child(-n+1) { background: var(--acento); box-shadow: 0 0 6px rgba(77, 178, 255, 0.55); }
+
+   .ic-nivel-texto {
+       font-family: var(--font-heading, 'Nunito', sans-serif);
+       font-size: 0.9rem;
+       font-weight: 700;
+       color: #ffffff;
+   }
+
+   /* --- Datos secundarios: población + altitud, uno al lado del otro,
+      sin divisores ni cajas — sólo dos columnas con aire entre sí -------- */
+   .ic-datos-secundarios {
+       display: flex;
+       gap: 40px;
+       margin-bottom: 18px;
+   }
+
+   .ic-dato-chico .ic-fila-label {
+       display: block;
+       margin-bottom: 6px;
+   }
+
+   .ic-fila-label {
+       font-size: 0.76rem;
+       color: rgba(226, 232, 240, 0.55);
+   }
+
+   .ic-fila-valor,
+   .ic-unidad {
+       font-family: var(--font-heading, 'Nunito', sans-serif);
+       font-size: 1.05rem;
+       font-weight: 700;
+       color: #ffffff;
+       font-variant-numeric: tabular-nums;
+   }
+
+   /* --- Mensaje narrativo: la voz de Jorge — cita editorial, protagonista -
+      tipografía grande, cursiva, mucho aire alrededor. No es "otro dato". */
+   .ic-mensaje {
+       margin-top: 0;
+       padding-top: 12px;
+       border-top: 1px solid rgba(255, 255, 255, 0.08);
+       font-family: var(--font-heading, 'Quicksand', sans-serif);
+       font-size: 1.35rem;
+       font-style: italic;
+       font-weight: 500;
+       line-height: 1.5;
+       color: #f8fafc;
+   }
+
+   /* --- "¿Qué significa?": explicación de la magnitud límite, oculta hasta
+      hover/click — la misma para las tres ciudades, vive afuera del cruce
+      de tarjetas para no repetirse ni parpadear al cambiar de ciudad. ----- */
+   .ic-info-fija {
+       position: relative;
+       flex: none;
+       margin-top: 14px;
+   }
+
+   .ic-info-boton {
+       background: none;
+       border: none;
+       padding: 0;
+       font-family: inherit;
+       font-size: 0.76rem;
+       color: rgba(77, 178, 255, 0.85);
+       cursor: pointer;
+       text-decoration: underline;
+       text-decoration-color: rgba(77, 178, 255, 0.35);
+       text-underline-offset: 3px;
+   }
+
+   .ic-info-boton:hover,
+   .ic-info-boton:focus-visible {
+       color: var(--acento);
+   }
+
+   .ic-info-panel {
+       position: absolute;
+       left: 0;
+       bottom: calc(100% + 12px);
+       width: 100%;
+       max-width: 320px;
+
+       background: rgba(10, 14, 26, 0.94);
+       -webkit-backdrop-filter: blur(14px);
+       backdrop-filter: blur(14px);
+       border: 1px solid rgba(255, 255, 255, 0.1);
+       border-radius: var(--radio-tarjeta, 10px);
+       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+       padding: 16px 18px;
+
+       opacity: 0;
+       transform: translateY(8px);
+       pointer-events: none;
+       transition: opacity 0.25s ease, transform 0.25s ease;
+   }
+
+   .ic-info-panel p {
+       margin: 0;
+       font-size: 0.8rem;
+       line-height: 1.55;
+       color: rgba(226, 232, 240, 0.85);
+   }
+
+   .ic-info-fija:hover .ic-info-panel,
+   .ic-info-fija:focus-within .ic-info-panel,
+   .ic-info-fija.ic-info-abierta .ic-info-panel {
+       opacity: 1;
+       transform: translateY(0);
+       pointer-events: auto;
+   }
+
    /* Estado inicial: activa a la vez las estrellas, el resplandor y el
       horizonte que le corresponden a la ciudad actual (y la Vía Láctea,
       sólo en el caso de Junín, porque comparte la clase "junin"). */
    .cielo-bsas .bsas{
        opacity:1;
    }
-   
+
    .cielo-firmat .firmat{
        opacity:1;
    }
-   
+
    .cielo-junin .junin{
        opacity:1;
    }
-   
+
+   /* ==========================================================================
+      DIFERENCIAS ENTRE CIUDADES, ACENTUADAS — misma composición que antes
+      (no se agrega ni se saca ninguna capa), sólo se estira el contraste
+      entre las tres para que el cambio se note más de un vistazo.
+      ========================================================================== */
+   #capa-orion {
+       transition: opacity 1.2s ease, filter 1.2s ease;
+   }
+
+   /* Buenos Aires: resplandor bien intenso, horizonte muy encendido, Orión
+      apenas se distingue del resplandor — cuesta encontrarlo. */
+   .cielo-bsas .resplandor-ciudad.bsas {
+       filter: brightness(1.2) saturate(1.15);
+   }
+   .cielo-bsas .horizonte-ciudad.bsas {
+       filter: brightness(1.1);
+   }
+   .cielo-bsas #capa-orion {
+       opacity: 0.55;
+       filter: saturate(0.6);
+   }
+
+   /* Firmat: resplandor bastante más tenue, y la Vía Láctea ya empieza a
+      insinuarse (mucho más tenue que en Junín — comparte el mismo grupo,
+      así que no hace falta duplicar contenido, sólo revelarlo antes). */
+   .cielo-firmat .resplandor-ciudad.firmat {
+       filter: brightness(0.8);
+   }
+   .cielo-firmat .via-lactea.junin {
+       opacity: 0.22;
+   }
+   .cielo-firmat #capa-orion {
+       opacity: 0.85;
+   }
+
+   /* Junín: horizonte casi negro, Vía Láctea bien marcada (ya cubierta por
+      ".cielo-junin .junin"), Orión en su brillo máximo — es el cielo donde
+      más protagonismo tiene. */
+   .cielo-junin .horizonte-ciudad.junin {
+       filter: brightness(0.6);
+   }
+   .cielo-junin #capa-orion {
+       opacity: 1;
+       filter: drop-shadow(0 0 6px rgba(207, 224, 255, 0.55));
+   }
+
    /* ==========================================================================
       ESCENA 6A — De la observación a la investigación
       El cielo de Junín (ver js/escena-transicion-datos.js) sigue exactamente

@@ -76,15 +76,26 @@ document.addEventListener("DOMContentLoaded", () => {
     // ======================================================================
     // 1. ESTRELLAS DE FONDO — una densidad distinta por ciudad
     // ======================================================================
+    // Un tercio de las estrellas parpadea muy suavemente (ver
+    // @keyframes cielos-titileo en styles.css): cada una fija su propia
+    // opacidad de base como variable CSS (--op-base) para que el parpadeo
+    // oscile alrededor de SU brillo real, no de un valor genérico.
     function generarEstrellas(contenedor, cfg) {
         for (let i = 0; i < cfg.cantidad; i++) {
+            const opacidadBase = entre(cfg.opacidadMin, cfg.opacidadMax);
             const estrella = crearSVG("circle", {
                 cx: entre(CONFIG.cieloX.min, CONFIG.cieloX.max),
                 cy: entre(CONFIG.cieloY.min, CONFIG.cieloY.max),
                 r: entre(cfg.radioMin, cfg.radioMax),
                 fill: "#f5f7ff",
-                opacity: entre(cfg.opacidadMin, cfg.opacidadMax)
+                opacity: opacidadBase
             });
+            if (azar() < 0.33) {
+                estrella.setAttribute("class", "estrella-titila");
+                estrella.style.setProperty("--op-base", opacidadBase.toFixed(2));
+                estrella.style.animationDuration = `${entre(2.5, 5).toFixed(2)}s`;
+                estrella.style.animationDelay = `-${entre(0, 5).toFixed(2)}s`;
+            }
             contenedor.appendChild(estrella);
         }
     }
@@ -93,35 +104,72 @@ document.addEventListener("DOMContentLoaded", () => {
     generarEstrellas(document.getElementById("estrellas-junin"), CONFIG.estrellas.junin);
 
     // ======================================================================
-    // 2. VÍA LÁCTEA — sólo se revela en el cielo más oscuro (Junín)
+    // 2. VÍA LÁCTEA — sólo se revela en el cielo más oscuro (Junín, y ya
+    //    insinuándose un poco en Firmat — ver CSS). Varias capas en vez de
+    //    una elipse uniforme: zonas más brillantes, bordes irregulares y
+    //    algunos cúmulos, para que se lea más como una foto real del cielo.
     // ======================================================================
     (function generarViaLactea() {
         const capa = document.getElementById("capa-via-lactea");
         if (!capa) return;
 
-        // Nube difusa de fondo (una elipse rotada, muy tenue), centrada en
-        // el ancho real del mundo (ver ANCHO_MUNDO más arriba).
         const centroViaLacteaX = ANCHO_MUNDO * 0.5;
-        const banda = crearSVG("ellipse", {
-            cx: centroViaLacteaX, cy: 430, rx: 750, ry: 65,
-            fill: "#cfd9ff", opacity: 0.05,
-            transform: `rotate(-28 ${centroViaLacteaX} 430)`
-        });
-        capa.appendChild(banda);
+        const anguloGrados = -28;
+        const angulo = (anguloGrados * Math.PI) / 180;
+        const dx = Math.cos(angulo), dy = Math.sin(angulo);
+
+        // Nube de fondo: varios tramos superpuestos a lo largo de la misma
+        // diagonal, cada uno con su propio tamaño y opacidad — en vez de una
+        // única elipse pareja, así hay zonas que brillan más que otras y el
+        // borde deja de verse perfectamente ovalado.
+        const tramos = 6;
+        for (let i = 0; i < tramos; i++) {
+            const t = (i / (tramos - 1) - 0.5) * 2 * 600;
+            const x = centroViaLacteaX + dx * t;
+            const y = 430 + dy * t;
+            capa.appendChild(crearSVG("ellipse", {
+                cx: x, cy: y, rx: entre(230, 340), ry: entre(45, 85),
+                fill: "#cfd9ff", opacity: entre(0.035, 0.09).toFixed(3),
+                transform: `rotate(${anguloGrados} ${x} ${y})`
+            }));
+        }
 
         // Textura: muchas estrellitas diminutas dispersas a lo largo de la
-        // misma diagonal, para que se lea como una franja y no una mancha.
-        const angulo = (-28 * Math.PI) / 180;
-        const dx = Math.cos(angulo), dy = Math.sin(angulo);
+        // misma diagonal (algunas con un leve tinte cálido o frío, para que
+        // no se vea un color uniforme), para que se lea como una franja y
+        // no una mancha.
         for (let i = 0; i < CONFIG.viaLactea.cantidad; i++) {
             const t = entre(-430, 430);
             const jitter = entre(-40, 40);
             const x = centroViaLacteaX + dx * t - dy * jitter;
             const y = 430 + dy * t + dx * jitter;
+            const semilla = azar();
+            const color = semilla < 0.18 ? "#ffe9d6" : semilla < 0.36 ? "#d8e6ff" : "#eef2ff";
             capa.appendChild(crearSVG("circle", {
                 cx: x, cy: y, r: entre(0.5, 1.3),
-                fill: "#eef2ff", opacity: entre(0.25, 0.6)
+                fill: color, opacity: entre(0.25, 0.6)
             }));
+        }
+
+        // Cúmulos: pequeñas concentraciones de estrellas que rompen la
+        // uniformidad de la franja, como cúmulos abiertos reales.
+        const cantidadCumulos = 5;
+        for (let c = 0; c < cantidadCumulos; c++) {
+            const t = entre(-380, 380);
+            const jitter = entre(-25, 25);
+            const cx = centroViaLacteaX + dx * t - dy * jitter;
+            const cy = 430 + dy * t + dx * jitter;
+            const cantidadEnCumulo = Math.round(entre(6, 14));
+            for (let k = 0; k < cantidadEnCumulo; k++) {
+                const radio = entre(0, 22);
+                const anguloCumulo = entre(0, Math.PI * 2);
+                capa.appendChild(crearSVG("circle", {
+                    cx: cx + Math.cos(anguloCumulo) * radio,
+                    cy: cy + Math.sin(anguloCumulo) * radio,
+                    r: entre(0.4, 1.1),
+                    fill: "#eef2ff", opacity: entre(0.3, 0.7)
+                }));
+            }
         }
     })();
 

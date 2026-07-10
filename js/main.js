@@ -141,9 +141,77 @@ document.addEventListener("DOMContentLoaded", () => {
     // Arrancamos directamente en Buenos Aires, igual que el bloque de arriba
     // ya arranca con su estado "inicio" sin esperar al scroll.
     const cieloInicial = document.getElementById("cielo-estrellas");
+
+    // Cuenta un [data-count-hasta] (magnitud límite / estrellas / población /
+    // altitud) desde 0 hasta su valor final, con un ease-out simple.
+    // data-count-formato="miles" agrupa los miles (3.000.000) para población.
+    function contarNumero(el, duracion = 900) {
+        const destino = parseFloat(el.getAttribute("data-count-hasta"));
+        if (Number.isNaN(destino)) return;
+        const decimales = Number(el.getAttribute("data-count-decimales") || "0");
+        const formateador = el.getAttribute("data-count-formato") === "miles"
+            ? new Intl.NumberFormat("es-AR", { maximumFractionDigits: decimales })
+            : null;
+        const escribir = (valor) => { el.textContent = formateador ? formateador.format(valor) : valor.toFixed(decimales); };
+        const inicio = performance.now();
+        function paso(ahora) {
+            const progreso = Math.min(1, (ahora - inicio) / duracion);
+            const facilitado = 1 - Math.pow(1 - progreso, 3); // ease-out cúbico
+            escribir(destino * facilitado);
+            if (progreso < 1) requestAnimationFrame(paso);
+            else escribir(destino);
+        }
+        requestAnimationFrame(paso);
+    }
+
+    // Activa la tarjeta de una ciudad (crossfade ya lo resuelve el CSS vía
+    // ".activa") y dispara el count-up de sus números — la barra y los
+    // puntos de contaminación se animan solos por CSS al mismo tiempo.
+    function activarCiudad(elemento) {
+        document.querySelectorAll(".info-ciudad").forEach(t => t.classList.remove("activa"));
+        if (!elemento) return;
+        elemento.classList.add("activa");
+        elemento.querySelectorAll("[data-count-hasta]").forEach(el => contarNumero(el));
+    }
+
+    // Buenos Aires (la primera ciudad) tenía un comportamiento distinto a
+    // las otras dos: como se activaba de forma síncrona acá mismo, el
+    // navegador podía pintarla directamente en su estado final sin
+    // transición visible, y recién con el disparador "bsas" (más abajo en
+    // el scroll) se veía animar algo. Un doble requestAnimationFrame no
+    // alcanzaba (el navegador puede procesar los dos callbacks antes de
+    // pintar ningún frame intermedio). El truco que sí funciona en el resto
+    // del proyecto (ver el crossfade de fotos de la escena 2, más arriba en
+    // este archivo) es forzar un reflow síncrono entre el estado de reposo
+    // y el estado activo: leer una propiedad de layout obliga al navegador
+    // a aplicar el primer estado antes de seguir, así el cambio siguiente sí
+    // se detecta como una transición real.
+    if (cieloInicial) cieloInicial.className = ""; // estado de reposo: sin ciudad activa
+    if (cieloInicial) void cieloInicial.offsetWidth; // fuerza el reflow
     if (cieloInicial) cieloInicial.className = "cielo-bsas";
-    const bsasInfoInicial = document.querySelector(".bsas-info");
-    if (bsasInfoInicial) bsasInfoInicial.classList.add("activa");
+    activarCiudad(document.querySelector(".bsas-info"));
+
+    // ¿Qué significa la magnitud límite?: hover ya lo resuelve el CSS
+    // (:hover / :focus-within); el click es para que también funcione con
+    // un solo toque en mobile, donde no existe hover.
+    (function conectarInfoMagnitud() {
+        const contenedor = document.getElementById("ic-info-fija");
+        const boton = document.getElementById("ic-info-boton");
+        if (!contenedor || !boton) return;
+
+        boton.addEventListener("click", (evento) => {
+            evento.stopPropagation();
+            const abierto = contenedor.classList.toggle("ic-info-abierta");
+            boton.setAttribute("aria-expanded", String(abierto));
+        });
+
+        document.addEventListener("click", (evento) => {
+            if (!contenedor.contains(evento.target)) {
+                contenedor.classList.remove("ic-info-abierta");
+                boton.setAttribute("aria-expanded", "false");
+            }
+        });
+    })();
 
     const opcionesE6 = {
         root: null,
@@ -186,25 +254,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
 
                 }
-                const textosCiudad = document.querySelectorAll(".info-ciudad");
 
-                textosCiudad.forEach(texto => {
-                    texto.classList.remove("activa");
-                });
-                if(paso === "bsas"){
-                    cielo.className = "cielo-bsas";
-                    document.querySelector(".bsas-info").classList.add("activa");
-                }
-
-                if(paso === "firmat"){
-                    cielo.className = "cielo-firmat";
-                    document.querySelector(".firmat-info").classList.add("activa");
-                }
-
-                if(paso === "junin"){
-                    cielo.className = "cielo-junin";
-                    document.querySelector(".junin-info").classList.add("activa");
-                }
+                if (paso === "bsas") activarCiudad(document.querySelector(".bsas-info"));
+                if (paso === "firmat") activarCiudad(document.querySelector(".firmat-info"));
+                if (paso === "junin") activarCiudad(document.querySelector(".junin-info"));
 
             }
         });
