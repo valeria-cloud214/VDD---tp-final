@@ -26,15 +26,15 @@ const CIUDADES_MUNDO = [
     { nombre: "Ciudad de México", pais: "Indonesia",     src: "visualisation/29480606", overlay: "Caída pronunciada",               destacado: false },
     { nombre: "Santiago",         pais: "Japón",         src: "visualisation/29656486", overlay: "Caída leve",                 destacado: false },
     // FILA 3
-    { nombre: "Mumbai",           pais: "India",         src: "visualisation/29480504", overlay: "Mayor pérdida de estrellas",          destacado: false },
-    { nombre: "Shanghái",         pais: "China",         src: "visualisation/29480539", overlay: "Cambio acelerado",                    destacado: false },
-    { nombre: "Berlín",           pais: "Alemania",      src: "visualisation/29480564", overlay: "≈ Se mantiene relativamente estable", destacado: false },
-    { nombre: "Moscú",            pais: "Rusia",         src: "visualisation/29480590", overlay: "▲ Tendencia creciente",               destacado: false },
+    { nombre: "Mumbai",           pais: "China",         src: "visualisation/29654772", overlay: "Mayor pérdida de estrellas",          destacado: false },
+    { nombre: "Shanghái",         pais: "Filipinas",         src: "visualisation/29657393", overlay: "Cambio acelerado",                    destacado: false },
+    { nombre: "Berlín",           pais: "Canada",      src: "visualisation/29657456", overlay: "≈ Se mantiene relativamente estable", destacado: false },
+    { nombre: "Moscú",            pais: "Chile",         src: "visualisation/29656496", overlay: "▲ Tendencia creciente",               destacado: false },
     // FILA 4 (repite los data-src de la fila 1 — mismos gráficos, no nuevos)
-    { nombre: "Buenos Aires",     pais: "Argentina",     src: "visualisation/29324397", overlay: "El punto de partida",                 destacado: false },
-    { nombre: "Tokio",            pais: "Japón",         src: "visualisation/29324604", overlay: "▲ Tendencia creciente",               destacado: false },
-    { nombre: "Nueva York",       pais: "EE. UU.",       src: "visualisation/29324591", overlay: "▲ Tendencia creciente",               destacado: false },
-    { nombre: "Londres",          pais: "Reino Unido",   src: "visualisation/29324582", overlay: "Cambio acelerado",                    destacado: false }
+    { nombre: "Buenos Aires",     pais: "Croacia",     src: "visualisation/29657461", overlay: "El punto de partida",                 destacado: false },
+    { nombre: "Tokio",            pais: "Portugal",         src: "visualisation/29657433", overlay: "▲ Tendencia creciente",               destacado: false },
+    { nombre: "Nueva York",       pais: "Macedonia",       src: "visualisation/29657496", overlay: "▲ Tendencia creciente",               destacado: false },
+    { nombre: "Londres",          pais: "Puerto Rico",   src: "visualisation/29657515", overlay: "Cambio acelerado",                    destacado: false }
 ];
 
 // Nombres que flotan en el ACTO 2, antes de que aparezca ningún gráfico.
