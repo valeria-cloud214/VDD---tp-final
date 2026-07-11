@@ -4,23 +4,28 @@
    Puente entre escena-luz (el mecanismo) y escena-mundo (el mismo patrón en
    todo el planeta): un caso local, con 4 años puntuales, mostrando cómo
    fue bajando la cantidad de estrellas visibles a medida que crecieron la
-   población y la edificación.
+   población y la edificación. El primer beat de texto es el conector en
+   primera persona que explica por qué se mira Córdoba capital en
+   particular.
 
-   ⚠️ Los datos de CORDOBA (magnitud límite, estrellas visibles, población)
-   son ILUSTRATIVOS — se armaron para que la escena funcione, no salen de
-   una fuente medida. Antes de publicar, reemplazar por datos reales
-   (mismo criterio que ya usa el panel de ciudades de escena-6).
+   ⚠️ Magnitud límite y estrellas visibles son ILUSTRATIVAS — no salen de
+   una fuente medida. La población de cada año sí son datos reales.
 
-   6 pasos de scroll, pinneados (mismo patrón que escena-transicion-datos.js
+   8 pasos de scroll, pinneados (mismo patrón que escena-transicion-datos.js
    / escena-transicion-fisica.js):
-   1) Aparece la línea de tiempo completa, con los 4 círculos ya con su
-      propia mini cantidad de estrellas adentro (overview).
-   2) Foco en 1980.
-   3) Foco en 2000.
-   4) Foco en 2016.
-   5) Foco en 2025.
-   6) Cierre: por qué pasó esto (población + edificación), con 2025 todavía
-      en foco.
+   1) Primera oración del conector, sobre el fondo estrellado (todavía sin
+      línea de tiempo, y con las estrellas un poco desenfocadas).
+   2) Segunda oración (se suma a la primera, ninguna se retira).
+   3) Las 2 oraciones se retiran y recién ahí entra la línea de tiempo
+      completa — las estrellas de fondo también se enfocan del todo.
+   4) Foco en 1980.
+   5) Foco en 2000.
+   6) Foco en 2016.
+   7) Foco en 2025.
+   8) Cierre: por qué pasó esto (población + edificación) — acá se
+      desbloquea la interactividad: cada círculo se puede tocar para abrir
+      su ficha completa (ver PANEL DE DETALLE más abajo). Los 4 círculos
+      quedan del mismo tamaño, ninguno se queda "en foco".
 
    En paralelo, el resplandor cálido de fondo crece paso a paso y el campo
    de estrellas de fondo se va apagando — mismo lenguaje visual que
@@ -53,23 +58,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const azar = crearRandom(19800101);
     const entre = (min, max) => min + azar() * (max - min);
 
-    // ⚠️ Ver nota de datos ilustrativos en el encabezado del archivo.
+    // ⚠️ Magnitud límite y estrellas visibles siguen siendo ILUSTRATIVAS —
+    // no salen de una fuente medida. La población sí son datos reales
+    // (Córdoba capital, según año).
     const CORDOBA = [
         {
             anio: 1980, id: "1980", x: 150, densidad: 1,
-            magnitud: "6,1", estrellas: "≈2.500", poblacion: "≈980 mil",
+            magnitud: "6,1", estrellas: "≈2.500", poblacion: "990.968 habitantes",
+            nota: "Casi sin resplandor artificial: se distinguían miles de estrellas a simple vista."
         },
         {
             anio: 2000, id: "2000", x: 483, densidad: 0.55,
-            magnitud: "5,0", estrellas: "≈900", poblacion: "≈1,3 millones",
+            magnitud: "5,0", estrellas: "≈900", poblacion: "1,25 millones de habitantes",
+            nota: "La ciudad había crecido en población y en construcción — el resplandor ya tapaba las estrellas más débiles."
         },
         {
             anio: 2016, id: "2016", x: 817, densidad: 0.2,
-            magnitud: "4,0", estrellas: "≈150", poblacion: "≈1,5 millones",
+            magnitud: "4,0", estrellas: "≈150", poblacion: "1.350.000 habitantes",
+            nota: "Más edificios y más luces encendidas toda la noche: del cielo original quedaban apenas las estrellas más brillantes."
         },
         {
             anio: 2025, id: "2025", x: 1150, densidad: 0.06,
-            magnitud: "3,2", estrellas: "≈35", poblacion: "≈1,6 millones",
+            magnitud: "3,2", estrellas: "≈35", poblacion: "1.637.000 habitantes",
+            nota: "Hoy, en pleno centro, el resplandor de la ciudad opaca casi todo lo demás."
         }
     ];
 
@@ -102,7 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     CORDOBA.forEach(d => {
         const grupo = crearSVG("g", { id: `ct-punto-${d.id}`, class: "ct-punto" });
-
         // Halo cálido detrás, apagado hasta que este año entra en foco.
         grupo.appendChild(crearSVG("circle", {
             cx: d.x, cy: Y_PUNTOS, r: RADIO_PUNTO + 26,
@@ -143,31 +153,156 @@ document.addEventListener("DOMContentLoaded", () => {
         texto.textContent = d.anio;
         grupo.appendChild(texto);
 
+        // Clickeable recién cuando termina la recorrida (ver
+        // .ct-interactivo más abajo) — el guard vive en abrirDetalle().
+        grupo.addEventListener("click", () => abrirDetalle(d));
+
         capaPuntos.appendChild(grupo);
     });
 
     // ======================================================================
-    // 3. SCROLL — 6 pasos
+    // 2b. CÍRCULO EXPANDIDO — al tocar un año, este círculo (mucho más
+    //     grande, centrado) muestra su cielo ocupando casi toda la
+    //     pantalla. Se arma una sola vez acá y se repuebla de estrellas en
+    //     cada apertura (ver mostrarCirculoGrande).
+    // ======================================================================
+    const RADIO_GRANDE = 230;
+    const CENTRO_GRANDE_X = 480;
+    const CENTRO_GRANDE_Y = 340;
+
+    const capaCirculoGrande = document.getElementById("ct-circulo-grande");
+    const clipGrandeId = "ct-clip-grande";
+    const clipGrande = crearSVG("clipPath", { id: clipGrandeId });
+    clipGrande.appendChild(crearSVG("circle", { cx: CENTRO_GRANDE_X, cy: CENTRO_GRANDE_Y, r: RADIO_GRANDE }));
+    defs.appendChild(clipGrande);
+
+    capaCirculoGrande.appendChild(crearSVG("circle", {
+        cx: CENTRO_GRANDE_X, cy: CENTRO_GRANDE_Y, r: RADIO_GRANDE + 18,
+        fill: "#ffd166", "fill-opacity": 0.22
+    }));
+    capaCirculoGrande.appendChild(crearSVG("circle", {
+        cx: CENTRO_GRANDE_X, cy: CENTRO_GRANDE_Y, r: RADIO_GRANDE,
+        fill: "#0a0c16", stroke: "#4a4560", "stroke-width": 2.5
+    }));
+    const estrellasGrandes = crearSVG("g", { id: "ct-circulo-grande-estrellas", "clip-path": `url(#${clipGrandeId})` });
+    capaCirculoGrande.appendChild(estrellasGrandes);
+    const textoAnioGrande = crearSVG("text", {
+        x: CENTRO_GRANDE_X, y: CENTRO_GRANDE_Y - RADIO_GRANDE - 30, id: "ct-circulo-grande-anio"
+    });
+    capaCirculoGrande.appendChild(textoAnioGrande);
+
+    // Repuebla el círculo grande con la densidad de estrellas del año
+    // elegido — mismo criterio que las mini estrellas de los puntos chicos.
+    function mostrarCirculoGrande(d) {
+        estrellasGrandes.innerHTML = "";
+        const cantidad = Math.round(90 * d.densidad) + 4;
+        for (let i = 0; i < cantidad; i++) {
+            const ang = entre(0, Math.PI * 2);
+            const rad = entre(0, RADIO_GRANDE - 6);
+            estrellasGrandes.appendChild(crearSVG("circle", {
+                cx: CENTRO_GRANDE_X + Math.cos(ang) * rad,
+                cy: CENTRO_GRANDE_Y + Math.sin(ang) * rad,
+                r: entre(1, 2.6), fill: "#f5f7ff", opacity: entre(0.55, 1)
+            }));
+        }
+        textoAnioGrande.textContent = d.anio;
+    }
+
+    // ======================================================================
+    // 3. PANEL DE DETALLE — se desbloquea recién en el cierre (paso 8): ahí
+    //    cada círculo se puede tocar para abrir su ficha completa
+    //    (población, magnitud límite, estrellas visibles, nota).
+    // ======================================================================
+    const panelDetalle = document.getElementById("ct-detalle");
+    const botonCerrarDetalle = document.getElementById("ct-detalle-cerrar");
+    const campoAnio = document.getElementById("ct-detalle-anio");
+    const campoPoblacion = document.getElementById("ct-detalle-poblacion");
+    const campoMagnitud = document.getElementById("ct-detalle-magnitud");
+    const campoEstrellas = document.getElementById("ct-detalle-estrellas");
+    const campoNota = document.getElementById("ct-detalle-nota");
+
+    function abrirDetalle(d) {
+        if (!pin.classList.contains("ct-interactivo")) return; // todavía no llegó al cierre
+
+        // Tocar el mismo año que ya está abierto lo cierra (toggle).
+        if (panelDetalle.classList.contains("ct-detalle-abierto") && panelDetalle.dataset.anioAbierto === String(d.anio)) {
+            cerrarDetalle();
+            return;
+        }
+
+        campoAnio.textContent = d.anio;
+        campoPoblacion.textContent = d.poblacion;
+        campoMagnitud.textContent = d.magnitud;
+        campoEstrellas.textContent = d.estrellas;
+        campoNota.textContent = d.nota;
+        panelDetalle.dataset.anioAbierto = String(d.anio);
+        panelDetalle.classList.add("ct-detalle-abierto");
+        pin.classList.add("ct-detalle-abierto");
+        mostrarCirculoGrande(d);
+
+        ["1980", "2000", "2016", "2025"].forEach(id => {
+            const punto = document.getElementById(`ct-punto-${id}`);
+            if (punto) punto.classList.toggle("ct-punto-seleccionado", id === String(d.anio));
+        });
+    }
+
+    function cerrarDetalle() {
+        panelDetalle.classList.remove("ct-detalle-abierto");
+        pin.classList.remove("ct-detalle-abierto");
+        delete panelDetalle.dataset.anioAbierto;
+        document.querySelectorAll(".ct-punto-seleccionado").forEach(p => p.classList.remove("ct-punto-seleccionado"));
+    }
+
+    if (botonCerrarDetalle) botonCerrarDetalle.addEventListener("click", cerrarDetalle);
+    // Tocar el fondo (fuera de los círculos y de la tarjeta) también cierra.
+    pin.addEventListener("click", (evento) => {
+        if (evento.target === pin || evento.target.id === "svg-cordoba-linea" || evento.target.tagName === "rect") {
+            cerrarDetalle();
+        }
+    });
+
+    // ======================================================================
+    // 4. SCROLL — 8 pasos
     // ======================================================================
     const resplandor = document.getElementById("ct-resplandor");
+    const frasesConector = document.querySelectorAll("[data-frase-conector]");
     const textos = document.querySelectorAll("[data-paso-ct]");
     const disparadores = document.querySelectorAll(".ct-disparador");
 
     // Cuánto resplandor y cuánto se apagan las estrellas de fondo en cada
-    // paso — va creciendo en paralelo a como avanzan los años.
-    const RESPLANDOR_POR_PASO = { 1: 0, 2: 0.12, 3: 0.4, 4: 0.68, 5: 0.9, 6: 0.9 };
-    const ESTRELLAS_FONDO_POR_PASO = { 1: 1, 2: 0.85, 3: 0.6, 4: 0.4, 5: 0.22, 6: 0.22 };
-    const FOCO_POR_PASO = { 2: "1980", 3: "2000", 4: "2016", 5: "2025", 6: "2025" };
+    // paso — va creciendo en paralelo a como avanzan los años. Los pasos
+    // 1-2 (conector) mantienen el fondo más tenue y desenfocado; recién en
+    // el paso 3 (entra la línea de tiempo) el cielo se ve nítido del todo.
+    const RESPLANDOR_POR_PASO = { 1: 0, 2: 0, 3: 0, 4: 0.12, 5: 0.4, 6: 0.68, 7: 0.9, 8: 0.9 };
+    const ESTRELLAS_FONDO_POR_PASO = { 1: 0.55, 2: 0.55, 3: 1, 4: 0.85, 5: 0.6, 6: 0.4, 7: 0.22, 8: 0.22 };
+    const FOCO_POR_PASO = { 4: "1980", 5: "2000", 6: "2016", 7: "2025" };
 
     function actualizarPaso(paso) {
         resplandor.style.opacity = RESPLANDOR_POR_PASO[paso] ?? 0;
         capaEstrellasFondo.style.opacity = ESTRELLAS_FONDO_POR_PASO[paso] ?? 1;
+        // "No tan nítido" mientras se lee el conector (pasos 1-2): un
+        // desenfoque chico sobre el campo de estrellas, que se disuelve
+        // apenas entra la línea de tiempo.
+        capaEstrellasFondo.style.filter = paso <= 2 ? "blur(3px)" : "blur(0px)";
+
+        // Conector: cada oración se suma a la anterior (ninguna se retira)
+        // y ambas desaparecen juntas apenas se pasa al paso 3.
+        frasesConector.forEach(f => {
+            const desde = Number(f.getAttribute("data-frase-conector"));
+            f.classList.toggle("activo-conector", paso >= desde && paso <= 2);
+        });
+
+        // La línea de tiempo (línea + los 4 círculos) recién aparece cuando
+        // ya se leyeron las 2 oraciones del conector.
+        pin.classList.toggle("ct-linea-visible", paso >= 3);
 
         const focoActivo = FOCO_POR_PASO[paso] || null;
         ["1980", "2000", "2016", "2025"].forEach(id => {
-            pin.classList.toggle(`ct-foco-${id}`, focoActivo === id && paso < 6);
+            pin.classList.toggle(`ct-foco-${id}`, focoActivo === id);
         });
-        pin.classList.toggle("ct-cierre", paso === 6);
+        // En el cierre (paso 8) ningún año queda "en foco": los 4 círculos
+        // se ven del mismo tamaño, listos para tocarlos.
+        pin.classList.toggle("ct-interactivo", paso === 8);
 
         textos.forEach(t => {
             t.classList.toggle("ct-texto-activo", Number(t.getAttribute("data-paso-ct")) === paso);

@@ -177,9 +177,14 @@
    }
    
    .parrafo-historia p {
-       font-size: 1.2rem;
-       line-height: 1.6;
+       font-size: 1.4rem;
+       line-height: 1.65;
        color: #f8fafc;
+   }
+
+   .parrafo-historia strong {
+       color: var(--acento);
+       font-weight: 700;
    }
    
    /* Clase activa: Hace aparecer el texto correspondiente */
@@ -275,11 +280,35 @@
    .e2-foto4 { background-image: url("../fotos/E2F4.png"); }
    .e2-foto5 { background-image: url("../fotos/E2F5.png"); }
    
-   /* Estilo para el texto que no se mueve */
-   .texto-fijo-rafaga p {
-       font-size: 1.2rem;
-       line-height: 1.6;
+   /* Cada frase vive en su propio beat, igual que .parrafo-historia en
+      escena-2: sólo se ve la que corresponde a la foto actual (ver
+      LÓGICA ESCENA 3 en main.js). Antes era un bloque fijo con las 2
+      oraciones completas siempre visibles a la vez. */
+   .rafaga-beat {
+       position: absolute;
+       left: 30px;
+       right: 30px;
+       opacity: 0;
+       transform: translateY(20px);
+       transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+       pointer-events: none;
+   }
+
+   .rafaga-beat.activo {
+       opacity: 1;
+       transform: translateY(0);
+       pointer-events: auto;
+   }
+
+   .rafaga-beat p {
+       font-size: 1.4rem;
+       line-height: 1.65;
        color: #f8fafc;
+   }
+
+   .rafaga-beat strong {
+       color: var(--acento);
+       font-weight: 700;
    }
    
    /* Disparadores de ráfaga: más cortos para acelerar el ritmo del scroll */
@@ -297,7 +326,7 @@
    
    .escena-corte-profundo {
        position: relative;
-       height: 260vh; /* 2 disparadores-corte (100vh c/u) + buffer chico */
+       height: 560vh; /* 5 disparadores-corte (100vh c/u) + buffer chico — antes 2 (260vh); los 3 nuevos son la secuencia de Orión sobre el mismo paso 2 */
        width: 100%;
        background-color: #050508;
        z-index: 5; /* Evita que se monte de forma extraña con la escena anterior */
@@ -349,7 +378,7 @@
    .bloque-entra-der {
        transform: translateX(100%);
        transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-       border-left: 2px solid #ef4444;
+       border-left: 2px solid var(--acento); /* antes: 2px solid #ef4444 (rojo) — ahora el mismo acento que usa el resto del sitio */
    }
    
    /* Cuando la Parte B está activa, ambos bloques se deslizan a su posición original (0) */
@@ -358,12 +387,13 @@
    
    /* Estilo de los textos */
    .texto-impacto p {
-       font-size: 1.2rem;
-       line-height: 1.6;
+       font-size: 1.35rem;
+       line-height: 1.65;
        color: #f8fafc;
    }
    .texto-impacto strong {
-       color: #ef4444;
+       color: var(--acento); /* antes: #ef4444 (rojo) */
+       font-weight: 700;
    }
    
    .disparador-corte {
@@ -459,79 +489,6 @@
    }
    
    /* ==========================================================================
-      7a-transicion. APAGÓN + ECO DE ORIÓN — puente entre escena-4 y escena-5
-      (ver js/escena-transicion-orion.js)
-      ========================================================================== */
-
-   .escena-orion-apagon {
-       position: relative;
-       width: 100%;
-       height: 420vh; /* sticky (100vh) + 3 disparadores (100vh c/u) + buffer chico */
-       background-color: #0f172a; /* mismo color que .bloque-texto: la escena arranca "adentro" de ese panel */
-   }
-
-   .pin-orion-apagon {
-       position: sticky;
-       top: 0;
-       left: 0;
-       width: 100%;
-       height: 100vh;
-       overflow: hidden;
-       background-color: #0f172a; /* arranca igual al fondo del panel de texto de la escena anterior */
-       transition: background-color 1.6s ease-in-out;
-   }
-   /* Paso 1: recién acá se apaga de verdad, del azul del panel al negro */
-   .pin-orion-apagon.oa-oscurece {
-       background-color: #000000;
-   }
-
-   #svg-orion-apagon {
-       position: absolute;
-       inset: 0;
-       width: 100%;
-       height: 100%;
-       display: block;
-   }
-
-   #capa-orion-apagon {
-       opacity: 0;
-       transition: opacity 1.8s ease-in-out .5s; /* espera a que oscurezca antes de aparecer */
-   }
-   .pin-orion-apagon.oa-orion-visible #capa-orion-apagon {
-       opacity: 1;
-   }
-   /* Se disuelve más lento que como apareció — que se sienta como algo que
-      se apaga, no como algo que se corta */
-   .pin-orion-apagon.oa-orion-disolviendo #capa-orion-apagon {
-       opacity: 0;
-       transition: opacity 2.6s ease-in-out;
-   }
-
-   /* Primer vistazo del cielo frío de la ruta: mismo degradé que usa
-      #ruta-grad-cielo en escena-5 (ver index.html), para que cuando termine
-      esta escena y arranque la sticky de la ruta, el color ya sea el mismo
-      y no se note la costura. */
-   .oa-fondo-ruta {
-       position: absolute;
-       inset: 0;
-       width: 100%;
-       height: 100%;
-       background: linear-gradient(to bottom, #020208, #080a18 65%, #0d1024);
-       opacity: 0;
-       transition: opacity 2.2s ease-in-out;
-   }
-   .pin-orion-apagon.oa-fondo-visible .oa-fondo-ruta {
-       opacity: 1;
-   }
-
-   .oa-disparador {
-       height: 100vh;
-       width: 100%;
-       position: relative;
-       pointer-events: none;
-   }
-
-   /* ==========================================================================
       7a. ESCENA 5 — Ruta con auto (contenedor propio, SVG generado en
       js/escena-ruta.js). El auto se mueve leyendo el scroll directamente en
       cada frame (no por pasos con IntersectionObserver como el resto del
@@ -552,6 +509,21 @@
        height: 100vh;
        overflow: hidden;
        background-color: #020208;
+
+       /* Revelación de entrada: arranca corrida hacia arriba, transparente
+          y desenfocada, y "emerge" (bajando + enfocándose) cuando la escena
+          entra en pantalla (la clase la agrega js/escena-orion-final.js) —
+          pensada para leerse como que la escena sale de adentro del
+          encandilamiento de la transición anterior. */
+       opacity: 0;
+       transform: translateY(-70px);
+       filter: blur(18px);
+       transition: opacity 1.2s ease-out, transform 1.2s ease-out, filter 1.4s ease-out;
+   }
+   .contenedor-fijo-ruta.ruta-revelada {
+       opacity: 1;
+       transform: translateY(0);
+       filter: blur(0);
    }
 
    #escena-ruta {
@@ -650,7 +622,94 @@
        height: 650vh; /* 2 bloques sticky (100vh c/u) + 4 disparadores-viaje (100vh c/u) + buffer chico */
        width: 100%;
    }
-   
+
+   /* ==========================================================================
+      TRANSICIÓN — ORIÓN + ENCANDILAMIENTO (ver js/escena-orion-final.js y
+      LÓGICA ESCENA 4 en main.js)
+      Integrada DENTRO del paso 2 de escena-4 (misma foto de él
+      recibiéndose, sin duplicarla): las clases .co-orion-aparece /
+      .co-encandila se agregan sobre ese mismo .paso-corte cuando el scroll
+      pasa los disparadores 3/4/5 — el paso visual sigue siendo el 2 todo el
+      tiempo.
+      ========================================================================== */
+
+   #svg-orion-final {
+       position: absolute;
+       inset: 0;
+       width: 100%;
+       height: 100%;
+       display: block;
+       pointer-events: none;
+   }
+
+   #of-orion {
+       opacity: 0;
+       transition: opacity 2s ease-in-out;
+   }
+   .paso-corte[data-paso="2"].co-orion-aparece #of-orion,
+   .paso-corte[data-paso="2"].co-encandila #of-orion {
+       opacity: 1;
+   }
+
+   /* El halo arranca chico y casi apagado, y crece hasta tapar toda la
+      pantalla — transform-box/origin para que escale desde su propio
+      centro (mismo truco que ya usa .estrella-orion en otra escena). */
+   #of-halo-grupo {
+       transform-box: fill-box;
+       transform-origin: center;
+       transform: scale(0.4);
+       opacity: 0;
+       transition: transform 2.6s ease-in, opacity 2.6s ease-in;
+   }
+   .paso-corte[data-paso="2"].co-encandila #of-halo-grupo {
+       transform: scale(26);
+       opacity: 1;
+   }
+
+   /* Blanco total: entra un poco después que el halo, así el encandilamiento
+      se siente progresivo y no como un corte brusco. Cubre TODA la pantalla
+      del paso (no sólo la imagen), por eso va afuera de
+      .contenedor-fijo-split, como hermano directo dentro de .paso-corte. */
+   .of-blanco {
+       position: absolute;
+       inset: 0;
+       width: 100%;
+       height: 100%;
+       background: #fffaf0;
+       opacity: 0;
+       transition: opacity 1.8s ease-in .8s;
+       pointer-events: none;
+   }
+   .paso-corte[data-paso="2"].co-encandila .of-blanco {
+       opacity: 1;
+   }
+
+   /* Texto: el párrafo del astronomo y el de Orión ocupan el mismo lugar
+      dentro de .bloque-texto — el de Orión arranca invisible y absoluto, y
+      se cruzan en fade cuando aparece la constelación. */
+   .co-texto-astronomo {
+       transition: opacity 0.8s ease-in-out;
+   }
+   .co-texto-orion {
+       position: absolute;
+       left: 0;
+       right: 0;
+       top: 50%;
+       transform: translateY(-50%);
+       opacity: 0;
+       transition: opacity 0.8s ease-in-out;
+       pointer-events: none;
+   }
+   .paso-corte[data-paso="2"].co-orion-aparece .co-texto-astronomo,
+   .paso-corte[data-paso="2"].co-encandila .co-texto-astronomo {
+       opacity: 0;
+   }
+   .paso-corte[data-paso="2"].co-orion-aparece .co-texto-orion,
+   .paso-corte[data-paso="2"].co-encandila .co-texto-orion {
+       opacity: 1;
+       pointer-events: auto;
+   }
+
    .contenedor-fijo-viaje {
        position: sticky;
        top: 0;
@@ -2156,7 +2215,7 @@
    .escena-cordoba-linea {
        position: relative;
        width: 100%;
-       height: 720vh; /* sticky (100vh) + 6 disparadores (100vh c/u) + buffer chico */
+       height: 920vh; /* sticky (100vh) + 8 disparadores (100vh c/u) + buffer chico */
        background-color: #020208;
    }
 
@@ -2183,7 +2242,7 @@
    }
 
    #ct-estrellas-fondo {
-       transition: opacity 1.8s ease-in-out;
+       transition: opacity 1.8s ease-in-out, filter 1.8s ease-in-out;
    }
 
    /* Kicker chico arriba a la izquierda, mismo trato tipográfico que el
@@ -2201,6 +2260,18 @@
        letter-spacing: 0.12em;
        text-transform: uppercase;
        color: rgba(226, 232, 240, 0.5);
+   }
+
+   /* --- Línea de tiempo: no aparece hasta que se leyó el conector entero
+      (paso 3, ver .ct-linea-visible en escena-cordoba-linea.js) ---------- */
+   #ct-linea-tiempo,
+   #ct-puntos {
+       opacity: 0;
+       transition: opacity 1.4s ease-in-out;
+   }
+   .pin-cordoba.ct-linea-visible #ct-linea-tiempo,
+   .pin-cordoba.ct-linea-visible #ct-puntos {
+       opacity: 1;
    }
 
    /* --- Los 4 puntos de la línea de tiempo ------------------------------- */
@@ -2224,28 +2295,27 @@
        transition: fill 1s ease-in-out;
    }
 
-   /* Foco: el punto del año activo crece y se ilumina, el resto se atenúa */
+   /* Foco: el punto del año activo crece y se ilumina, el resto se atenúa.
+      En el cierre (paso 8) ninguna de estas clases ct-foco-* está puesta,
+      así que los 4 quedan del mismo tamaño — listos para tocarlos. */
    .pin-cordoba.ct-foco-1980 #ct-punto-1980 .ct-punto-halo,
    .pin-cordoba.ct-foco-2000 #ct-punto-2000 .ct-punto-halo,
    .pin-cordoba.ct-foco-2016 #ct-punto-2016 .ct-punto-halo,
-   .pin-cordoba.ct-foco-2025 #ct-punto-2025 .ct-punto-halo,
-   .pin-cordoba.ct-cierre #ct-punto-2025 .ct-punto-halo {
+   .pin-cordoba.ct-foco-2025 #ct-punto-2025 .ct-punto-halo {
        opacity: 0.75;
    }
 
    .pin-cordoba.ct-foco-1980 #ct-punto-1980,
    .pin-cordoba.ct-foco-2000 #ct-punto-2000,
    .pin-cordoba.ct-foco-2016 #ct-punto-2016,
-   .pin-cordoba.ct-foco-2025 #ct-punto-2025,
-   .pin-cordoba.ct-cierre #ct-punto-2025 {
+   .pin-cordoba.ct-foco-2025 #ct-punto-2025 {
        transform: scale(1.65);
    }
 
    .pin-cordoba.ct-foco-1980 #ct-punto-1980 .ct-punto-anio,
    .pin-cordoba.ct-foco-2000 #ct-punto-2000 .ct-punto-anio,
    .pin-cordoba.ct-foco-2016 #ct-punto-2016 .ct-punto-anio,
-   .pin-cordoba.ct-foco-2025 #ct-punto-2025 .ct-punto-anio,
-   .pin-cordoba.ct-cierre #ct-punto-2025 .ct-punto-anio {
+   .pin-cordoba.ct-foco-2025 #ct-punto-2025 .ct-punto-anio {
        fill: var(--acento);
    }
 
@@ -2253,9 +2323,194 @@
    .pin-cordoba.ct-foco-1980 .ct-punto:not(#ct-punto-1980),
    .pin-cordoba.ct-foco-2000 .ct-punto:not(#ct-punto-2000),
    .pin-cordoba.ct-foco-2016 .ct-punto:not(#ct-punto-2016),
-   .pin-cordoba.ct-foco-2025 .ct-punto:not(#ct-punto-2025),
-   .pin-cordoba.ct-cierre .ct-punto:not(#ct-punto-2025) {
+   .pin-cordoba.ct-foco-2025 .ct-punto:not(#ct-punto-2025) {
        opacity: 0.35;
+   }
+
+   /* --- Círculo expandido: "crece" hasta ocupar casi toda la pantalla al
+      tocar un año (ver mostrarCirculoGrande en escena-cordoba-linea.js) --- */
+   #ct-circulo-grande {
+       transform-box: fill-box;
+       transform-origin: center;
+       transform: scale(0.05);
+       opacity: 0;
+       transition: transform 0.9s cubic-bezier(0.22, 0.9, 0.3, 1), opacity 0.5s ease;
+       pointer-events: none;
+   }
+   .pin-cordoba.ct-detalle-abierto #ct-circulo-grande {
+       transform: scale(1);
+       opacity: 1;
+   }
+
+   #ct-circulo-grande-anio {
+       font-family: var(--font-heading, 'Nunito', sans-serif);
+       font-size: 46px;
+       font-weight: 700;
+       fill: var(--acento);
+       text-anchor: middle;
+   }
+
+   /* La línea de tiempo y los puntos chicos se atenúan mientras el círculo
+      grande está abierto, para que no compitan */
+   .pin-cordoba.ct-detalle-abierto #ct-puntos,
+   .pin-cordoba.ct-detalle-abierto #ct-linea-tiempo {
+       opacity: 0.06;
+       transition: opacity 0.6s ease;
+       pointer-events: none;
+   }
+
+   /* --- Interactividad: recién se habilita al llegar al cierre (paso 6,
+      ver .ct-interactivo en escena-cordoba-linea.js) --------------------- */
+   .pin-cordoba.ct-interactivo .ct-punto {
+       cursor: pointer;
+   }
+   .pin-cordoba.ct-interactivo .ct-punto:hover,
+   .pin-cordoba.ct-interactivo .ct-punto:focus-visible {
+       transform: scale(1.18);
+   }
+   .pin-cordoba.ct-interactivo .ct-punto:hover .ct-punto-halo {
+       opacity: 0.6;
+   }
+   .pin-cordoba.ct-interactivo .ct-punto.ct-punto-seleccionado {
+       transform: scale(1.5);
+   }
+   .pin-cordoba.ct-interactivo .ct-punto.ct-punto-seleccionado .ct-punto-halo {
+       opacity: 0.85;
+   }
+   .pin-cordoba.ct-interactivo .ct-punto.ct-punto-seleccionado .ct-punto-anio {
+       fill: var(--acento);
+   }
+   /* Sutil pulso invitando a tocar, apenas se desbloquea */
+   .pin-cordoba.ct-interactivo .ct-punto-halo {
+       animation: ct-pulso-invitacion 2.6s ease-in-out infinite;
+   }
+   @keyframes ct-pulso-invitacion {
+       0%, 100% { opacity: 0.2; }
+       50% { opacity: 0.45; }
+   }
+
+   /* --- Panel de detalle: ficha completa de un año, se abre tocando su
+      círculo (sólo con .ct-interactivo puesto) ---------------------------- */
+   .ct-detalle {
+       position: absolute;
+       right: 60px;
+       bottom: 80px;
+       z-index: 3;
+       width: 100%;
+       max-width: 340px;
+
+       background: rgba(8, 10, 16, 0.9);
+       -webkit-backdrop-filter: blur(12px);
+       backdrop-filter: blur(12px);
+       border: 1px solid rgba(255, 209, 102, 0.35);
+       border-radius: var(--radio-tarjeta, 10px);
+       padding: 22px 24px;
+       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+
+       opacity: 0;
+       transform: translateY(16px) scale(0.97);
+       pointer-events: none;
+       transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+   }
+   .ct-detalle.ct-detalle-abierto {
+       opacity: 1;
+       transform: translateY(0) scale(1);
+       pointer-events: auto;
+   }
+
+   .ct-detalle-cerrar {
+       position: absolute;
+       top: 10px;
+       right: 12px;
+       background: none;
+       border: none;
+       color: rgba(226, 232, 240, 0.6);
+       font-size: 1.4rem;
+       line-height: 1;
+       cursor: pointer;
+       padding: 4px 8px;
+   }
+   .ct-detalle-cerrar:hover {
+       color: #f8fafc;
+   }
+
+   .ct-detalle-anio {
+       font-family: var(--font-heading, 'Nunito', sans-serif);
+       font-size: 1.6rem;
+       font-weight: 700;
+       color: var(--acento);
+       margin-bottom: 12px;
+   }
+
+   .ct-detalle-fila {
+       display: flex;
+       justify-content: space-between;
+       gap: 16px;
+       padding: 7px 0;
+       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+       font-size: 0.92rem;
+   }
+   .ct-detalle-fila span {
+       color: rgba(226, 232, 240, 0.6);
+   }
+   .ct-detalle-fila strong {
+       color: #f8fafc;
+       text-align: right;
+   }
+
+   .ct-detalle-nota {
+       margin-top: 14px;
+       font-size: 0.9rem;
+       line-height: 1.5;
+       color: rgba(226, 232, 240, 0.85);
+   }
+
+   @media (max-width: 760px) {
+       .ct-detalle {
+           right: 20px;
+           left: 20px;
+           bottom: auto;
+           top: 90px; /* arriba en mobile, para no pisar la tarjeta de texto que queda abajo */
+           max-width: none;
+       }
+   }
+
+   /* --- Conector: misma estética que .tf-frase (escena-6c) --------------- */
+   .ct-conector {
+       position: absolute;
+       inset: 0;
+       z-index: 2;
+       display: flex;
+       flex-direction: column;
+       gap: 20px;
+       align-items: center;
+       justify-content: center;
+       padding: 0 12%;
+       text-align: center;
+       pointer-events: none;
+   }
+   .ct-conector-linea {
+       max-width: 760px;
+       font-family: var(--font-heading, 'Nunito', sans-serif);
+       font-weight: 600;
+       font-size: 2.2rem;
+       line-height: 1.55;
+       color: #ffffff;
+       letter-spacing: 0.01em;
+       text-shadow:
+           0 0 10px rgba(0, 0, 0, 0.9),
+           0 0 26px rgba(0, 0, 0, 0.8),
+           0 4px 18px rgba(0, 0, 0, 0.75);
+       opacity: 0;
+       transform: translateY(14px);
+       transition: opacity 1.2s ease, transform 1.2s ease;
+   }
+   .ct-conector-linea.activo-conector {
+       opacity: 1;
+       transform: translateY(0);
+   }
+   .ct-conector strong {
+       color: var(--acento);
    }
 
    /* --- Texto: misma tarjeta que .texto-luz ------------------------------ */
@@ -2307,6 +2562,9 @@
    }
 
    @media (max-width: 760px) {
+       .ct-conector-linea {
+           font-size: 1.5rem;
+       }
        .ct-texto-contenedor {
            left: 20px;
            right: 20px;

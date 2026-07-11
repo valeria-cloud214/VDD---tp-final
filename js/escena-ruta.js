@@ -143,13 +143,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const RUEDA_R = 27;
     const RUEDA_TRASERA_CX = -58;
     const RUEDA_DELANTERA_CX = 58;
-    const FITITO_ROJO = "#e6392f";
-    const FITITO_ROJO_SOMBRA = "#a8241c";
+    const AUTO_COLOR = "#2f8fae";        // antes: "#4fc3e6" — celeste más oscuro
+    const AUTO_COLOR_SOMBRA = "#1e647c"; // antes: "#2e93ad"
     const CONTORNO = "#1a1512";
     const CUERPO_ESCALA = 0.72;
 
     const grupoCuerpo = crearSVG("g", {
-        transform: `translate(0, ${RUEDA_CY * (1 - CUERPO_ESCALA)}) scale(${CUERPO_ESCALA})`
+        // Espejado horizontal (scale X negativo): el auto sigue viajando de
+        // izquierda a derecha (ver X_INICIO/X_FIN más abajo), pero ahora se
+        // ve invertido — mismo ancla en x=0, no hace falta compensar con
+        // ningún translate extra en X.
+        transform: `translate(0, ${RUEDA_CY * (1 - CUERPO_ESCALA)}) scale(${-CUERPO_ESCALA}, ${CUERPO_ESCALA})`
     });
     grupoAuto.appendChild(grupoCuerpo);
 
@@ -193,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
         [RUEDA_TRASERA_CX, RUEDA_DELANTERA_CX].forEach(cx => {
             grupoCuerpo.appendChild(crearSVG("path", {
                 d: `M ${cx - 36},460 A 36 36 0 0 1 ${cx + 36},460 Z`,
-                fill: FITITO_ROJO_SOMBRA
+                fill: AUTO_COLOR_SOMBRA
             }));
         });
 
@@ -210,7 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
                "C70,333 92,349 102,370 " +
                "C110,388 113,410 110,432 " +
                "C108,446 110,454 108,460 Z",
-            fill: FITITO_ROJO, stroke: CONTORNO, "stroke-width": 5, "stroke-linejoin": "round"
+            fill: AUTO_COLOR, stroke: CONTORNO, "stroke-width": 5, "stroke-linejoin": "round"
         }));
 
         // Ventana: un solo vidrio grande (como en la referencia, casi todo

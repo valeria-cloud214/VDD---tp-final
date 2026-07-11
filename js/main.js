@@ -82,9 +82,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     const fondoViaje = document.getElementById("fondo-viaje");
     const disparadoresE3 = document.querySelectorAll(".disparador-rafaga");
+    const beatsRafaga = document.querySelectorAll(".rafaga-beat");
 
     // Foto inicial por defecto para la escena 3
     if (fondoViaje) fondoViaje.className = "fondo-dinamico e2-foto1";
+    if (beatsRafaga[0]) beatsRafaga[0].classList.add("activo");
 
     const opcionesE3 = {
         root: null,
@@ -96,10 +98,16 @@ document.addEventListener("DOMContentLoaded", () => {
         entradas.forEach(entrada => {
             if (entrada.isIntersecting) {
                 const paso = entrada.target.getAttribute("data-foto");
-                
-                // Cambia la foto velozmente sin alterar el texto
+
+                // Cambia la foto velozmente...
                 fondoViaje.className = "fondo-dinamico";
                 fondoViaje.classList.add(`e2-foto${paso}`);
+
+                // ...y ahora la frase cambia junto con ella (antes el texto
+                // quedaba fijo mientras pasaban las 5 fotos).
+                beatsRafaga.forEach(beat => {
+                    beat.classList.toggle("activo", beat.getAttribute("data-frase-rafaga") === paso);
+                });
             }
         });
     }, opcionesE3);
@@ -111,6 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     const disparadoresE4 = document.querySelectorAll(".disparador-corte");
     const pasosCorte = document.querySelectorAll(".paso-corte");
+    const pasoRecibido = document.querySelector('.paso-corte[data-paso="2"]');
 
     const opcionesE4 = {
         root: null,
@@ -118,18 +127,26 @@ document.addEventListener("DOMContentLoaded", () => {
         threshold: 0
     };
 
+    // A partir del disparador 3 (mismo "paso" visual: la foto de él
+    // recibiéndose no cambia ni se duplica) empieza la secuencia de Orión:
+    // 3 = Orión y el texto nuevo aparecen, 4 = empieza a encandilar,
+    // 5 = blanco sostenido, listo para pasar a la escena de la ruta.
+    const PASO_VISUAL_POR_CORTE = { 1: "1", 2: "2", 3: "2", 4: "2", 5: "2" };
+
     const observadorE4 = new IntersectionObserver((entradas) => {
         entradas.forEach(entrada => {
             if (entrada.isIntersecting) {
                 const corteActual = entrada.target.getAttribute("data-corte");
-                
+                const pasoVisual = PASO_VISUAL_POR_CORTE[corteActual] || corteActual;
+
                 pasosCorte.forEach(paso => {
-                    if (paso.getAttribute("data-paso") === corteActual) {
-                        paso.classList.add("activo-corte");
-                    } else {
-                        paso.classList.remove("activo-corte");
-                    }
+                    paso.classList.toggle("activo-corte", paso.getAttribute("data-paso") === pasoVisual);
                 });
+
+                if (pasoRecibido) {
+                    pasoRecibido.classList.toggle("co-orion-aparece", corteActual === "3");
+                    pasoRecibido.classList.toggle("co-encandila", corteActual === "4" || corteActual === "5");
+                }
             }
         });
     }, opcionesE4);
