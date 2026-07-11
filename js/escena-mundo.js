@@ -148,13 +148,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }, []);
 
         const filasDOM = FILAS.map((ciudadesFila, i) => {
-            const caption = document.createElement("p");
-            caption.className = "mundo-narrativa-fila";
-            (NARRATIVA_MUNDO.grilla[i] || []).forEach((linea, idx) => {
-                if (idx > 0) caption.appendChild(document.createElement("br"));
-                caption.appendChild(document.createTextNode(linea));
-            });
-            contenedorGrilla.appendChild(caption);
+            const textoFila = (NARRATIVA_MUNDO.grilla[i] || []).join("").trim();
+            let caption = null;
+            if (textoFila) {
+                caption = document.createElement("p");
+                caption.className = "mundo-narrativa-fila";
+                (NARRATIVA_MUNDO.grilla[i] || []).forEach((linea, idx) => {
+                    if (idx > 0) caption.appendChild(document.createElement("br"));
+                    caption.appendChild(document.createTextNode(linea));
+                });
+                contenedorGrilla.appendChild(caption);
+            }
 
             const celdas = ciudadesFila.map(ciudad => {
                 const celda = document.createElement("div");
@@ -163,7 +167,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 // trae su nombre de ciudad incrustado adentro del embed.
                 celda.innerHTML = `
                     <div class="cargando-grafico">Cargando gráfico…</div>
-                    ${ciudad.overlay ? `<div class="grafico-overlay">${ciudad.overlay}</div>` : ""}
                     <div class="flourish-embed flourish-chart" data-src="${ciudad.src}"></div>
                 `;
                 contenedorGrilla.appendChild(celda);
@@ -188,48 +191,39 @@ document.addEventListener("DOMContentLoaded", () => {
         // arriba de nuevo por encima de la segunda fila. Mismo patrón que
         // ya usa el telón en main.js: mirar hacia qué lado del viewport
         // salió el target para saber si fue "bajando" o "subiendo".
-        if (guia && filasDOM[1]) {
-            const observadorGuia = new IntersectionObserver((entradas) => {
-                entradas.forEach(entrada => {
-                    if (entrada.isIntersecting) {
-                        guia.classList.remove("mundo-visible");
-                    } else if (entrada.boundingClientRect.top > 0) {
-                        // La segunda fila está por debajo del viewport: o
-                        // todavía no llegamos, o volvimos para arriba.
-                        guia.classList.add("mundo-visible");
-                    }
-                });
-            }, { root: null, rootMargin: "-10% 0px -70% 0px", threshold: 0 });
-            observadorGuia.observe(filasDOM[1].caption);
-        } else if (guia) {
-            guia.classList.add("mundo-visible");
-        }
+        // Guía: mostrarla de entrada ya que no hay captions para observar
+        if (guia) guia.classList.add("mundo-visible");
 
-        const observadorFilas = new IntersectionObserver((entradas) => {
-            entradas.forEach(entrada => {
-                if (!entrada.isIntersecting) return;
-                const i = Number(entrada.target.getAttribute("data-fila-indice"));
-                const fila = filasDOM[i];
-                if (!fila) return;
-
-                fila.caption.classList.add("mundo-visible");
-                fila.celdas.forEach(c => c.classList.add("mundo-visible"));
-                if (!fila.cargada) {
-                    fila.cargada = true;
-                    fila.celdas.forEach(cargarCelda);
-                }
-
-                // Resaltado contextual: recién cuando terminó de armarse la
-                // última fila, marcamos las ciudades "destacado" y
-                // atenuamos el resto (ver CSS ".mundo-grilla-resaltando").
-                if (i === filasDOM.length - 1) contenedorGrilla.classList.add("mundo-grilla-resaltando");
-            });
-        }, { root: null, rootMargin: "0px 0px -12% 0px", threshold: 0 });
-
-        filasDOM.forEach((fila, i) => {
-            fila.caption.setAttribute("data-fila-indice", String(i));
-            observadorFilas.observe(fila.caption);
+        // Mostrar todas las celdas y cargar gráficos
+        filasDOM.forEach((fila) => {
+            fila.celdas.forEach(c => c.classList.add("mundo-visible"));
         });
+
+        // Cargar Flourish con retraso para asegurar que el script ya está listo
+        setTimeout(() => {
+            filasDOM.forEach((fila) => {
+                fila.celdas.forEach(cargarCelda);
+            });
+        }, 800);
+
+        // Ocultar "Cargando gráfico" cuando el iframe termina de cargar
+        document.querySelectorAll(".celda-grafico-mundo").forEach(celda => {
+            const checkIframe = setInterval(() => {
+                const iframe = celda.querySelector("iframe");
+                if (iframe) {
+                    clearInterval(checkIframe);
+                    iframe.addEventListener("load", () => {
+                        celda.classList.add("grafico-listo");
+                    });
+                    // Por si ya cargó antes de que agregáramos el listener
+                    if (iframe.contentDocument && iframe.contentDocument.readyState === "complete") {
+                        celda.classList.add("grafico-listo");
+                    }
+                }
+            }, 200);
+        });
+
+        contenedorGrilla.classList.add("mundo-grilla-resaltando");
     })();
 
     // ======================================================================

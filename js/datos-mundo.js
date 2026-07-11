@@ -21,20 +21,20 @@ const CIUDADES_MUNDO = [
     { nombre: "Nueva York",       pais: "EE. UU.",       src: "visualisation/29654815", overlay: "Caída pronunciada",               destacado: true },
     { nombre: "Londres",          pais: "Italia",        src: "visualisation/29654800", overlay: "Caída moderada",                    destacado: true },
     // FILA 2
-    { nombre: "El Cairo",         pais: "India",         src: "visualisation/29656503", overlay: "Caída moderada",          destacado: false },
-    { nombre: "Sídney",           pais: "Sudáfrica",     src: "visualisation/29654807", overlay: "Caída pronunciada", destacado: false },
-    { nombre: "Ciudad de México", pais: "Indonesia",     src: "visualisation/29480606", overlay: "Caída pronunciada",               destacado: false },
-    { nombre: "Santiago",         pais: "Japón",         src: "visualisation/29656486", overlay: "Caída leve",                 destacado: false },
+    { nombre: "El Cairo",         pais: "India",         src: "visualisation/29656503", overlay: "Caída moderada",          destacado: true },
+    { nombre: "Sídney",           pais: "Sudáfrica",     src: "visualisation/29654807", overlay: "Caída pronunciada", destacado: true },
+    { nombre: "Ciudad de México", pais: "Indonesia",     src: "visualisation/29480606", overlay: "Caída pronunciada",               destacado: true },
+    { nombre: "Santiago",         pais: "Japón",         src: "visualisation/29656486", overlay: "Caída leve",                 destacado: true },
     // FILA 3
-    { nombre: "Mumbai",           pais: "China",         src: "visualisation/29654772", overlay: "Mayor pérdida de estrellas",          destacado: false },
-    { nombre: "Shanghái",         pais: "Filipinas",         src: "visualisation/29657393", overlay: "Cambio acelerado",                    destacado: false },
-    { nombre: "Berlín",           pais: "Canada",      src: "visualisation/29657456", overlay: "≈ Se mantiene relativamente estable", destacado: false },
-    { nombre: "Moscú",            pais: "Chile",         src: "visualisation/29656496", overlay: "▲ Tendencia creciente",               destacado: false },
+    { nombre: "Mumbai",           pais: "China",         src: "visualisation/29654772", overlay: "Mayor pérdida de estrellas",          destacado: true },
+    { nombre: "Shanghái",         pais: "Filipinas",         src: "visualisation/29657393", overlay: "Cambio acelerado",                    destacado: true },
+    { nombre: "Berlín",           pais: "Canada",      src: "visualisation/29657456", overlay: "≈ Se mantiene relativamente estable", destacado: true },
+    { nombre: "Moscú",            pais: "Chile",         src: "visualisation/29656496", overlay: "▲ Tendencia creciente",               destacado: true },
     // FILA 4 (repite los data-src de la fila 1 — mismos gráficos, no nuevos)
-    { nombre: "Buenos Aires",     pais: "Croacia",     src: "visualisation/29657461", overlay: "El punto de partida",                 destacado: false },
-    { nombre: "Tokio",            pais: "Portugal",         src: "visualisation/29657433", overlay: "▲ Tendencia creciente",               destacado: false },
-    { nombre: "Nueva York",       pais: "Macedonia",       src: "visualisation/29657496", overlay: "▲ Tendencia creciente",               destacado: false },
-    { nombre: "Londres",          pais: "Puerto Rico",   src: "visualisation/29657515", overlay: "Cambio acelerado",                    destacado: false }
+    { nombre: "Buenos Aires",     pais: "Croacia",     src: "visualisation/29657461", overlay: "El punto de partida",                 destacado: true },
+    { nombre: "Tokio",            pais: "Portugal",         src: "visualisation/29657433", overlay: "▲ Tendencia creciente",               destacado: true },
+    { nombre: "Nueva York",       pais: "Macedonia",       src: "visualisation/29657496", overlay: "▲ Tendencia creciente",               destacado: true },
+    { nombre: "Londres",          pais: "Puerto Rico",   src: "visualisation/29657515", overlay: "Cambio acelerado",                    destacado: true }
 ];
 
 // Nombres que flotan en el ACTO 2, antes de que aparezca ningún gráfico.
@@ -66,10 +66,10 @@ const NARRATIVA_MUNDO = {
 
     // ACTO 3 — frases que acompañan, fila por fila, la construcción de la grilla
     grilla: [
-        ["¿Sería igual en todos lados?"],
-        ["Los datos empezaron a responder."],
-        ["Países diferentes.", "Idiomas distintos.", "Continentes distintos."],
-        ["Y, sin embargo…", "la respuesta era siempre la misma."]
+        [""],
+        [""],
+        [""],
+        [""]
     ],
 
     // Cierre de la escena: conecta directamente con la escena final
