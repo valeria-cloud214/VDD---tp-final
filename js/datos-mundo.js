@@ -17,24 +17,27 @@
 const CIUDADES_MUNDO = [
     // FILA 1
     { nombre: "Buenos Aires",     pais: "Brasil",        src: "visualisation/29654754", overlay: "Caída pronunciada",                 destacado: true },
-    { nombre: "Tokio",            pais: "Grecia",        src: "visualisation/29654782", overlay: "Caída moderada",               destacado: true },
     { nombre: "Nueva York",       pais: "EE. UU.",       src: "visualisation/29654815", overlay: "Caída pronunciada",               destacado: true },
-    { nombre: "Londres",          pais: "Italia",        src: "visualisation/29654800", overlay: "Caída moderada",                    destacado: true },
-    // FILA 2
     { nombre: "El Cairo",         pais: "India",         src: "visualisation/29656503", overlay: "Caída moderada",          destacado: true },
     { nombre: "Sídney",           pais: "Sudáfrica",     src: "visualisation/29654807", overlay: "Caída pronunciada", destacado: true },
+    { nombre: "Mumbai",           pais: "China",         src: "visualisation/29654772", overlay: "Mayor pérdida de estrellas",          destacado: true },
+    { nombre: "Tokio",            pais: "Portugal",         src: "visualisation/29657433", overlay: "▲ Tendencia creciente",               destacado: true },
+    { nombre: "Londres",          pais: "Puerto Rico",   src: "visualisation/29657515", overlay: "Cambio acelerado",                    destacado: true },
     { nombre: "Ciudad de México", pais: "Indonesia",     src: "visualisation/29480606", overlay: "Caída pronunciada",               destacado: true },
+
+    // FILA 2
+    { nombre: "Londres",          pais: "Italia",        src: "visualisation/29654800", overlay: "Caída moderada",                    destacado: true },
+
+    { nombre: "Tokio",            pais: "Grecia",        src: "visualisation/29654782", overlay: "Caída moderada",               destacado: true },
+
     { nombre: "Santiago",         pais: "Japón",         src: "visualisation/29656486", overlay: "Caída leve",                 destacado: true },
     // FILA 3
-    { nombre: "Mumbai",           pais: "China",         src: "visualisation/29654772", overlay: "Mayor pérdida de estrellas",          destacado: true },
     { nombre: "Shanghái",         pais: "Filipinas",         src: "visualisation/29657393", overlay: "Cambio acelerado",                    destacado: true },
     { nombre: "Berlín",           pais: "Canada",      src: "visualisation/29657456", overlay: "≈ Se mantiene relativamente estable", destacado: true },
     { nombre: "Moscú",            pais: "Chile",         src: "visualisation/29656496", overlay: "▲ Tendencia creciente",               destacado: true },
     // FILA 4 (repite los data-src de la fila 1 — mismos gráficos, no nuevos)
     { nombre: "Buenos Aires",     pais: "Croacia",     src: "visualisation/29657461", overlay: "El punto de partida",                 destacado: true },
-    { nombre: "Tokio",            pais: "Portugal",         src: "visualisation/29657433", overlay: "▲ Tendencia creciente",               destacado: true },
-    { nombre: "Nueva York",       pais: "Macedonia",       src: "visualisation/29657496", overlay: "▲ Tendencia creciente",               destacado: true },
-    { nombre: "Londres",          pais: "Puerto Rico",   src: "visualisation/29657515", overlay: "Cambio acelerado",                    destacado: true }
+    { nombre: "Nueva York",       pais: "Macedonia",       src: "visualisation/29657496", overlay: "▲ Tendencia creciente",               destacado: true }
 ];
 
 // Nombres que flotan en el ACTO 2, antes de que aparezca ningún gráfico.
@@ -86,7 +89,7 @@ const NARRATIVA_MUNDO = {
 // están las 4 filas completas.
 const GUIA_GRILLA_MUNDO = {
     titulo: "¿Qué estás viendo?",
-    texto: "Cada gráfico representa un país distinto. El eje horizontal muestra los años; el vertical, la magnitud límite observada. Cuanto menor es ese valor, menos estrellas pueden verse desde ese país."
+    texto: " En cada gráfico el eje vertical muestra la magnitud límite: cuanto más bajo el número, menos estrellas podés ver desde ese lugar."
 };
 
 // Título breve que ya traía el proyecto, ahora como dato en vez de texto
