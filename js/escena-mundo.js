@@ -255,4 +255,32 @@ document.addEventListener("DOMContentLoaded", () => {
         disparadores.forEach(d => observador.observe(d));
     })();
 
+
+
+    // Forzar altura de iframes de Flourish en la grilla mundial
+    function forzarAlturaIframes() {
+        const celdas = document.querySelectorAll(".celda-grafico-mundo");
+        celdas.forEach(celda => {
+            const iframe = celda.querySelector("iframe");
+            if (iframe) {
+                const altoCelda = celda.getBoundingClientRect().height;
+                iframe.style.setProperty("height", (altoCelda + 50) + "px", "important");
+                iframe.style.setProperty("max-height", "none", "important");
+            }
+        });
+    }
+
+    // Flourish tarda en inyectar los iframes — esperamos con un intervalo
+    // que se detiene solo cuando ya están todos
+    const intervaloFlourish = setInterval(() => {
+        const iframes = document.querySelectorAll(".celda-grafico-mundo iframe");
+        if (iframes.length > 0) {
+            forzarAlturaIframes();
+            clearInterval(intervaloFlourish);
+        }
+    }, 300);
+
+    // También al redimensionar la ventana
+    window.addEventListener("resize", forzarAlturaIframes);
+
 });

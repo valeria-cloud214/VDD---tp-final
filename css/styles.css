@@ -2582,16 +2582,35 @@
    }
 
    .celda-grafico-mundo {
-       background: #0f172a;
-       border-radius: 8px;
-       overflow: hidden;
-       border: 1px solid rgba(255, 255, 255, 0.06);
-       position: relative;
-       height: 200px;
-       opacity: 0;
-       transform: translateY(20px) scale(0.97);
-       transition: opacity 1s ease, transform 1s ease, border-color 0.4s ease, box-shadow 0.4s ease;
-   }
+        position: relative;
+        width: 100%;
+        height: 310px;
+        background: #0f172a;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.06);
+        transition: border-color 0.3s ease, transform 0.3s ease;
+        overflow: hidden;
+    }
+
+    .celda-grafico-mundo:hover {
+        border-color: rgba(255, 209, 102, 0.3);
+        transform: translateY(-3px);
+    }
+
+    .celda-grafico-mundo .flourish-embed {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .celda-grafico-mundo iframe {
+        width: 100% !important;
+        height: 310px !important;
+        max-height: none !important;
+        display: block;
+    }
 
    .celda-grafico-mundo.mundo-visible {
        opacity: 1;
@@ -2624,19 +2643,19 @@
 
    /* Anotación discreta por gráfico (▲ tendencia creciente, etc.) — ver
       "overlay" en cada ciudad de js/datos-mundo.js. */
-   .grafico-overlay {
-       position: absolute;
-       bottom: 7px;
-       right: 8px;
-       z-index: 3;
-       font-size: 0.65rem;
-       font-weight: 600;
-       color: var(--acento);
-       background: rgba(5, 6, 10, 0.6);
-       padding: 3px 7px;
-       border-radius: 4px;
-       pointer-events: none;
-   }
+    .grafico-overlay {
+        position: absolute;
+        bottom: 40px;    /* antes: 7px */
+        right: 8px;
+        z-index: 3;
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: var(--acento);
+        background: rgba(5, 6, 10, 0.6);
+        padding: 3px 7px;
+        border-radius: 4px;
+        pointer-events: none;
+    }
 
    /* Resaltado contextual: sólo se activa cuando la grilla entera tiene la
       clase "mundo-grilla-resaltando" (ver escena-mundo.js, se agrega al

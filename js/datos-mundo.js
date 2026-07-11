@@ -16,15 +16,15 @@
 // en escena-mundo.js).
 const CIUDADES_MUNDO = [
     // FILA 1
-    { nombre: "Buenos Aires",     pais: "Argentina",     src: "visualisation/29324397", overlay: "El punto de partida",                 destacado: true },
-    { nombre: "Tokio",            pais: "Japón",         src: "visualisation/29324604", overlay: "▲ Tendencia creciente",               destacado: true },
-    { nombre: "Nueva York",       pais: "EE. UU.",       src: "visualisation/29324591", overlay: "▲ Tendencia creciente",               destacado: true },
-    { nombre: "Londres",          pais: "Reino Unido",   src: "visualisation/29324582", overlay: "Cambio acelerado",                    destacado: true },
+    { nombre: "Buenos Aires",     pais: "Brasil",        src: "visualisation/29654754", overlay: "Caída pronunciada",                 destacado: true },
+    { nombre: "Tokio",            pais: "Grecia",        src: "visualisation/29654782", overlay: "Caída moderada",               destacado: true },
+    { nombre: "Nueva York",       pais: "EE. UU.",       src: "visualisation/29654815", overlay: "Caída pronunciada",               destacado: true },
+    { nombre: "Londres",          pais: "Italia",        src: "visualisation/29654800", overlay: "Caída moderada",                    destacado: true },
     // FILA 2
-    { nombre: "El Cairo",         pais: "Egipto",        src: "visualisation/29324438", overlay: "Mayor pérdida de estrellas",          destacado: false },
-    { nombre: "Sídney",           pais: "Australia",     src: "visualisation/29324485", overlay: "≈ Se mantiene relativamente estable", destacado: false },
-    { nombre: "Ciudad de México", pais: "México",        src: "visualisation/29480361", overlay: "▲ Tendencia creciente",               destacado: false },
-    { nombre: "Santiago",         pais: "Chile",         src: "visualisation/29480465", overlay: "⬇ Recuperación leve",                 destacado: false },
+    { nombre: "El Cairo",         pais: "India",         src: "visualisation/29656503", overlay: "Caída moderada",          destacado: false },
+    { nombre: "Sídney",           pais: "Sudáfrica",     src: "visualisation/29654807", overlay: "Caída pronunciada", destacado: false },
+    { nombre: "Ciudad de México", pais: "Indonesia",     src: "visualisation/29480606", overlay: "Caída pronunciada",               destacado: false },
+    { nombre: "Santiago",         pais: "Japón",         src: "visualisation/29656486", overlay: "Caída leve",                 destacado: false },
     // FILA 3
     { nombre: "Mumbai",           pais: "India",         src: "visualisation/29480504", overlay: "Mayor pérdida de estrellas",          destacado: false },
     { nombre: "Shanghái",         pais: "China",         src: "visualisation/29480539", overlay: "Cambio acelerado",                    destacado: false },
@@ -66,17 +66,17 @@ const NARRATIVA_MUNDO = {
 
     // ACTO 3 — frases que acompañan, fila por fila, la construcción de la grilla
     grilla: [
-        ["Pensé que encontraría historias completamente distintas."],
-        ["Pero empezó a aparecer un patrón."],
-        ["Ciudades diferentes.", "Idiomas distintos.", "Continentes distintos."],
-        ["Y, sin embargo…", "la tendencia era sorprendentemente parecida."]
+        ["¿Sería igual en todos lados?"],
+        ["Los datos empezaron a responder."],
+        ["Países diferentes.", "Idiomas distintos.", "Continentes distintos."],
+        ["Y, sin embargo…", "la respuesta era siempre la misma."]
     ],
 
     // Cierre de la escena: conecta directamente con la escena final
     // existente ("No importa el continente. No importa el idioma...").
     cierre: [
-        ["No eran ciudades aisladas."],
-        ["Era el mismo patrón…", "repitiéndose una y otra vez."],
+        ["No eran casos aislados."],
+        ["Era el mismo patrón…", "repitiéndose en cada rincón del planeta."],
         ["Sin importar el país.", "Sin importar el idioma.", "Sin importar el continente."]
     ]
 };
@@ -86,9 +86,9 @@ const NARRATIVA_MUNDO = {
 // están las 4 filas completas.
 const GUIA_GRILLA_MUNDO = {
     titulo: "¿Qué estás viendo?",
-    texto: "Cada gráfico representa una ciudad distinta. El eje horizontal muestra los años; el vertical, la magnitud límite observada. Cuanto menor es ese valor, menos estrellas pueden verse desde ese lugar."
+    texto: "Cada gráfico representa un país distinto. El eje horizontal muestra los años; el vertical, la magnitud límite observada. Cuanto menor es ese valor, menos estrellas pueden verse desde ese país."
 };
 
 // Título breve que ya traía el proyecto, ahora como dato en vez de texto
 // fijo en el HTML.
-const INTRO_GRILLA_MUNDO = "La evolución de la contaminación lumínica en ciudades del mundo entre 2006 y 2024.";
+const INTRO_GRILLA_MUNDO = "";
