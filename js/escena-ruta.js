@@ -256,11 +256,21 @@ document.addEventListener("DOMContentLoaded", () => {
         let progreso = alturaScrolleable > 0 ? (-rect.top) / alturaScrolleable : 0;
         progreso = Math.min(1, Math.max(0, progreso));
 
-        // El velo blanco (continuación del destello de escena-4) se disuelve
-        // recién cuando este sticky ya quedó pinneado arriba de todo — o sea,
-        // exactamente cuando la escena anterior terminó de salir. Antes de
-        // eso la pantalla sigue blanca, así que no hay ningún corte ni
-        // pantalla vacía entre una escena y la otra.
+        // 1) VISIBILIDAD. La escena arranca con "visibility: hidden" (ver
+        //    .escena-scroll-ruta en styles.css): como tiene margin-top -100vh
+        //    para solaparse con escena-4, si estuviera visible desde el vamos
+        //    se le vería asomar una franja blanca por abajo mientras todavía
+        //    está corriendo el destello. El umbral es apretado a propósito
+        //    (30px): para cuando se enciende, escena-4 ya está 100% blanca,
+        //    así que el relevo entre una y otra es literalmente invisible —
+        //    blanco sobre blanco.
+        seccion.classList.toggle("ruta-en-escena", rect.top <= 30);
+
+        // 2) EL VELO BLANCO (continuación del destello de escena-4) se disuelve
+        //    recién cuando este sticky ya quedó pinneado arriba de todo — o sea,
+        //    exactamente cuando la escena anterior terminó de salir. Antes de
+        //    eso la pantalla sigue blanca, así que no hay ningún corte ni
+        //    pantalla vacía entre una escena y la otra.
         if (contenedorRuta) {
             contenedorRuta.classList.toggle("ruta-revelada", rect.top <= 4);
         }

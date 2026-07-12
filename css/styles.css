@@ -327,7 +327,15 @@
    
    .escena-corte-profundo {
        position: relative;
-       height: 360vh; /* 3 disparadores de 100vh + 2 de 25vh (los del destello, bien cortos) + buffer chico */
+       /* CLAVE: el paso activo es sticky (100vh) y los disparadores van
+          debajo, en el flujo. Para que TODOS los disparadores lleguen a
+          dispararse mientras el paso sigue pinneado, la altura tiene que ser
+          exactamente 100vh + la suma de los disparadores. Si es menor, el
+          sticky se suelta antes de tiempo y los últimos disparadores llegan
+          cuando la escena ya scrolleó fuera de pantalla (era el bug del
+          destello: nunca se veía).
+          100vh (sticky) + 100 + 100 + 190 (disparadores) = 490vh. */
+       height: 490vh;
        width: 100%;
        background-color: #050508;
        z-index: 5; /* Evita que se monte de forma extraña con la escena anterior */
@@ -403,14 +411,13 @@
        position: relative;
        pointer-events: none;
    }
-   /* Los dos últimos tramos son los del destello. Bien cortos: el
-      encandilamiento tiene que terminar ANTES de que el que scrollea llegue
-      a la zona blanca — si estos tramos son largos, se pasa varios cientos
-      de píxeles mirando una pantalla en blanco. Con 25vh el destello arranca
-      y, casi enseguida, ya entra el sticky de la escena de la ruta. */
-   .disparador-corte[data-corte="4"],
-   .disparador-corte[data-corte="5"] {
-       height: 25vh;
+   /* El tercero es el más largo: adentro de este tramo aparece Orión con su
+      texto y, sobre el final, ocurre el destello. El destello NO lo dispara
+      este div: va atado directamente al scroll, frame a frame (ver
+      js/escena-orion-final.js), así es perfectamente fluido y siempre
+      termina justo cuando la escena de la ruta toma la pantalla. */
+   .disparador-corte[data-corte="3"] {
+       height: 190vh;
    }
    
    
@@ -509,6 +516,21 @@
        position: relative;
        height: 400vh;
        width: 100%;
+
+       /* SOLAPE: sin esto, entre que el paso pinneado de escena-4 se suelta y
+          esta escena llega a pinnearse hay exactamente 100vh (el alto del
+          pin) de scroll muerto — y como todo está blanco por el destello, es
+          una pantalla en blanco que hay que atravesar a rueda. Subiéndola
+          100vh, esta escena queda pinneada EXACTAMENTE en el mismo instante
+          en que la otra se suelta: el relevo es inmediato.
+          Mientras tanto se mantiene oculta (visibility) para que no se le vea
+          asomar una franja blanca por abajo durante el destello. */
+       margin-top: -100vh;
+       z-index: 6; /* por encima de .escena-corte-profundo (z-index 5) */
+       visibility: hidden;
+   }
+   .escena-scroll-ruta.ruta-en-escena {
+       visibility: visible;
    }
 
    .contenedor-fijo-ruta {
@@ -534,7 +556,7 @@
        height: 100%;
        background: #fffaf0;
        opacity: 1;
-       transition: opacity 0.8s ease-out 1s; /* 1s de blanco sostenido antes de revelar la ruta, después se disuelve en 0.8s */
+       transition: opacity 0.7s ease-out 0.6s; /* 0.6s de blanco sostenido (el respiro después del destello) y recién ahí se revela la ruta */
        pointer-events: none;
        z-index: 5;
    }
@@ -643,10 +665,11 @@
       TRANSICIÓN — ORIÓN + ENCANDILAMIENTO (ver js/escena-orion-final.js y
       LÓGICA ESCENA 4 en main.js)
       Integrada DENTRO del paso 2 de escena-4 (misma foto de él
-      recibiéndose, sin duplicarla): las clases .co-orion-aparece /
-      .co-encandila se agregan sobre ese mismo .paso-corte cuando el scroll
-      pasa los disparadores 3/4/5 — el paso visual sigue siendo el 2 todo el
-      tiempo.
+      recibiéndose, sin duplicarla): el paso visual sigue siendo el 2 todo el
+      tiempo. Orión aparece con .co-orion-aparece (la agrega el observer de
+      main.js en el disparador 3), y el destello lo maneja el scroll frame a
+      frame desde js/escena-orion-final.js — por eso el halo y el blanco de
+      acá abajo no tienen transición CSS.
       ========================================================================== */
 
    #svg-orion-final {
@@ -660,32 +683,29 @@
 
    #of-orion {
        opacity: 0;
-       transition: opacity 2s ease-in-out;
+       transition: opacity 1.4s ease-in-out;
    }
-   .paso-corte[data-paso="2"].co-orion-aparece #of-orion,
-   .paso-corte[data-paso="2"].co-encandila #of-orion {
+   .paso-corte[data-paso="2"].co-orion-aparece #of-orion {
        opacity: 1;
    }
 
-   /* El halo arranca chico y casi apagado, y crece hasta tapar toda la
-      pantalla — transform-box/origin para que escale desde su propio
-      centro (mismo truco que ya usa .estrella-orion en otra escena). */
+   /* Halo y blanco: NO tienen transición CSS a propósito. Los maneja el
+      scroll, frame a frame (ver actualizarDestello() en
+      js/escena-orion-final.js): el destello avanza exactamente al ritmo de
+      la rueda, así que nunca queda a mitad de camino ni se adelanta al
+      scroll — y siempre termina justo cuando la escena de la ruta releva la
+      pantalla. Los valores de acá abajo son sólo el estado inicial (y el
+      fallback si el JS no corre). */
    #of-halo-grupo {
        transform-box: fill-box;
        transform-origin: center;
        transform: scale(0.4);
        opacity: 0;
-       transition: transform 0.55s ease-in, opacity 0.55s ease-in; /* bien rápido: el destello tiene que completarse antes de que el scroll llegue al blanco */
-   }
-   .paso-corte[data-paso="2"].co-encandila #of-halo-grupo {
-       transform: scale(26);
-       opacity: 1;
    }
 
-   /* Blanco total: entra un poco después que el halo, así el encandilamiento
-      se siente progresivo y no como un corte brusco. Cubre TODA la pantalla
-      del paso (no sólo la imagen), por eso va afuera de
-      .contenedor-fijo-split, como hermano directo dentro de .paso-corte. */
+   /* Blanco total: cubre TODA la pantalla del paso (no sólo la imagen), por
+      eso va afuera de .contenedor-fijo-split, como hermano directo dentro de
+      .paso-corte. */
    .of-blanco {
        position: absolute;
        inset: 0;
@@ -693,11 +713,7 @@
        height: 100%;
        background: #fffaf0;
        opacity: 0;
-       transition: opacity 0.35s ease-in; /* sin espera y bien corto: la pantalla se pone blanca de golpe, como un fogonazo */
        pointer-events: none;
-   }
-   .paso-corte[data-paso="2"].co-encandila .of-blanco {
-       opacity: 1;
    }
 
    /* Texto: el párrafo del astronomo y el de Orión ocupan el mismo lugar
@@ -722,12 +738,10 @@
        transition: opacity 0.8s ease-in-out;
        pointer-events: none;
    }
-   .paso-corte[data-paso="2"].co-orion-aparece .co-texto-astronomo,
-   .paso-corte[data-paso="2"].co-encandila .co-texto-astronomo {
+   .paso-corte[data-paso="2"].co-orion-aparece .co-texto-astronomo {
        opacity: 0;
    }
-   .paso-corte[data-paso="2"].co-orion-aparece .co-texto-orion,
-   .paso-corte[data-paso="2"].co-encandila .co-texto-orion {
+   .paso-corte[data-paso="2"].co-orion-aparece .co-texto-orion {
        opacity: 1;
        pointer-events: auto;
    }

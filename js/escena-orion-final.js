@@ -1,15 +1,18 @@
 /* ==========================================================================
-   ORIÓN SOBRE LA FOTO DE ÉL RECIBIÉNDOSE (dentro del paso 2 de escena-4)
+   ORIÓN + DESTELLO (dentro del paso 2 de escena-4)
    ==========================================================================
-   El paso a paso de scroll (cuándo aparece, cuándo encandila) lo maneja
-   LÓGICA ESCENA 4 en main.js — ese observer agrega/saca las clases
-   .co-orion-aparece y .co-encandila sobre el mismo .paso-corte[data-paso="2"]
-   (la foto de él recibiéndose no cambia ni se duplica).
+   Este archivo hace dos cosas:
 
-   Este archivo sólo:
-   1) dibuja la constelación una vez, al cargar la página.
-   2) dispara la revelación de la escena de la ruta cuando aparece en
-      pantalla (ver .ruta-revelada en styles.css).
+   1) Dibuja la constelación una vez, al cargar la página. Cuándo APARECE lo
+      decide LÓGICA ESCENA 4 en main.js: ese observer agrega .co-orion-aparece
+      sobre .paso-corte[data-paso="2"] al llegar al disparador 3 (la foto de
+      él recibiéndose no cambia ni se duplica — es la misma).
+
+   2) Corre el DESTELLO, atado al scroll frame a frame (ver actualizarDestello()
+      más abajo). No usa pasos ni transiciones CSS: el halo crece y la pantalla
+      se va a blanco en función de la POSICIÓN del scroll, así el destello es
+      perfectamente fluido, no se puede saltear, y siempre termina antes de
+      que la escena de la ruta releve la pantalla.
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -73,15 +76,89 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // El halo que después crece hasta encandilar todo ya está centrado en
-    // el mismo punto (ver el <circle> fijo en index.html, cx=945 cy=175).
+    // el mismo punto (ver el <circle> fijo en index.html).
 
     // ======================================================================
-    // El destello blanco con el que termina esta escena NO se corta acá: la
-    // escena de la ruta arranca con su propio velo blanco encima (ver
-    // .ruta-destello en styles.css), que se disuelve recién cuando su
-    // sticky queda pinneado — así la pantalla nunca deja de estar en blanco
-    // al cruzar de una escena a la otra, y la ruta aparece en ese mismo
-    // lugar. Ese momento lo decide js/escena-ruta.js, que ya lee el scroll
-    // en cada frame.
+    // DESTELLO — atado al scroll, frame a frame (no por pasos ni por
+    // transiciones CSS con tiempo propio).
+    //
+    // Antes esto lo disparaba un IntersectionObserver sobre disparadores que
+    // quedaban por debajo del tramo pinneado: para cuando se disparaban, la
+    // escena ya había scrolleado fuera de pantalla y el destello no se veía.
+    //
+    // Ahora el destello es una función de la POSICIÓN del scroll, no del
+    // tiempo. Eso da tres cosas:
+    //   1) Fluidez total: avanza exactamente al ritmo de la rueda/el dedo,
+    //      sin lag ni animaciones que corren por su cuenta.
+    //   2) Imposible de saltear: para llegar al blanco hay que scrollear a
+    //      través del destello, así que siempre se aprecia.
+    //   3) Imposible que quede a medias: a DESTELLO_FIN la pantalla ya está
+    //      100% blanca, y recién ahí termina el tramo pinneado — o sea, el
+    //      destello SIEMPRE termina antes de que se llegue a la parte
+    //      blanca.
+    //
+    // Las dos constantes están en "progreso del tramo pinneado" (0 = recién
+    // se pinneó, 1 = se está por soltar):
+    //   - antes de 0.74 no pasa nada (se lee el texto y se mira a Orión)
+    //   - entre 0.74 y 0.96 crece el halo y la pantalla se va a blanco
+    //   - de 0.96 a 1 ya está todo blanco: es apenas un respiro antes de que
+    //     la escena de la ruta tome la pantalla (con su propio velo blanco,
+    //     ver .ruta-destello en styles.css — por eso no se ve ningún corte)
+    // ======================================================================
+    const seccion = document.getElementById("escena-4");
+    const pasoRecibido = document.querySelector('.paso-corte[data-paso="2"]');
+    const halo = document.getElementById("of-halo-grupo");
+    const blanco = pasoRecibido ? pasoRecibido.querySelector(".of-blanco") : null;
+
+    if (seccion && halo && blanco) {
+
+        const DESTELLO_INICIO = 0.74;
+        const DESTELLO_FIN = 0.96;
+        const HALO_ESCALA_MAX = 30;
+
+        function actualizarDestello() {
+            const rect = seccion.getBoundingClientRect();
+            const alturaPinneada = seccion.offsetHeight - window.innerHeight;
+            let progreso = alturaPinneada > 0 ? (-rect.top) / alturaPinneada : 0;
+            progreso = Math.min(1, Math.max(0, progreso));
+
+            // t = 0 al empezar el destello, 1 cuando ya está todo blanco
+            let t = (progreso - DESTELLO_INICIO) / (DESTELLO_FIN - DESTELLO_INICIO);
+            t = Math.min(1, Math.max(0, t));
+
+            // El halo arranca despacio y se dispara sobre el final: se siente
+            // como una luz que se enciende, no como un círculo que se infla a
+            // velocidad constante.
+            const crecimiento = Math.pow(t, 2.2);
+            halo.style.opacity = Math.min(1, t * 4);
+            halo.style.transform = `scale(${0.4 + crecimiento * HALO_ESCALA_MAX})`;
+
+            // El blanco entra en la última mitad del destello, cuando el halo
+            // ya llenó buena parte de la pantalla — así primero se ve crecer
+            // la luz y recién después el encandilamiento la termina de tapar.
+            blanco.style.opacity = Math.min(1, Math.max(0, (t - 0.5) / 0.5));
+        }
+
+        let esperandoFrame = false;
+        window.addEventListener("scroll", () => {
+            if (!esperandoFrame) {
+                esperandoFrame = true;
+                requestAnimationFrame(() => {
+                    actualizarDestello();
+                    esperandoFrame = false;
+                });
+            }
+        }, { passive: true });
+        window.addEventListener("resize", actualizarDestello);
+
+        actualizarDestello(); // estado inicial, por si ya está a la vista al cargar
+    }
+
+    // El destello no se corta al terminar esta escena: la escena de la ruta
+    // arranca con su propio velo blanco encima (ver .ruta-destello en
+    // styles.css), que se disuelve recién cuando su sticky queda pinneado —
+    // así la pantalla nunca deja de estar en blanco al cruzar de una escena a
+    // la otra, y la ruta aparece en ese mismo lugar. Ese momento lo decide
+    // js/escena-ruta.js, que ya lee el scroll en cada frame.
 
 });
