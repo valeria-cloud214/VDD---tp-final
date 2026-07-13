@@ -76,21 +76,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // el mismo punto (ver el <circle> fijo en index.html, cx=945 cy=175).
 
     // ======================================================================
-    // REVELACIÓN DE LA RUTA — "emerge" apenas asoma en pantalla, con su
-    // propia animación (ver .ruta-revelada en styles.css).
-    // ======================================================================
-    const escena5 = document.getElementById("escena-5");
-    const contenedorRuta = document.querySelector(".contenedor-fijo-ruta");
-
-    if (escena5 && contenedorRuta) {
-        const observadorRuta = new IntersectionObserver((entradas) => {
-            entradas.forEach(entrada => {
-                if (entrada.isIntersecting) {
-                    contenedorRuta.classList.add("ruta-revelada");
-                }
-            });
-        }, { root: null, threshold: 0 });
-        observadorRuta.observe(escena5);
-    }
+    // El destello blanco con el que termina esta escena NO se corta acá: la
+    // escena de la ruta arranca con su propio velo blanco encima (ver
+    // .ruta-destello en styles.css), que se disuelve recién cuando su
+    // sticky queda pinneado — así la pantalla nunca deja de estar en blanco
+    // al cruzar de una escena a la otra, y la ruta aparece en ese mismo
+    // lugar. Ese momento lo decide js/escena-ruta.js, que ya lee el scroll
+    // en cada frame.
 
 });

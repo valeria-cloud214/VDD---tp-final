@@ -248,11 +248,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const X_INICIO = 60;
     const X_FIN = 1340;
 
+    const contenedorRuta = document.querySelector(".contenedor-fijo-ruta");
+
     function actualizar() {
         const rect = seccion.getBoundingClientRect();
         const alturaScrolleable = seccion.offsetHeight - window.innerHeight;
         let progreso = alturaScrolleable > 0 ? (-rect.top) / alturaScrolleable : 0;
         progreso = Math.min(1, Math.max(0, progreso));
+
+        // El velo blanco (continuación del destello de escena-4) se disuelve
+        // recién cuando este sticky ya quedó pinneado arriba de todo — o sea,
+        // exactamente cuando la escena anterior terminó de salir. Antes de
+        // eso la pantalla sigue blanca, así que no hay ningún corte ni
+        // pantalla vacía entre una escena y la otra.
+        if (contenedorRuta) {
+            contenedorRuta.classList.toggle("ruta-revelada", rect.top <= 4);
+        }
 
         const x = X_INICIO + progreso * (X_FIN - X_INICIO);
         grupoAuto.setAttribute("transform", `translate(${x}, 0)`);

@@ -170,7 +170,7 @@
                             <p>Con los años, el misterio no hizo más que crecer. Aquella pregunta de la infancia seguía flotando en el aire: <strong>¿por qué los cielos de mi ciudad se habían vuelto tan borrosos y opacos?</strong> Impulsado por esa curiosidad indomable, convertí la obsesión en mi profesión y <strong>me recibí de astrónomo.</strong></p>
                         </div>
                         <div class="texto-impacto co-texto-orion">
-                            <p>Me dediqué toda mi vida a estudiar <strong>a dónde se iban las estrellas</strong>, a dónde se escondía Orión. <strong>Hoy les quiero mostrar los resultados de mi investigación.</strong></p>
+                            <p>Me dediqué toda mi vida a estudiar <strong>a dónde se iban las estrellas</strong>, a dónde se escondía Orión. <strong>Por eso hoy les quiero mostrar los resultados de mi investigación.</strong></p>
                         </div>
                     </div>
                 </div>
@@ -246,9 +246,17 @@
                      auto, que quedan más abajo en el encuadre. -->
                 <div class="texto-ruta-contenedor">
                     <div class="texto-ruta-tarjeta">
-                        <p>Pero el papel y las aulas pronto me quedaron chicos. Necesitaba ver las estrellas con mis propios ojos, recuperar el asombro perdido. Así fue como armé las valijas y emprendí un viaje persiguiendo la luz por distintas ciudades de Argentina.</p>
+                        <p>El papel y las aulas pronto me quedaron chicos. Necesitaba ver las estrellas con mis propios ojos, recuperar el asombro perdido. Así fue como armé las valijas y emprendí un viaje persiguiendo la luz por distintas ciudades de Argentina. En este camino pude recolectar los siguientes datos</p>
                     </div>
                 </div>
+
+                <!-- Velo blanco: es la CONTINUACIÓN del destello con el que
+                     termina la escena anterior (ver .of-blanco en el paso 2
+                     de escena-4). Arranca opaco, así que al cruzar el límite
+                     entre las dos escenas la pantalla nunca deja de estar en
+                     blanco; después se disuelve y la ruta (que ya estaba
+                     armada acá abajo) aparece en ese mismo lugar. -->
+                <div class="ruta-destello"></div>
 
             </div>
 
@@ -1074,6 +1082,11 @@
                 <g id="ct-circulo-grande"></g>
             </svg>
 
+            <!-- Fondo nuevo: tapa el cielo mientras se leen las 2 oraciones
+                 del conector — recién se disuelve cuando entra la línea de
+                 tiempo (mismo momento que .ct-linea-visible, paso 3). -->
+            <div class="ct-fondo-conector"></div>
+
             <div class="ct-kicker-contenedor">
                 <div class="ct-kicker">Córdoba capital</div>
             </div>
@@ -1091,20 +1104,29 @@
             <!-- TEXTO: misma tarjeta que .texto-luz (blur + borde + sombra) -->
             <div class="ct-texto-contenedor">
                 <div class="ct-texto" data-paso-ct="4">
-                    <p><strong>1980.</strong> 990.968 habitantes. Magnitud límite ≈6,1 — se distinguían miles de estrellas a simple vista, casi sin resplandor artificial en el cielo.</p>
+                    <p><strong>1980.</strong> Con casi un millón de habitantes y una magnitud límite de ≈6,1, el cielo era un tapiz intacto. A simple vista se distinguían miles de estrellas, libres de cualquier resplandor artificial.</p>
                 </div>
                 <div class="ct-texto" data-paso-ct="5">
-                    <p><strong>2000.</strong> La población ya había crecido a 1,25 millones. El resplandor empezaba a taparse las estrellas más débiles.</p>
+                    <p><strong>2000.</strong> La población trepó a 1,25 millones y la magnitud límite cayó a 5,7. El crecimiento urbano encendió las primeras luces intensas, que comenzaron a borrar los destellos más sutiles.</p>
                 </div>
                 <div class="ct-texto" data-paso-ct="6">
-                    <p><strong>2016.</strong> 1.350.000 habitantes, y más edificios con más luces encendidas toda la noche. Del cielo original quedaban apenas las estrellas más brillantes.</p>
+                    <p><strong>2016.</strong> Con 1,35 millones de personas, los edificios con luces encendidas toda la noche se multiplicaron, reduciendo la magnitud a 5,0. Del cielo original, ya solo resistían las estrellas más brillantes.</p>
                 </div>
                 <div class="ct-texto" data-paso-ct="7">
-                    <p><strong>2025.</strong> Hoy Córdoba tiene 1.637.000 habitantes, y el resplandor de la ciudad opaca casi todo lo demás.</p>
+                    <p><strong>2025.</strong> Hoy, Córdoba supera los 1,63 millones de habitantes. La magnitud límite se desplomó a 4,5: el resplandor de la gran urbe se volvió tan denso que oculta casi todo el universo sobre nosotros.</p>
                 </div>
                 <div class="ct-texto" data-paso-ct="8">
-                    <p>El patrón es siempre el mismo: a más población y más edificación, más luz artificial escapa hacia el cielo — y menos estrellas quedan para ver. <strong>Tocá cada año del cielo para ver el detalle completo.</strong></p>
+                    <p>Córdoba no contradijo lo que venía estudiando; al contrario, el patrón implacable volvió a repetirse: a más cemento, menos cielo.</p>
                 </div>
+            </div>
+
+            <!-- Invitación a interactuar: separada del texto informativo, con
+                 su propio bloque destacado (borde acento + pulso), para que
+                 se lea como una acción y no como una frase más del párrafo.
+                 Sólo aparece en el cierre (paso 8, ver .ct-interactivo). -->
+            <div class="ct-invitacion" id="ct-invitacion">
+                <span class="ct-invitacion-icono" aria-hidden="true">☝</span>
+                <span>Tocá cada año para más información.</span>
             </div>
 
             <!-- Panel de detalle: se abre al tocar un año (sólo habilitado

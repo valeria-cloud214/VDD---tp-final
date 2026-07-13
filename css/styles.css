@@ -262,7 +262,7 @@
    
    .escena-scroll-rafaga {
        position: relative;
-       height: 370vh; /* sticky (100vh) + 5 disparadores-rafaga (50vh c/u) + buffer chico */
+       height: 470vh; /* sticky (100vh) + 5 disparadores-rafaga (70vh c/u) + buffer chico */
        width: 100%;
    }
    
@@ -311,9 +311,10 @@
        font-weight: 700;
    }
    
-   /* Disparadores de ráfaga: más cortos para acelerar el ritmo del scroll */
+   /* Disparadores de ráfaga: un poco más largos que antes (eran 50vh) para
+      que las fotos y el texto tarden un poco más en cambiar entre sí */
    .disparador-rafaga {
-       height: 50vh; 
+       height: 70vh; 
        width: 100%;
        position: relative;
        pointer-events: none;
@@ -326,7 +327,7 @@
    
    .escena-corte-profundo {
        position: relative;
-       height: 560vh; /* 5 disparadores-corte (100vh c/u) + buffer chico — antes 2 (260vh); los 3 nuevos son la secuencia de Orión sobre el mismo paso 2 */
+       height: 360vh; /* 3 disparadores de 100vh + 2 de 25vh (los del destello, bien cortos) + buffer chico */
        width: 100%;
        background-color: #050508;
        z-index: 5; /* Evita que se monte de forma extraña con la escena anterior */
@@ -401,6 +402,15 @@
        width: 100%;
        position: relative;
        pointer-events: none;
+   }
+   /* Los dos últimos tramos son los del destello. Bien cortos: el
+      encandilamiento tiene que terminar ANTES de que el que scrollea llegue
+      a la zona blanca — si estos tramos son largos, se pasa varios cientos
+      de píxeles mirando una pantalla en blanco. Con 25vh el destello arranca
+      y, casi enseguida, ya entra el sticky de la escena de la ruta. */
+   .disparador-corte[data-corte="4"],
+   .disparador-corte[data-corte="5"] {
+       height: 25vh;
    }
    
    
@@ -509,21 +519,27 @@
        height: 100vh;
        overflow: hidden;
        background-color: #020208;
-
-       /* Revelación de entrada: arranca corrida hacia arriba, transparente
-          y desenfocada, y "emerge" (bajando + enfocándose) cuando la escena
-          entra en pantalla (la clase la agrega js/escena-orion-final.js) —
-          pensada para leerse como que la escena sale de adentro del
-          encandilamiento de la transición anterior. */
-       opacity: 0;
-       transform: translateY(-70px);
-       filter: blur(18px);
-       transition: opacity 1.2s ease-out, transform 1.2s ease-out, filter 1.4s ease-out;
    }
-   .contenedor-fijo-ruta.ruta-revelada {
+
+   /* Velo blanco: continuación directa del destello con el que termina
+      escena-4 (ver .of-blanco). Arranca opaco — así, al cruzar el límite
+      entre las dos escenas, la pantalla nunca deja de estar en blanco — y
+      se disuelve cuando la escena entra en pantalla (la clase la agrega
+      js/escena-orion-final.js), revelando la ruta, el auto, los carteles y
+      el texto ahí mismo, sin pantalla vacía en el medio. */
+   .ruta-destello {
+       position: absolute;
+       inset: 0;
+       width: 100%;
+       height: 100%;
+       background: #fffaf0;
        opacity: 1;
-       transform: translateY(0);
-       filter: blur(0);
+       transition: opacity 0.8s ease-out 1s; /* 1s de blanco sostenido antes de revelar la ruta, después se disuelve en 0.8s */
+       pointer-events: none;
+       z-index: 5;
+   }
+   .contenedor-fijo-ruta.ruta-revelada .ruta-destello {
+       opacity: 0;
    }
 
    #escena-ruta {
@@ -659,7 +675,7 @@
        transform-origin: center;
        transform: scale(0.4);
        opacity: 0;
-       transition: transform 2.6s ease-in, opacity 2.6s ease-in;
+       transition: transform 0.55s ease-in, opacity 0.55s ease-in; /* bien rápido: el destello tiene que completarse antes de que el scroll llegue al blanco */
    }
    .paso-corte[data-paso="2"].co-encandila #of-halo-grupo {
        transform: scale(26);
@@ -677,7 +693,7 @@
        height: 100%;
        background: #fffaf0;
        opacity: 0;
-       transition: opacity 1.8s ease-in .8s;
+       transition: opacity 0.35s ease-in; /* sin espera y bien corto: la pantalla se pone blanca de golpe, como un fogonazo */
        pointer-events: none;
    }
    .paso-corte[data-paso="2"].co-encandila .of-blanco {
@@ -692,10 +708,16 @@
    }
    .co-texto-orion {
        position: absolute;
-       left: 0;
-       right: 0;
-       top: 50%;
-       transform: translateY(-50%);
+       /* Mismo margen que el resto de los textos del sitio (.parrafo-historia,
+          .rafaga-beat y el padding de .bloque-texto): al ser absoluto, "inset: 0"
+          se saltaba el padding del contenedor y el texto quedaba pegado a los
+          bordes. */
+       left: 30px;
+       right: 30px;
+       top: 0;
+       bottom: 0;
+       display: flex;
+       align-items: center; /* mismo centrado que .bloque-texto, ver arriba */
        opacity: 0;
        transition: opacity 0.8s ease-in-out;
        pointer-events: none;
@@ -1589,7 +1611,7 @@
      position: -webkit-sticky;
      position: sticky;
      top: 0;
-     width: 90vw; 
+     width: 50vw; /* antes: 90vw — dejaba casi sin espacio al panel de texto */
      height: 100vh;
      z-index: 5;
      
@@ -2242,7 +2264,7 @@
    }
 
    #ct-estrellas-fondo {
-       transition: opacity 1.8s ease-in-out, filter 1.8s ease-in-out;
+       transition: opacity 1.8s ease-in-out;
    }
 
    /* Kicker chico arriba a la izquierda, mismo trato tipográfico que el
@@ -2259,7 +2281,23 @@
        font-weight: 700;
        letter-spacing: 0.12em;
        text-transform: uppercase;
-       color: rgba(226, 232, 240, 0.5);
+       color: #ffffff; /* antes rgba(226,232,240,.5), se leía celeste */
+   }
+
+   /* Fondo nuevo: tapa el cielo estrellado mientras se leen las 2 oraciones
+      del conector (pasos 1-2) — se disuelve junto con la aparición de la
+      línea de tiempo (paso 3, ver .ct-linea-visible). */
+   .ct-fondo-conector {
+       position: absolute;
+       inset: 0;
+       z-index: 1;
+       background: #05070d;
+       opacity: 1;
+       transition: opacity 1.6s ease-in-out;
+       pointer-events: none;
+   }
+   .pin-cordoba.ct-linea-visible .ct-fondo-conector {
+       opacity: 0;
    }
 
    /* --- Línea de tiempo: no aparece hasta que se leyó el conector entero
@@ -2387,6 +2425,59 @@
    @keyframes ct-pulso-invitacion {
        0%, 100% { opacity: 0.2; }
        50% { opacity: 0.45; }
+   }
+
+   /* --- Invitación a tocar: bloque propio, separado del texto informativo.
+      Arriba al centro, misma forma que el resto de las tarjetas del sitio
+      (rectangular, borde redondeado) — se lee como una acción, no como una
+      frase más del párrafo. Sólo con .ct-interactivo (paso 8), y se esconde
+      apenas se abre el primer detalle (ya cumplió su función). --- */
+   .ct-invitacion {
+       position: absolute;
+       top: 40px;
+       left: 50%;
+       z-index: 3;
+
+       display: flex;
+       align-items: center;
+       gap: 9px;
+
+       background: rgba(8, 10, 16, 0.85);
+       -webkit-backdrop-filter: blur(10px);
+       backdrop-filter: blur(10px);
+       border: 1px solid #5b7ba6; /* azul apagado, en vez del amarillo acento */
+       border-radius: var(--radio-tarjeta, 10px);
+       padding: 12px 18px;
+
+       font-size: 0.92rem;
+       font-weight: 600;
+       color: #a8c2de; /* azul apagado, más claro para que se lea */
+       white-space: nowrap;
+
+       opacity: 0;
+       transform: translate(-50%, -10px);
+       pointer-events: none;
+       transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+   }
+   .pin-cordoba.ct-interactivo .ct-invitacion {
+       opacity: 1;
+       transform: translate(-50%, 0);
+       animation: ct-invitacion-pulso 2.4s ease-in-out infinite;
+   }
+   /* Ya tocaron un año: la invitación se retira */
+   .pin-cordoba.ct-detalle-abierto .ct-invitacion {
+       opacity: 0;
+       transform: translate(-50%, -10px);
+       animation: none;
+   }
+
+   .ct-invitacion-icono {
+       font-size: 1.05rem;
+   }
+
+   @keyframes ct-invitacion-pulso {
+       0%, 100% { box-shadow: 0 0 0 0 rgba(91, 123, 166, 0.45); }
+       50% { box-shadow: 0 0 0 8px rgba(91, 123, 166, 0); }
    }
 
    /* --- Panel de detalle: ficha completa de un año, se abre tocando su
@@ -2522,6 +2613,13 @@
        width: 100%;
        max-width: 560px;
        pointer-events: none;
+       transition: opacity 0.5s ease-in-out;
+   }
+   /* Con un año abierto, el texto de cierre ("Córdoba no contradijo…") pasa
+      a segundo plano: sigue ahí, pero atenuado, para que el protagonismo lo
+      tengan el círculo grande y su ficha. */
+   .pin-cordoba.ct-detalle-abierto .ct-texto-contenedor {
+       opacity: 0.15;
    }
 
    .ct-texto {
@@ -2570,6 +2668,14 @@
            right: 20px;
            bottom: 110px;
            max-width: none;
+       }
+       .ct-invitacion {
+           top: 70px;
+           padding: 10px 14px;
+           font-size: 0.8rem;
+           white-space: normal;
+           text-align: center;
+           max-width: calc(100% - 40px);
        }
        .ct-texto p {
            font-size: 1.05rem;

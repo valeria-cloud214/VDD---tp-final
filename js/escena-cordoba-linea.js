@@ -58,31 +58,110 @@ document.addEventListener("DOMContentLoaded", () => {
     const azar = crearRandom(19800101);
     const entre = (min, max) => min + azar() * (max - min);
 
-    // ⚠️ Magnitud límite y estrellas visibles siguen siendo ILUSTRATIVAS —
-    // no salen de una fuente medida. La población sí son datos reales
-    // (Córdoba capital, según año).
+    // ⚠️ Población y magnitud límite son los valores que usa la narración de
+    // la escena (ver los textos por paso en index.html) — mantenerlos
+    // sincronizados si cambian.
+    //
+    // "estrellasVisibles" es la cantidad REAL de estrellas que se dibujan en
+    // el cielo de ese año (antes era una "densidad" relativa) — es también
+    // el número que muestra la ficha al tocar el año, así que lo que se ve y
+    // lo que se lee siempre coinciden.
+    //
+    // "conOrion": en 1980, 2000 y 2016 la constelación todavía se distingue;
+    // en 2025 el resplandor ya la borró.
     const CORDOBA = [
         {
-            anio: 1980, id: "1980", x: 150, densidad: 1,
-            magnitud: "6,1", estrellas: "≈2.500", poblacion: "990.968 habitantes",
-            nota: "Casi sin resplandor artificial: se distinguían miles de estrellas a simple vista."
+            anio: 1980, id: "1980", x: 150, estrellasVisibles: 165, conOrion: true,
+            magnitud: "≈6,1", poblacion: "990.968 habitantes",
+            nota: "El cielo era un tapiz intacto: miles de estrellas a simple vista, libres de cualquier resplandor artificial."
         },
         {
-            anio: 2000, id: "2000", x: 483, densidad: 0.55,
-            magnitud: "5,0", estrellas: "≈900", poblacion: "1,25 millones de habitantes",
-            nota: "La ciudad había crecido en población y en construcción — el resplandor ya tapaba las estrellas más débiles."
+            anio: 2000, id: "2000", x: 483, estrellasVisibles: 70, conOrion: true,
+            magnitud: "5,7", poblacion: "1,25 millones de habitantes",
+            nota: "El crecimiento urbano encendió las primeras luces intensas, que empezaron a borrar los destellos más sutiles."
         },
         {
-            anio: 2016, id: "2016", x: 817, densidad: 0.2,
-            magnitud: "4,0", estrellas: "≈150", poblacion: "1.350.000 habitantes",
-            nota: "Más edificios y más luces encendidas toda la noche: del cielo original quedaban apenas las estrellas más brillantes."
+            anio: 2016, id: "2016", x: 817, estrellasVisibles: 37, conOrion: true,
+            magnitud: "5,0", poblacion: "1,35 millones de habitantes",
+            nota: "Se multiplicaron los edificios con luces encendidas toda la noche: del cielo original ya sólo resistían las estrellas más brillantes."
         },
         {
-            anio: 2025, id: "2025", x: 1150, densidad: 0.06,
-            magnitud: "3,2", estrellas: "≈35", poblacion: "1.637.000 habitantes",
-            nota: "Hoy, en pleno centro, el resplandor de la ciudad opaca casi todo lo demás."
+            anio: 2025, id: "2025", x: 1150, estrellasVisibles: 16, conOrion: false,
+            magnitud: "4,5", poblacion: "más de 1,63 millones de habitantes",
+            nota: "El resplandor de la gran urbe se volvió tan denso que oculta casi todo el universo sobre nosotros."
         }
     ];
+
+    // Orión en coordenadas normalizadas (centro 0,0; radio ~1): se reescala
+    // al radio de cada círculo, así la misma constelación entra igual en el
+    // punto chico de la línea de tiempo y en el círculo grande.
+    const ORION_NORM = [
+        { dx: -0.44, dy: 0.47, r: 1.5 },  // Rigel
+        { dx: -0.35, dy: -0.35, r: 1.35 },// Betelgeuse
+        { dx: 0.40, dy: -0.43, r: 1 },    // Bellatrix
+        { dx: 0.00, dy: -0.02, r: 0.9 },  // Alnilam
+        { dx: 0.18, dy: 0.02, r: 0.9 },   // Alnitak
+        { dx: 0.44, dy: 0.48, r: 1.05 },  // Saiph
+        { dx: -0.16, dy: -0.07, r: 0.85 } // Mintaka
+    ];
+    const ORION_LINEAS = [[1, 6], [2, 4], [6, 3], [3, 4], [6, 0], [4, 5]];
+
+    // Dónde y qué tan grande va Orión, en fracción del radio del círculo que
+    // la contiene — así vale igual para el punto chico y para el expandido.
+    // Arriba a la izquierda, y ocupando ~1/3 del círculo (en el círculo
+    // grande, de 230 de radio, eso son unos 2 cm en pantalla).
+    const ORION_CENTRO_FX = -0.42; // desplazamiento X, en radios (negativo = izquierda)
+    const ORION_CENTRO_FY = -0.42; // desplazamiento Y, en radios (negativo = arriba)
+    const ORION_EXTENSION = 0.30;  // qué porción del radio abarca la constelación
+
+    // Círculo de exclusión: ninguna estrella suelta se dibuja acá adentro,
+    // así Orión nunca queda tapada ni "ensuciada" por estrellas encima.
+    const ORION_RADIO_EXCLUSION = 0.46; // en radios del círculo contenedor
+
+    function centroOrion(cx, cy, radio) {
+        return [cx + ORION_CENTRO_FX * radio, cy + ORION_CENTRO_FY * radio];
+    }
+
+    // ¿Este punto cae sobre la zona de Orión? Se usa al sembrar las
+    // estrellas sueltas para saltearlo.
+    function pisaOrion(x, y, cx, cy, radio) {
+        const [ox, oy] = centroOrion(cx, cy, radio);
+        const dist = Math.hypot(x - ox, y - oy);
+        return dist < ORION_RADIO_EXCLUSION * radio;
+    }
+
+    // Dibuja Orión adentro de un círculo cualquiera (centro + radio), a la
+    // escala que le corresponda. Se usa igual para los puntos de la línea de
+    // tiempo y para el círculo expandido.
+    function dibujarOrion(contenedor, cx, cy, radio, escalaEstrella) {
+        const [ox, oy] = centroOrion(cx, cy, radio);
+        const escala = radio * ORION_EXTENSION;
+        const pos = i => [
+            ox + ORION_NORM[i].dx * escala,
+            oy + ORION_NORM[i].dy * escala
+        ];
+
+        const lineas = crearSVG("g", {
+            stroke: "#cfe0ff", "stroke-opacity": "0.4",
+            "stroke-width": Math.max(0.5, radio * 0.008)
+        });
+        ORION_LINEAS.forEach(([a, b]) => {
+            const [x1, y1] = pos(a), [x2, y2] = pos(b);
+            lineas.appendChild(crearSVG("line", { x1, y1, x2, y2 }));
+        });
+        contenedor.appendChild(lineas);
+
+        ORION_NORM.forEach((e, i) => {
+            const [x, y] = pos(i);
+            const r = e.r * escalaEstrella;
+            contenedor.appendChild(crearSVG("circle", {
+                cx: x, cy: y, r: r * 2.4, fill: "#cfe3ff", "fill-opacity": 0.2
+            }));
+            contenedor.appendChild(crearSVG("circle", {
+                cx: x, cy: y, r: r, fill: "#eaf1ff"
+            }));
+        });
+    }
 
     const RADIO_PUNTO = 40;
     const Y_PUNTOS = 420;
@@ -131,19 +210,26 @@ document.addEventListener("DOMContentLoaded", () => {
             fill: "#0a0c16", stroke: "#4a4560", "stroke-width": 2
         }));
 
-        // Mini estrellas adentro del círculo — cantidad proporcional a
-        // "densidad" (1 = 1980, casi 0 = 2025).
+        // Estrellas adentro del círculo. En el punto chico no entran las 165
+        // de 1980 sin quedar un borrón, así que se dibuja una fracción — la
+        // cantidad REAL de cada año se ve completa en el círculo expandido
+        // (y es la que informa la ficha).
         const miniEstrellas = crearSVG("g", { "clip-path": `url(#${clipId})` });
-        const cantidad = Math.round(28 * d.densidad) + 2;
-        for (let i = 0; i < cantidad; i++) {
+        const cantidad = Math.max(2, Math.round(d.estrellasVisibles * 0.18));
+        let puestas = 0, intentos = 0;
+        while (puestas < cantidad && intentos < cantidad * 40) {
+            intentos++;
             const ang = entre(0, Math.PI * 2);
             const rad = entre(0, RADIO_PUNTO - 4);
+            const x = d.x + Math.cos(ang) * rad;
+            const y = Y_PUNTOS + Math.sin(ang) * rad;
+            if (d.conOrion && pisaOrion(x, y, d.x, Y_PUNTOS, RADIO_PUNTO)) continue;
             miniEstrellas.appendChild(crearSVG("circle", {
-                cx: d.x + Math.cos(ang) * rad,
-                cy: Y_PUNTOS + Math.sin(ang) * rad,
-                r: entre(0.9, 2.1), fill: "#f5f7ff", opacity: entre(0.6, 1)
+                cx: x, cy: y, r: entre(0.9, 2.1), fill: "#f5f7ff", opacity: entre(0.6, 1)
             }));
+            puestas++;
         }
+        if (d.conOrion) dibujarOrion(miniEstrellas, d.x, Y_PUNTOS, RADIO_PUNTO, 0.75);
         grupo.appendChild(miniEstrellas);
 
         // Año, debajo del círculo.
@@ -191,20 +277,27 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     capaCirculoGrande.appendChild(textoAnioGrande);
 
-    // Repuebla el círculo grande con la densidad de estrellas del año
-    // elegido — mismo criterio que las mini estrellas de los puntos chicos.
+    // Repuebla el círculo grande con la cantidad REAL de estrellas del año
+    // elegido (165 / 70 / 37 / 16) — el mismo número que informa la ficha.
+    // En 1980, 2000 y 2016 se dibuja además Orión; en 2025 ya no se ve.
     function mostrarCirculoGrande(d) {
         estrellasGrandes.innerHTML = "";
-        const cantidad = Math.round(90 * d.densidad) + 4;
-        for (let i = 0; i < cantidad; i++) {
+        let puestas = 0, intentos = 0;
+        while (puestas < d.estrellasVisibles && intentos < d.estrellasVisibles * 40) {
+            intentos++;
             const ang = entre(0, Math.PI * 2);
             const rad = entre(0, RADIO_GRANDE - 6);
+            const x = CENTRO_GRANDE_X + Math.cos(ang) * rad;
+            const y = CENTRO_GRANDE_Y + Math.sin(ang) * rad;
+            // Zona de Orión reservada: si la constelación se dibuja en este
+            // año, ninguna estrella suelta puede pisarla.
+            if (d.conOrion && pisaOrion(x, y, CENTRO_GRANDE_X, CENTRO_GRANDE_Y, RADIO_GRANDE)) continue;
             estrellasGrandes.appendChild(crearSVG("circle", {
-                cx: CENTRO_GRANDE_X + Math.cos(ang) * rad,
-                cy: CENTRO_GRANDE_Y + Math.sin(ang) * rad,
-                r: entre(1, 2.6), fill: "#f5f7ff", opacity: entre(0.55, 1)
+                cx: x, cy: y, r: entre(1, 2.6), fill: "#f5f7ff", opacity: entre(0.55, 1)
             }));
+            puestas++;
         }
+        if (d.conOrion) dibujarOrion(estrellasGrandes, CENTRO_GRANDE_X, CENTRO_GRANDE_Y, RADIO_GRANDE, 2.6);
         textoAnioGrande.textContent = d.anio;
     }
 
@@ -233,7 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
         campoAnio.textContent = d.anio;
         campoPoblacion.textContent = d.poblacion;
         campoMagnitud.textContent = d.magnitud;
-        campoEstrellas.textContent = d.estrellas;
+        campoEstrellas.textContent = d.estrellasVisibles;
         campoNota.textContent = d.nota;
         panelDetalle.dataset.anioAbierto = String(d.anio);
         panelDetalle.classList.add("ct-detalle-abierto");
@@ -271,19 +364,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Cuánto resplandor y cuánto se apagan las estrellas de fondo en cada
     // paso — va creciendo en paralelo a como avanzan los años. Los pasos
-    // 1-2 (conector) mantienen el fondo más tenue y desenfocado; recién en
-    // el paso 3 (entra la línea de tiempo) el cielo se ve nítido del todo.
+    // 1-2 (conector) no se ven igual: el cielo entero queda tapado por
+    // .ct-fondo-conector (ver styles.css), así que acá da igual su opacidad.
     const RESPLANDOR_POR_PASO = { 1: 0, 2: 0, 3: 0, 4: 0.12, 5: 0.4, 6: 0.68, 7: 0.9, 8: 0.9 };
-    const ESTRELLAS_FONDO_POR_PASO = { 1: 0.55, 2: 0.55, 3: 1, 4: 0.85, 5: 0.6, 6: 0.4, 7: 0.22, 8: 0.22 };
+    const ESTRELLAS_FONDO_POR_PASO = { 1: 1, 2: 1, 3: 1, 4: 0.85, 5: 0.6, 6: 0.4, 7: 0.22, 8: 0.22 };
     const FOCO_POR_PASO = { 4: "1980", 5: "2000", 6: "2016", 7: "2025" };
 
     function actualizarPaso(paso) {
         resplandor.style.opacity = RESPLANDOR_POR_PASO[paso] ?? 0;
         capaEstrellasFondo.style.opacity = ESTRELLAS_FONDO_POR_PASO[paso] ?? 1;
-        // "No tan nítido" mientras se lee el conector (pasos 1-2): un
-        // desenfoque chico sobre el campo de estrellas, que se disuelve
-        // apenas entra la línea de tiempo.
-        capaEstrellasFondo.style.filter = paso <= 2 ? "blur(3px)" : "blur(0px)";
 
         // Conector: cada oración se suma a la anterior (ninguna se retira)
         // y ambas desaparecen juntas apenas se pasa al paso 3.
@@ -292,8 +381,9 @@ document.addEventListener("DOMContentLoaded", () => {
             f.classList.toggle("activo-conector", paso >= desde && paso <= 2);
         });
 
-        // La línea de tiempo (línea + los 4 círculos) recién aparece cuando
-        // ya se leyeron las 2 oraciones del conector.
+        // El fondo nuevo se disuelve y la línea de tiempo (línea + los 4
+        // círculos) recién aparece cuando ya se leyeron las 2 oraciones del
+        // conector — mismo momento, misma clase.
         pin.classList.toggle("ct-linea-visible", paso >= 3);
 
         const focoActivo = FOCO_POR_PASO[paso] || null;

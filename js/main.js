@@ -130,7 +130,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // A partir del disparador 3 (mismo "paso" visual: la foto de él
     // recibiéndose no cambia ni se duplica) empieza la secuencia de Orión:
     // 3 = Orión y el texto nuevo aparecen, 4 = empieza a encandilar,
-    // 5 = blanco sostenido, listo para pasar a la escena de la ruta.
+    // 5 = blanco pleno. El blanco NO se corta acá: la escena de la ruta
+    // arranca con su propio velo blanco (ver .ruta-destello en styles.css),
+    // así que al cruzar el límite entre las dos escenas la pantalla sigue
+    // en blanco y ese blanco se disuelve revelando la ruta ahí mismo — sin
+    // pantalla vacía en el medio.
     const PASO_VISUAL_POR_CORTE = { 1: "1", 2: "2", 3: "2", 4: "2", 5: "2" };
 
     const observadorE4 = new IntersectionObserver((entradas) => {
