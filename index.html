@@ -337,6 +337,12 @@
                      por teclado. -->
                 <div id="tooltip-estrella" class="tooltip-estrella" aria-hidden="true"></div>
 
+                <!-- Cartel de ayuda: sólo aparece si, a los pocos segundos de
+                     llegar a una ciudad, todavía no hubo ningún hover sobre
+                     la constelación — ver js/escena-cielos.js. El texto queda
+                     acá (no en el JS) para poder cambiarlo sin tocar código. -->
+                <div id="cartel-ayuda-constelacion" class="cartel-ayuda-constelacion" aria-hidden="true">Cada estrella guarda una historia.</div>
+
             </div>
 
             <!-- PANEL A LA DERECHA — acompaña la visualización, nunca compite
@@ -596,6 +602,11 @@
     <div class="seccion-grafico">
         <div id="contenedor-svg">
             <div id="my_dataviz"></div>
+
+            <!-- Tooltip de las luces del scatter: se llena y posiciona en
+                 JS (ver main.js) a partir de los mismos datos del CSV, no
+                 hay texto por ciudad escrito a mano acá. -->
+            <div id="tooltip-industrial" class="tooltip-industrial" aria-hidden="true"></div>
         </div>
 
         <div class="contenedor-textos">
@@ -770,20 +781,26 @@
 
             </svg>
 
-            <!-- Mini-gráfico: sólo un recordatorio visual, no compite con el
-                 scatter principal que ya vimos. Los datos reales (D3, desde
-                 grafico-chico.csv) los completa js/escena-transicion-fisica.js;
-                 el "d" de acá abajo es sólo un fallback por si ese fetch falla. -->
+            <!-- Mini-gráfico: nube de puntos reales (una por ciudad de
+                 grafico-chico.csv) más una línea de tendencia — no un simple
+                 dibujo. Todo lo completa js/escena-transicion-fisica.js; el
+                 contenido de acá abajo (ejes + línea con su curvita) es sólo
+                 un fallback por si ese fetch falla (por ejemplo, abriendo el
+                 sitio como archivo local sin servidor). -->
             <div class="tf-mini-grafico" id="tf-mini-grafico">
                 <svg viewBox="0 0 300 170" aria-hidden="true">
-                    <line x1="14" y1="10" x2="14" y2="150" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
-                    <line x1="14" y1="150" x2="290" y2="150" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
-                    <path id="tf-linea-grafico" d="M 18,142 C 90,132 150,100 180,70 C 220,32 250,20 286,12" fill="none" stroke="#f6c453" stroke-width="2.5" stroke-linecap="round" />
+                    <line x1="72" y1="10" x2="72" y2="150" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+                    <line x1="72" y1="150" x2="290" y2="150" stroke="rgba(255,255,255,0.22)" stroke-width="1" />
+                    <text class="tf-mini-grafico-eje-texto" x="4" y="21" font-size="8.5">Más estrellas</text>
+                    <text class="tf-mini-grafico-eje-texto" x="4" y="144" font-size="8.5">Menos estrellas</text>
+                    <g id="tf-puntos-grafico"></g>
+                    <path id="tf-linea-grafico" d="M 76,130 L 286,20" fill="none" stroke="#f6c453" stroke-width="2.5" stroke-linecap="round" />
                 </svg>
                 <div class="tf-mini-grafico-etiquetas">
-                    <span>Población (miles de habitantes)</span>
-                    <span>Calidad del cielo nocturno</span>
+                    <span>Menor población</span>
+                    <span>Mayor población</span>
                 </div>
+                <p class="tf-mini-grafico-conclusion">No todos los lugares se comportaban igual. Pero la tendencia era imposible de ignorar.</p>
                 <p class="tf-mini-grafico-fuente">Fuente: Censo Nacional 2022 (INDEC) y Globe at Night (2006–2025).</p>
             </div>
 
@@ -818,8 +835,8 @@
                  desplazamiento — "simplemente aparecen" -->
             <div class="tf-texto-contenedor">
                 <div class="tf-frase" data-frase-tf="1"><p>Los datos mostraban un patrón.</p></div>
-                <div class="tf-frase" data-frase-tf="2">
-                    <p>Cuantas más personas vivían en un lugar…<br><span class="tf-linea-pausa">…menos estrellas podían verse.</span></p>
+                <div class="tf-frase tf-frase-evidencia" data-frase-tf="2">
+                    <p>Cuantas más personas…<br><span class="tf-linea-pausa">menos estrellas podrían verse.</span></p>
                 </div>
                 <div class="tf-frase" data-frase-tf="3">
                     <p>Pero una relación no es una explicación.<br><span class="tf-linea-pausa">Necesitaba entender qué estaba ocultando realmente el cielo.</span></p>
@@ -894,6 +911,18 @@
                         <stop offset="100%" stop-color="#ffb45e" stop-opacity="0" />
                     </radialGradient>
 
+                    <!-- Cúpula de skyglow: niebla azul-grisácea (mismos tonos que
+                         gradiente-atmosfera, más oscuros) que representa la luz de
+                         la ciudad ya dispersada en la atmósfera — no un color nuevo. -->
+                    <radialGradient id="gradiente-domo-luminico" cx="50%" cy="100%" r="65%">
+                        <stop offset="0%" stop-color="#4d6e93" stop-opacity="0.65" />
+                        <stop offset="55%" stop-color="#33507a" stop-opacity="0.3" />
+                        <stop offset="100%" stop-color="#1c2c4a" stop-opacity="0" />
+                    </radialGradient>
+                    <filter id="filtro-domo-luminico" x="-60%" y="-60%" width="220%" height="220%">
+                        <feGaussianBlur id="blur-domo-luminico" stdDeviation="55" />
+                    </filter>
+
                     <!-- Rayos de luz: cálidos, se desvanecen hacia arriba -->
                     <linearGradient id="gradiente-rayo" x1="0" y1="1" x2="0" y2="0">
                         <stop offset="0%" stop-color="#ffd9a0" stop-opacity="0.65" />
@@ -946,6 +975,19 @@
                          por la misma razón que el cielo de fondo. -->
                     <g id="capa-atmosfera">
                         <rect id="capa-atmosfera-forma" x="-3400" y="-400" width="8800" height="660" fill="url(#gradiente-atmosfera)" opacity="0" />
+                    </g>
+
+                    <!-- 4b. CÚPULA DE SKYGLOW (reacciona directo al nivel/slider,
+                         ver render() en escena-luz.js): niebla azul-grisácea muy
+                         difusa encima de la ciudad, no una banda de bordes duros
+                         como la atmósfera de arriba. La idea que tiene que quedar
+                         clara sin texto: no son las luces las que tapan las
+                         estrellas, es esta neblina la que las cubre — por eso
+                         vive arriba de #capa-estrellas en el orden de capas. -->
+                    <g id="capa-domo-luminico">
+                        <ellipse id="capa-domo-luminico-forma" cx="800" cy="260" rx="2600" ry="260"
+                                 fill="url(#gradiente-domo-luminico)" opacity="0"
+                                 filter="url(#filtro-domo-luminico)" />
                     </g>
 
                     <!-- 5. RESPLANDOR DE CONTAMINACIÓN (crece con el nivel/slider) -->
@@ -1087,10 +1129,6 @@
                  tiempo (mismo momento que .ct-linea-visible, paso 3). -->
             <div class="ct-fondo-conector"></div>
 
-            <div class="ct-kicker-contenedor">
-                <div class="ct-kicker">Córdoba capital</div>
-            </div>
-
             <!-- Conector: misma estética que .tf-frase (escena-6c) — frase
                  grande centrada, sin tarjeta, con text-shadow en vez de
                  fondo. Las 2 oraciones aparecen una por vez (se acumulan) y
@@ -1099,6 +1137,15 @@
             <div class="ct-conector">
                 <p class="ct-conector-linea" data-frase-conector="1">Quería ver cómo afectaba este fenómeno a una ciudad en particular, a través de los años.</p>
                 <p class="ct-conector-linea" data-frase-conector="2">Por eso elegí estudiar los cielos de Córdoba capital</p>
+            </div>
+
+            <!-- Kicker: funciona como el encabezado del caso de estudio, así
+                 que recién aparece cuando arranca la visualización de la
+                 línea de tiempo (paso 3, misma clase/transición que
+                 #ct-linea-tiempo y #ct-puntos más abajo) — no antes, durante
+                 el conector. -->
+            <div class="ct-kicker-contenedor">
+                <div class="ct-kicker">Córdoba capital</div>
             </div>
 
             <!-- TEXTO: misma tarjeta que .texto-luz (blur + borde + sombra) -->
@@ -1157,38 +1204,22 @@
         ESCENA MUNDIAL — El mismo patrón, repetido en todo el planeta
         (ver js/escena-mundo.js y js/datos-mundo.js)
 
-        3 partes, ya NO todas pinneadas: los gráficos de Flourish traen su
-        propio título/leyenda incrustado en el embed, y forzarlos a entrar
-        en una grilla clippeada a 100vh los hacía solaparse. Ahora sólo el
-        arranque (actos 1-2, sólo texto) y el cierre (acto 4) están
-        pinneados; la grilla del medio (acto 3) es scroll normal, cada fila
-        aparece a tamaño completo y el usuario puede seguir bajando para
-        ver más — no hace falta que las 16 entren en una sola pantalla.
+        Ya sólo queda la grilla (antes acto 3), en SCROLL NORMAL: los
+        gráficos de Flourish traen su propio título/leyenda incrustado en
+        el embed, y forzarlos a entrar en una grilla clippeada a 100vh los
+        hacía solaparse. Cada fila aparece a tamaño completo y el usuario
+        puede seguir bajando para ver más — no hace falta que las 16 entren
+        en una sola pantalla.
 
-        El id "escena-8-transicion" se mantiene en la PARTE 1 (aunque ya no
-        se llame así puertas afuera) porque main.js lo usa para decidir
-        cuándo levantar el telón que viene de la escena de luz.
+        La intro pinneada (acto 2, "el mundo empieza a aparecer") se sacó
+        por completo: era una transición que ya no aportaba información
+        ("No importaba el continente." / "Las mismas preguntas podían
+        hacerse en cualquier lugar.") entre el conector de Córdoba
+        (escena-cordoba-linea.js) y "Orión en el mundo"
+        (escena-orion-mundo.js) — ahora el scroll pasa directo de una a la
+        otra. El cierre pinneado (acto 4) ya se había sacado antes por el
+        mismo motivo (ver escena-mundo.js).
     ============================================= -->
-
-    <!-- PARTE 1 — pinneada: actos 1 (cambio de escala) y 2 (el mundo
-         empieza a aparecer) -->
-    <section id="escena-8-transicion" class="escena-mundo-intro-pin">
-
-        <div class="pin-mundo-intro" id="mundo-intro-pin">
-
-            <div class="mundo-acto mundo-acto2" id="mundo-acto2">
-                <div class="mundo-nombres-ciudades" id="mundo-nombres-ciudades" aria-hidden="true"></div>
-                <div class="mundo-acto2-texto" id="mundo-acto2-texto"></div>
-            </div>
-
-        </div>
-
-        <!-- 3 tramos de 100vh: el acto 2 (el mundo empieza a aparecer) -->
-        <div class="mundo-intro-disparador" data-paso-mundo="1"></div>
-        <div class="mundo-intro-disparador" data-paso-mundo="2"></div>
-        <div class="mundo-intro-disparador" data-paso-mundo="3"></div>
-
-    </section>
 
     <!-- =============================================
         ORIÓN EN EL MUNDO (ver js/escena-orion-mundo.js)
@@ -1203,16 +1234,25 @@
 
         <div class="pin-orion-mundo">
 
-            <!-- Textos: los pasos 1-6 (frase por frase) van solos, centrados
-                 y grandes (misma estética que .tf-frase); del 7 en adelante
-                 bajan a una tarjeta al pie para no taparle el mapa. -->
+            <!-- Textos: el paso 1 es la única frase suelta (aparece y
+                 desaparece del todo, mismo mecanismo de siempre); del paso 2
+                 al 6 el pensamiento se arma solo, una línea a la vez, sin
+                 que las anteriores desaparezcan (ver .om-bloque-pensamiento
+                 más abajo y actualizarBloquePensamiento() en
+                 escena-orion-mundo.js). Del 7 en adelante bajan a una
+                 tarjeta al pie para no taparle el mapa. -->
             <div class="om-frases">
                 <p class="om-frase" data-paso-om="1">Había algo que me seguía rebotando en la cabeza:</p>
-                <p class="om-frase" data-paso-om="2">La frase que me había dicho mi abuela.</p>
-                <p class="om-frase" data-paso-om="3">Que no importaba dónde estuviera,Orión siempre iba a estar ahí.</p>
-                <p class="om-frase" data-paso-om="4">Me di cuenta de que nunca lo había comprobado.</p>
-                <p class="om-frase" data-paso-om="5">¿Será que se la puede ver desde cualquier punto del planeta?</p>
-                <p class="om-frase" data-paso-om="6">Y si es así, ¿se la ve igual en todos lados?</p>
+            </div>
+
+            <div class="om-bloque-pensamiento" id="om-bloque-pensamiento">
+                <div class="om-bloque-interno">
+                    <p class="om-linea-pensamiento" data-paso-om="2">La frase que me había dicho mi abuela.</p>
+                    <p class="om-linea-pensamiento" data-paso-om="3">Que no importaba dónde estuviera, Orión siempre iba a estar ahí.</p>
+                    <p class="om-linea-pensamiento" data-paso-om="4">Me di cuenta de que nunca lo había comprobado.</p>
+                    <p class="om-linea-pensamiento" data-paso-om="5">¿Será que se la puede ver desde cualquier punto del planeta?</p>
+                    <p class="om-linea-pensamiento" data-paso-om="6">Y si es así, ¿se la ve igual en todos lados?</p>
+                </div>
             </div>
 
             <!-- El mapa -->
@@ -1269,16 +1309,18 @@
 
         </div>
 
-        <!-- 14 tramos: 1-6 texto de la abuela (frase por frase), 7 aparece
-             el mapa, 8-10 el foco guiado en cada una de las 3 formas de ver
-             Orión (sur/norte/ecuatorial), 11-14 transición hacia la grilla
-             (pines quedan tocables desde el 11) -->
-        <div class="om-disparador" data-paso-om="1"></div>
-        <div class="om-disparador" data-paso-om="2"></div>
-        <div class="om-disparador" data-paso-om="3"></div>
-        <div class="om-disparador" data-paso-om="4"></div>
-        <div class="om-disparador" data-paso-om="5"></div>
-        <div class="om-disparador" data-paso-om="6"></div>
+        <!-- 14 tramos: 1-6 el pensamiento de la abuela (más cortos —
+             om-disparador-rapido— para que el scroll fluya más rápido acá,
+             ver .om-disparador-rapido), 7 aparece el mapa, 8-10 el foco
+             guiado en cada una de las 3 formas de ver Orión
+             (sur/norte/ecuatorial), 11-14 transición hacia la grilla (pines
+             quedan tocables desde el 11) -->
+        <div class="om-disparador om-disparador-rapido" data-paso-om="1"></div>
+        <div class="om-disparador om-disparador-rapido" data-paso-om="2"></div>
+        <div class="om-disparador om-disparador-rapido" data-paso-om="3"></div>
+        <div class="om-disparador om-disparador-rapido" data-paso-om="4"></div>
+        <div class="om-disparador om-disparador-rapido" data-paso-om="5"></div>
+        <div class="om-disparador om-disparador-rapido" data-paso-om="6"></div>
         <div class="om-disparador" data-paso-om="7"></div>
         <div class="om-disparador" data-paso-om="8"></div>
         <div class="om-disparador" data-paso-om="9"></div>

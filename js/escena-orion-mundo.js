@@ -285,15 +285,59 @@ document.addEventListener("DOMContentLoaded", () => {
     // ======================================================================
     // 6. SCROLL — 8 pasos
     // ======================================================================
-    const textos = document.querySelectorAll("[data-paso-om]");
+    // Las líneas del pensamiento acumulado (pasos 2-6) tienen su propia
+    // lógica (más abajo): se excluyen acá para que no las pise el mecanismo
+    // genérico de "activa sólo si el paso coincide exacto".
+    const textos = document.querySelectorAll("[data-paso-om]:not(.om-linea-pensamiento)");
     const disparadores = document.querySelectorAll(".om-disparador");
 
     // Qué ciudad se enfoca en cada paso del recorrido guiado (una por cada
     // una de las 3 vistas: sur, norte, ecuatorial).
     const FOCO_POR_PASO = { 8: "Buenos Aires", 9: "Nueva York", 10: "Yakarta" };
 
+    // ======================================================================
+    // 6b. PENSAMIENTO ACUMULADO — pasos 2 a 6
+    // ======================================================================
+    // Cada línea nueva se suma debajo de la anterior (nunca la reemplaza):
+    // las más viejas se atenúan y el bloque entero se recalcula para seguir
+    // centrado, sin importar cuántas líneas haya. "top" de cada línea se
+    // computa en JS (no hay forma de centrar un stack de alto variable sólo
+    // con CSS); la entrada de cada línea nueva (fade + translateY) y el
+    // deslizamiento de las viejas hacia arriba los anima la transición ya
+    // declarada en CSS sobre "top"/"opacity"/"transform".
+    const lineasPensamiento = Array.from(document.querySelectorAll(".om-linea-pensamiento"));
+    const GAP_PENSAMIENTO = 26;
+
+    function actualizarBloquePensamiento(paso) {
+        const visibles = lineasPensamiento.filter(el => Number(el.getAttribute("data-paso-om")) <= paso);
+        const ocultas = lineasPensamiento.filter(el => !visibles.includes(el));
+
+        ocultas.forEach(el => {
+            el.classList.remove("om-linea-visible");
+            el.style.opacity = 0;
+        });
+
+        if (!visibles.length) return;
+
+        const alturas = visibles.map(el => el.offsetHeight);
+        const alturaTotal = alturas.reduce((a, b) => a + b, 0) + GAP_PENSAMIENTO * (visibles.length - 1);
+        let y = -alturaTotal / 2;
+
+        visibles.forEach((el, i) => {
+            el.style.top = `${y}px`;
+            y += alturas[i] + GAP_PENSAMIENTO;
+
+            // distancia 0 = la línea actual (100%); cada línea más vieja
+            // pierde un poco más, con un piso para que ninguna se vuelva
+            // ilegible aunque se acumulen las 5.
+            const distancia = visibles.length - 1 - i;
+            el.style.opacity = Math.max(0.35, 1 - distancia * 0.2).toFixed(2);
+            el.classList.add("om-linea-visible");
+        });
+    }
+
     function actualizarPaso(paso) {
-        // Pasos 1-6: sólo el texto de la abuela. El mapa entra en el 7.
+        // Pasos 1-6: sólo el pensamiento de la abuela. El mapa entra en el 7.
         pin.classList.toggle("om-mapa-visible", paso >= 7);
         // Al terminar el recorrido guiado (pasos 8-10), todos los pines
         // quedan tocables.
@@ -312,6 +356,8 @@ document.addEventListener("DOMContentLoaded", () => {
         textos.forEach(t => {
             t.classList.toggle("om-texto-activo", Number(t.getAttribute("data-paso-om")) === paso);
         });
+
+        actualizarBloquePensamiento(paso);
     }
 
     const observador = new IntersectionObserver((entradas) => {

@@ -40,28 +40,18 @@ const CIUDADES_MUNDO = [
     { nombre: "Nueva York",       pais: "Macedonia",       src: "visualisation/29657496", overlay: "▲ Tendencia creciente",               destacado: true }
 ];
 
-// Nombres que flotan en el ACTO 2, antes de que aparezca ningún gráfico.
-// No tienen por qué coincidir uno a uno con CIUDADES_MUNDO: sólo tienen que
-// transmitir que la búsqueda se expandió a todo el mundo.
-const NOMBRES_MUNDO_ACTO2 = [
-    "Buenos Aires", "Tokio", "Nueva York", "Londres", "El Cairo", "Sídney",
-    "Ciudad de México", "Santiago", "Mumbai", "Shanghái", "Berlín", "Moscú"
-];
-
 // Textos por acto. Cada línea interna de un array es un renglón de texto
 // dentro del mismo beat (aparecen juntas); cada elemento del array externo
 // es un beat nuevo (un paso de scroll).
 const NARRATIVA_MUNDO = {
 
-    // (El ACTO 1 — "Lo que descubrí en Argentina no era una excepción" — se
-    // sacó: la escena ahora arranca directo en el ACTO 2, y de ahí pasa
-    // directo al "conector" de la abuela en escena-orion-mundo.js.)
-
-    // ACTO 2 — el mundo empieza a aparecer (nombres flotando + estas frases)
-    acto2: [
-        ["No importaba el continente."],
-        ["Las mismas preguntas podían hacerse en cualquier lugar."]
-    ],
+    // (El ACTO 1 — "Lo que descubrí en Argentina no era una excepción" — y
+    // el ACTO 2 — "el mundo empieza a aparecer", nombres flotando + "No
+    // importaba el continente." / "Las mismas preguntas podían hacerse en
+    // cualquier lugar." — se sacaron los dos: la escena ahora arranca
+    // directo en la grilla (ACTO 3), y antes de ella el scroll pasa directo
+    // del conector de Córdoba al "conector" de la abuela en
+    // escena-orion-mundo.js.)
 
     // ACTO 3 — frases que acompañan, fila por fila, la construcción de la grilla
     grilla: [

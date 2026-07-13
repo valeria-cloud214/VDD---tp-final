@@ -513,6 +513,54 @@ d3.csv("grafico-poblacion.csv").then( function(data) {
 
     puntos.append("circle").attr("class", "punto-halo").attr("r", 14).style("fill", "url(#grad-punto-industrial)");
     puntos.append("circle").attr("class", "punto-nucleo").attr("r", 2.5).style("fill", "#fff8ec");
+    // Área sensible invisible, más grande que el halo: así no hace falta
+    // acertarle al núcleo exacto para descubrir que el punto es interactivo.
+    // Va al final para quedar por encima de halo y núcleo (que tienen
+    // pointer-events: none, ver CSS) y ser quien realmente reciba el hover.
+    puntos.append("circle").attr("class", "punto-hover-area").attr("r", 20).style("fill", "transparent");
+
+    // --- TOOLTIP DE LAS LUCES ------------------------------------------
+    // El contenido sale directo de "d" (la misma fila del CSV que ya usa el
+    // resto del gráfico): si el CSV cambia, el tooltip cambia solo, sin
+    // tocar código acá.
+    const tooltipIndustrial = document.getElementById("tooltip-industrial");
+    const contenedorSvgEl = document.getElementById("contenedor-svg");
+
+    function formatearPoblacionTooltip(num) {
+      return Number(num).toLocaleString("es-AR");
+    }
+
+    function posicionarTooltipIndustrial(event) {
+      if (!tooltipIndustrial || !contenedorSvgEl) return;
+      const rect = contenedorSvgEl.getBoundingClientRect();
+      const anchoTooltip = 200, altoTooltip = 90;
+      let px = event.clientX - rect.left + 16;
+      let py = event.clientY - rect.top + 16;
+      if (px + anchoTooltip > rect.width) px = event.clientX - rect.left - anchoTooltip - 14;
+      if (py + altoTooltip > rect.height) py = rect.height - altoTooltip - 10;
+      tooltipIndustrial.style.left = `${px}px`;
+      tooltipIndustrial.style.top = `${py}px`;
+    }
+
+    function mostrarTooltipIndustrial(event, d) {
+      if (!tooltipIndustrial) return;
+      tooltipIndustrial.innerHTML = `<strong>${d.Ciudad}</strong><span class="tooltip-industrial-dato">Población: ${formatearPoblacionTooltip(d.Poblacion)}</span><span class="tooltip-industrial-dato">Índice: ${d.Indice_Industrial_Nocturno}</span>`;
+      tooltipIndustrial.classList.add("visible");
+      posicionarTooltipIndustrial(event);
+    }
+
+    function ocultarTooltipIndustrial() {
+      if (tooltipIndustrial) tooltipIndustrial.classList.remove("visible");
+    }
+
+    puntos
+      .on("mouseenter", mostrarTooltipIndustrial)
+      .on("mousemove", posicionarTooltipIndustrial)
+      .on("mouseleave", ocultarTooltipIndustrial);
+
+    // Durante el scroll (el gráfico entero se mueve entre etapas) nunca debe
+    // quedar un tooltip abierto colgado sobre una luz vieja.
+    window.addEventListener("scroll", ocultarTooltipIndustrial);
 
     // Mueve todos los puntos a la posición que calcule posFn (con transición
     // suave, ver CSS) y ajusta su opacidad.

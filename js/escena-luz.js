@@ -110,8 +110,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const capaRayos = document.getElementById("capa-rayos");
     const capaEstrellas = document.getElementById("capa-estrellas");
     const capaOrion = document.getElementById("capa-constelacion-orion");
-    const capaAtmosfera = document.getElementById("capa-atmosfera-forma");
     const capaResplandor = document.getElementById("capa-resplandor-forma");
+    const capaDomoLuminico = document.getElementById("capa-domo-luminico-forma");
+    const blurDomoLuminico = document.getElementById("blur-domo-luminico");
 
     // El origen del sistema de coordenadas SVG queda fijo en (0,0): así,
     // todas las animaciones de cámara son una simple traslación/escala en Y,
@@ -378,6 +379,25 @@ document.addEventListener("DOMContentLoaded", () => {
         // Resplandor de contaminación: el halo cálido que sube desde la ciudad.
         capaResplandor.style.opacity = (t * 0.85).toFixed(3);
 
+        // Cúpula de skyglow: la niebla azul-grisácea que representa la luz ya
+        // dispersada en la atmósfera (ver capa-domo-luminico-forma en el SVG).
+        // Opacidad, altura Y blur interpolan juntos —nunca de golpe: esto se
+        // llama siempre dentro de un tween con easing, sea scroll o slider—
+        // para que se sienta un mismo fenómeno físico continuo, no un on/off.
+        // Con nivel ~0 la opacidad llega EXACTO a 0 y el elemento se oculta
+        // del todo (display:none): no puede quedar ni un resto de franja o
+        // borde cuando "no existe" contaminación lumínica.
+        if (capaDomoLuminico) {
+            if (t < 0.05) {
+                capaDomoLuminico.style.display = "none";
+            } else {
+                capaDomoLuminico.style.display = "";
+                capaDomoLuminico.style.opacity = (t * 0.9).toFixed(3);
+                capaDomoLuminico.setAttribute("ry", (40 + t * 430).toFixed(1));
+                if (blurDomoLuminico) blurDomoLuminico.setAttribute("stdDeviation", (10 + t * 50).toFixed(1));
+            }
+        }
+
         // Estrellas y constelación: pierden contraste pero nunca desaparecen
         // del todo (ver las dos funciones de abajo para el porqué de cada curva).
         aplicarOpacidadEstrellas(t);
@@ -480,10 +500,12 @@ document.addEventListener("DOMContentLoaded", () => {
           .call(() => mostrarSoloTexto(2), null, 0.5)
           .to(nivelProxy, { v: 18, duration: 1, onUpdate: () => render(nivelProxy.v) }, 0.5);
 
-        // PASO 3: aparece la atmósfera, los rayos la alcanzan
+        // PASO 3: aparece la atmósfera — ya no es una banda propia con bordes
+        // duros (eso dejaba una franja visible incluso con poca luz): ahora
+        // es el mismo domo de skyglow que controla render(), así que alcanza
+        // con subir el nivel para que aparezca de forma continua y sin bordes.
         tl.to(mundo, { y: CONFIG.camara.paso3.y, duration: 1, ease: "none" }, 1.6)
           .call(() => mostrarSoloTexto(3), null, 1.7)
-          .to(capaAtmosfera, { opacity: 0.55, duration: 1 }, 1.7)
           .to(nivelProxy, { v: 26, duration: 1, onUpdate: () => render(nivelProxy.v) }, 1.7);
 
         // PASO 4: los rayos se dispersan (curvatura orgánica, sin flechas)

@@ -1,15 +1,16 @@
 /* ==========================================================================
    ESCENA MUNDIAL — El mismo patrón, repetido en todo el planeta
    ==========================================================================
-   3 partes independientes, cada una con su propio controlador de scroll
-   más abajo en este archivo:
+   Ya sólo queda 1 parte activa (más abajo en este archivo, PARTE 2), con su
+   propio controlador de scroll:
 
-   PARTE 1 — pinneada (mismo mecanismo que escena-6a: pin de 100vh + N
-   disparadores de 100vh + un actualizarPaso(paso) con comparaciones ">=").
-   Sólo el acto 2 (el mundo empieza a aparecer): 3 pasos. El acto 1 ("Lo que
-   descubrí en Argentina no era una excepción") se sacó — la escena arranca
-   directo acá y de acá pasa directo al "conector" de la abuela en
-   escena-orion-mundo.js.
+   PARTE 1 — ya no está: era la intro pinneada del acto 2 ("el mundo
+   empieza a aparecer" — nombres flotando + "No importaba el continente." /
+   "Las mismas preguntas podían hacerse en cualquier lugar."), una
+   transición que quedó redundante entre el conector de Córdoba
+   (escena-cordoba-linea.js) y "Orión en el mundo" (escena-orion-mundo.js).
+   El acto 1 ("Lo que descubrí en Argentina no era una excepción") ya se
+   había sacado antes por el mismo motivo.
 
    PARTE 2 — la grilla (acto 3), en SCROLL NORMAL, no pinneada. Los
    gráficos de Flourish traen su propio título/leyenda incrustado en el
@@ -83,48 +84,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 100);
     }
 
-    // ======================================================================
-    // PARTE 1 — intro pinneada (actos 1 y 2)
-    // ======================================================================
-    (function iniciarIntro() {
-        const raiz = document.getElementById("mundo-intro-pin");
-        if (!raiz) return;
-
-        const contenedorNombres = document.getElementById("mundo-nombres-ciudades");
-        const nombresEl = NOMBRES_MUNDO_ACTO2.map((nombre, i) => {
-            const el = document.createElement("span");
-            el.className = "mundo-nombre-ciudad";
-            el.textContent = nombre;
-            el.style.left = `${entre(8, 84)}%`;
-            el.style.top = `${entre(14, 80)}%`;
-            el.style.fontSize = `${entre(0.95, 1.5).toFixed(2)}rem`;
-            el.style.transitionDelay = `${(i % 4) * 90}ms`;
-            contenedorNombres.appendChild(el);
-            return el;
-        });
-
-        const beatsActo2 = crearBeats(document.getElementById("mundo-acto2-texto"), NARRATIVA_MUNDO.acto2, "mundo-frase-acto2", "data-frase-m2");
-
-        const acto2 = document.getElementById("mundo-acto2");
-        const disparadores = document.querySelectorAll(".mundo-intro-disparador");
-        const FRASE_ACTO2_POR_PASO = { 2: 1, 3: 2 };
-
-        function actualizarPaso(paso) {
-            if (acto2) acto2.classList.toggle("mundo-visible", paso >= 1 && paso <= 3);
-            const nombresVisibles = paso === 1 ? 4 : paso === 2 ? 8 : paso >= 3 ? nombresEl.length : 0;
-            nombresEl.forEach((el, i) => el.classList.toggle("mundo-nombre-activo", i < nombresVisibles));
-            const fraseActiva = FRASE_ACTO2_POR_PASO[paso] || null;
-            beatsActo2.forEach((beat, i) => beat.classList.toggle("activo-m", fraseActiva !== null && i + 1 === fraseActiva));
-        }
-
-        const observador = new IntersectionObserver((entradas) => {
-            entradas.forEach(entrada => {
-                if (entrada.isIntersecting) actualizarPaso(Number(entrada.target.getAttribute("data-paso-mundo")));
-            });
-        }, { root: null, rootMargin: "-30% 0px -50% 0px", threshold: 0 });
-
-        disparadores.forEach(d => observador.observe(d));
-    })();
+    // (La PARTE 1 — intro pinneada de los actos 1 y 2, "el mundo empieza a
+    // aparecer" — se sacó por completo: era una transición redundante entre
+    // el conector de Córdoba y "Orión en el mundo". Ver el comentario sobre
+    // ESCENA MUNDIAL en index.html.)
 
     // ======================================================================
     // PARTE 2 — la grilla (acto 3), en scroll normal

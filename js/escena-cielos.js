@@ -402,43 +402,83 @@ document.addEventListener("DOMContentLoaded", () => {
                 "data-revela-en": revelaEn,
                 "data-dato": estrella.dato
             });
+            // Zona de proximidad: un anillo invisible más grande que todo lo
+            // demás, agregado primero (así el círculo de hover real, que se
+            // agrega al final, manda apenas el cursor entra al centro). Sólo
+            // dispara un brillo apenas mayor —ver clase "cerca" en el CSS—,
+            // antes incluso del hover completo.
+            g.appendChild(crearSVG("circle", {
+                cx: estrella.x, cy: estrella.y, r: estrella.r + 30,
+                fill: "transparent", class: "zona-cercana"
+            }));
             // Halo suave detrás (también crece un poco con el hover, vía CSS).
             // Usa fill-opacity (no "opacity") para que el fundido entre
             // "todavía no se distingue" y "ya se distingue" —que se maneja
             // con la propiedad CSS "opacity"— no lo pise.
             g.appendChild(crearSVG("circle", {
                 cx: estrella.x, cy: estrella.y, r: estrella.r * 2.4,
-                fill: estrella.color, "fill-opacity": 0.18, class: "punto-estrella"
+                fill: estrella.color, "fill-opacity": 0.18, class: "punto-estrella halo-estrella"
             }));
             // El punto de la estrella en sí
             g.appendChild(crearSVG("circle", {
                 cx: estrella.x, cy: estrella.y, r: estrella.r,
-                fill: estrella.color, class: "punto-estrella"
+                fill: estrella.color, class: "punto-estrella nucleo-estrella"
             }));
-            // Área de hover más grande que el punto visible: más fácil de
-            // acertar con el mouse, sobre todo en las estrellas chicas.
+            // Onda expansiva: nace pegada a la estrella y sólo se ve durante
+            // la respiración (ver clase "respira" en el CSS) — nace, se
+            // expande, pierde opacidad y desaparece, como una onda de luz.
+            // En reposo es invisible (fill-opacity: 0 en el CSS de base).
+            g.appendChild(crearSVG("circle", {
+                cx: estrella.x, cy: estrella.y, r: estrella.r * 1.6,
+                fill: estrella.color, class: "onda-estrella"
+            }));
+            // Área de hover real (acá sí se muestra el tooltip): más grande
+            // que el punto visible pero más chica que la zona de proximidad
+            // de arriba. Se agrega al final para quedar por encima de todo.
             g.appendChild(crearSVG("circle", {
                 cx: estrella.x, cy: estrella.y, r: estrella.r + 16,
-                fill: "transparent"
+                fill: "transparent", class: "zona-hover"
             }));
             capa.appendChild(g);
         });
     })();
 
+    // A qué ciudad corresponde el cielo que se está mostrando ahora mismo,
+    // para poder comparar contra el "revelaEn" de cada estrella. La usan
+    // tanto el tooltip como la respiración ambiente de más abajo.
+    function ciudadActual() {
+        if (contenedorCielo.classList.contains("cielo-junin")) return "junin";
+        if (contenedorCielo.classList.contains("cielo-firmat")) return "firmat";
+        return "bsas";
+    }
+
     // ======================================================================
-    // 5. TOOLTIP — sigue al cursor mientras hoverea una estrella de Orión
+    // 5. CARTEL DE AYUDA — "Pasá el cursor sobre la constelación."
+    // ======================================================================
+    // Sólo aparece si, pasados unos segundos desde que se entró a una
+    // ciudad, el usuario todavía no descubrió por su cuenta que la
+    // constelación es interactiva (ver respiración ambiente más abajo). En
+    // cuanto hay un primer hover real, se apaga con fade y no vuelve a
+    // mostrarse en el resto de la escena. El texto vive en el HTML (ver
+    // index.html, #cartel-ayuda-constelacion), no acá, para poder cambiarlo
+    // sin tocar el código.
+    const cartelAyuda = document.getElementById("cartel-ayuda-constelacion");
+    let constelacionDescubierta = false;
+    let temporizadorAyuda = null;
+
+    function marcarConstelacionDescubierta() {
+        if (constelacionDescubierta) return;
+        constelacionDescubierta = true;
+        clearTimeout(temporizadorAyuda);
+        if (cartelAyuda) cartelAyuda.classList.remove("visible");
+    }
+
+    // ======================================================================
+    // 6. TOOLTIP — sigue al cursor mientras hoverea una estrella de Orión
     // ======================================================================
     (function conectarTooltip() {
         const tooltip = document.getElementById("tooltip-estrella");
         if (!tooltip) return;
-
-        // A qué ciudad corresponde el cielo que se está mostrando ahora
-        // mismo, para poder comparar contra el "revelaEn" de cada estrella.
-        function ciudadActual() {
-            if (contenedorCielo.classList.contains("cielo-junin")) return "junin";
-            if (contenedorCielo.classList.contains("cielo-firmat")) return "firmat";
-            return "bsas";
-        }
 
         function posicionar(e) {
             const rect = contenedorCielo.getBoundingClientRect();
@@ -456,8 +496,18 @@ document.addEventListener("DOMContentLoaded", () => {
             const magReal = parseFloat(g.getAttribute("data-magnitud-real"));
             const dato = g.getAttribute("data-dato");
             const revelaEn = g.getAttribute("data-revela-en");
+            const zonaCercana = g.querySelector(".zona-cercana");
+            const zonaHover = g.querySelector(".zona-hover");
 
-            g.addEventListener("mouseenter", (e) => {
+            // Proximidad: todavía no es hover completo, pero ya alcanza para
+            // que el halo crezca un poco — se siente que ahí hay algo antes
+            // de llegar del todo.
+            zonaCercana.addEventListener("mouseenter", () => g.classList.add("cerca"));
+            zonaCercana.addEventListener("mouseleave", () => g.classList.remove("cerca"));
+
+            zonaHover.addEventListener("mouseenter", (e) => {
+                marcarConstelacionDescubierta();
+                g.classList.add("activa");
                 const ciudad = ciudadActual();
                 const yaSeVe = ORDEN_CIUDADES[ciudad] >= ORDEN_CIUDADES[revelaEn];
                 const magMostrada = formatearMagnitud(magnitudPercibida(magReal, ciudad));
@@ -473,9 +523,85 @@ document.addEventListener("DOMContentLoaded", () => {
                 tooltip.classList.add("visible");
                 posicionar(e);
             });
-            g.addEventListener("mousemove", posicionar);
-            g.addEventListener("mouseleave", () => tooltip.classList.remove("visible"));
+            zonaHover.addEventListener("mousemove", posicionar);
+            zonaHover.addEventListener("mouseleave", () => {
+                g.classList.remove("activa");
+                tooltip.classList.remove("visible");
+            });
         });
+    })();
+
+    // ======================================================================
+    // 7. CONSTELACIÓN "VIVA" — invitación a explorar
+    // ======================================================================
+    // Terminado el crossfade de cada ciudad, la constelación queda
+    // completamente quieta un par de segundos y después empieza a
+    // "respirar": una única estrella a la vez (nunca varias juntas) crece
+    // apenas, su halo se acentúa y una onda de luz nace pegada a ella y se
+    // expande hasta desvanecerse. El recorrido sigue siempre el mismo orden
+    // —seis puntas de la figura— para que el ojo termine leyendo la forma
+    // completa de Orión, no un parpadeo al azar.
+    const ORDEN_RECORRIDO = ["Betelgeuse", "Bellatrix", "Alnitak", "Alnilam", "Mintaka", "Rigel", "Saiph"];
+
+    (function respiracionConstelacion() {
+        const porNombre = {};
+        document.querySelectorAll(".estrella-orion").forEach(g => {
+            porNombre[g.getAttribute("data-nombre")] = g;
+        });
+        if (!Object.keys(porNombre).length) return;
+
+        function visibleAhora(g) {
+            const ciudad = ciudadActual();
+            return ORDEN_CIUDADES[ciudad] >= ORDEN_CIUDADES[g.getAttribute("data-revela-en")];
+        }
+        function respirar(g) {
+            g.classList.add("respira");
+            g.addEventListener("animationend", () => g.classList.remove("respira"), { once: true });
+        }
+
+        let indice = 0;
+        let temporizadorPulso = null;
+        let temporizadorInicio = null;
+
+        // Avanza por el orden fijo hasta encontrar la próxima estrella que
+        // esta ciudad ya revela (las que todavía no se distinguen se
+        // saltean, pero sin romper el orden ni dejar huecos en el ritmo).
+        function pulsoSiguiente() {
+            for (let i = 0; i < ORDEN_RECORRIDO.length; i++) {
+                const g = porNombre[ORDEN_RECORRIDO[indice]];
+                indice = (indice + 1) % ORDEN_RECORRIDO.length;
+                if (g && visibleAhora(g)) {
+                    respirar(g);
+                    break;
+                }
+            }
+            temporizadorPulso = setTimeout(pulsoSiguiente, 3800);
+        }
+
+        function alCambiarCiudad() {
+            clearTimeout(temporizadorPulso);
+            clearTimeout(temporizadorInicio);
+            clearTimeout(temporizadorAyuda);
+            if (cartelAyuda) cartelAyuda.classList.remove("visible");
+
+            indice = 0; // el recorrido siempre vuelve a arrancar en Betelgeuse
+
+            // ~2s de quietud total (ya terminó el crossfade de la ciudad)
+            // antes de que la constelación empiece a respirar de nuevo.
+            temporizadorInicio = setTimeout(pulsoSiguiente, 2000);
+
+            // Si a los ~7s de haber entrado a esta ciudad el usuario todavía
+            // no hizo ningún hover, recién ahí aparece la ayuda discreta.
+            if (!constelacionDescubierta) {
+                temporizadorAyuda = setTimeout(() => {
+                    if (!constelacionDescubierta && cartelAyuda) cartelAyuda.classList.add("visible");
+                }, 7000);
+            }
+        }
+
+        alCambiarCiudad();
+        new MutationObserver(alCambiarCiudad)
+            .observe(contenedorCielo, { attributes: true, attributeFilter: ["class"] });
     })();
 
 });
