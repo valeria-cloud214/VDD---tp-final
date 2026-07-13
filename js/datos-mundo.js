@@ -53,13 +53,9 @@ const NOMBRES_MUNDO_ACTO2 = [
 // es un beat nuevo (un paso de scroll).
 const NARRATIVA_MUNDO = {
 
-    // ACTO 1 — cambio de escala: pantalla limpia, sólo texto.
-    acto1: [
-        ["Lo que descubrí en Argentina…", "no era una excepción."],
-        ["Pensé que quizás sólo ocurría acá."],
-        ["Pero necesitaba comprobarlo."],
-        ["Así que amplié la búsqueda."]
-    ],
+    // (El ACTO 1 — "Lo que descubrí en Argentina no era una excepción" — se
+    // sacó: la escena ahora arranca directo en el ACTO 2, y de ahí pasa
+    // directo al "conector" de la abuela en escena-orion-mundo.js.)
 
     // ACTO 2 — el mundo empieza a aparecer (nombres flotando + estas frases)
     acto2: [
@@ -73,15 +69,13 @@ const NARRATIVA_MUNDO = {
         [""],
         [""],
         [""]
-    ],
-
-    // Cierre de la escena: conecta directamente con la escena final
-    // existente ("No importa el continente. No importa el idioma...").
-    cierre: [
-        ["No eran casos aislados."],
-        ["Era el mismo patrón…", "repitiéndose en cada rincón del planeta."],
-        ["Sin importar el país.", "Sin importar el idioma.", "Sin importar el continente."]
     ]
+
+    // (El cierre/ACTO 4 — "No eran casos aislados... Sin importar el país,
+    // el idioma, el continente" — también se sacó: quedaba pisando el
+    // mismo mensaje que ya dice, con más fuerza, escena-cierre.js justo
+    // después ["No importa el continente." / "...idioma." / "...cultura."].
+    // Esa escena es ahora la que lo dice, una sola vez.)
 };
 
 // Pequeña guía que acompaña la primera aparición de la grilla — no es una

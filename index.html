@@ -1176,10 +1176,6 @@
 
         <div class="pin-mundo-intro" id="mundo-intro-pin">
 
-            <div class="mundo-acto mundo-acto1" id="mundo-acto1">
-                <div class="mundo-acto1-texto" id="mundo-acto1-texto"></div>
-            </div>
-
             <div class="mundo-acto mundo-acto2" id="mundo-acto2">
                 <div class="mundo-nombres-ciudades" id="mundo-nombres-ciudades" aria-hidden="true"></div>
                 <div class="mundo-acto2-texto" id="mundo-acto2-texto"></div>
@@ -1187,14 +1183,110 @@
 
         </div>
 
-        <!-- 7 tramos de 100vh: acto 1 = pasos 1-4, acto 2 = pasos 5-7 -->
+        <!-- 3 tramos de 100vh: el acto 2 (el mundo empieza a aparecer) -->
         <div class="mundo-intro-disparador" data-paso-mundo="1"></div>
         <div class="mundo-intro-disparador" data-paso-mundo="2"></div>
         <div class="mundo-intro-disparador" data-paso-mundo="3"></div>
-        <div class="mundo-intro-disparador" data-paso-mundo="4"></div>
-        <div class="mundo-intro-disparador" data-paso-mundo="5"></div>
-        <div class="mundo-intro-disparador" data-paso-mundo="6"></div>
-        <div class="mundo-intro-disparador" data-paso-mundo="7"></div>
+
+    </section>
+
+    <!-- =============================================
+        ORIÓN EN EL MUNDO (ver js/escena-orion-mundo.js)
+        Puente entre "lo que descubrí en Argentina no era una excepción" y la
+        grilla de contaminación por país. Antes de ir a los datos, Jorge
+        vuelve a la promesa de la abuela y la comprueba: ¿Orión se ve desde
+        cualquier lado? ¿Y se ve igual? Mapa mundial con 17 ciudades, foco
+        guiado en 3 (una por cada forma distinta de ver la constelación) y,
+        al final, todos los pines quedan tocables.
+    ============================================= -->
+    <section id="escena-orion-mundo" class="escena-orion-mundo">
+
+        <div class="pin-orion-mundo">
+
+            <!-- Textos: los pasos 1-6 (frase por frase) van solos, centrados
+                 y grandes (misma estética que .tf-frase); del 7 en adelante
+                 bajan a una tarjeta al pie para no taparle el mapa. -->
+            <div class="om-frases">
+                <p class="om-frase" data-paso-om="1">Había algo que me seguía rebotando en la cabeza:</p>
+                <p class="om-frase" data-paso-om="2">La frase que me había dicho mi abuela.</p>
+                <p class="om-frase" data-paso-om="3">Que no importaba dónde estuviera,Orión siempre iba a estar ahí.</p>
+                <p class="om-frase" data-paso-om="4">Me di cuenta de que nunca lo había comprobado.</p>
+                <p class="om-frase" data-paso-om="5">¿Será que se la puede ver desde cualquier punto del planeta?</p>
+                <p class="om-frase" data-paso-om="6">Y si es así, ¿se la ve igual en todos lados?</p>
+            </div>
+
+            <!-- El mapa -->
+            <div class="om-mapa-contenedor">
+                <svg id="om-svg-mapa" viewBox="0 0 1000 520" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                    <g id="om-mundo"></g>
+                    <g id="om-pines"></g>
+                </svg>
+            </div>
+
+            <!-- Panel: el cielo de la ciudad elegida, con Orión girada como
+                 se la ve desde ahí de verdad -->
+            <div class="om-panel" id="om-panel">
+                <button class="om-panel-cerrar" id="om-panel-cerrar" aria-label="Cerrar">×</button>
+
+                <svg id="om-svg-cielo" viewBox="0 0 300 300" aria-hidden="true">
+                    <circle cx="150" cy="150" r="130" class="om-cielo-disco" />
+                    <g id="om-cielo-fondo"></g>
+                    <g id="om-orion"></g>
+                </svg>
+
+                <div class="om-panel-datos">
+                    <div class="om-panel-ciudad" id="om-panel-ciudad"></div>
+                    <div class="om-panel-vista" id="om-panel-vista"></div>
+                    <div class="om-panel-hemisferio" id="om-panel-hemisferio"></div>
+                    <p class="om-panel-texto" id="om-panel-texto"></p>
+                </div>
+            </div>
+
+            <!-- Tarjeta de texto al pie (paso 7, y 11-14 la transición final) -->
+            <div class="om-pie">
+                <div class="om-texto" data-paso-om="7">
+                    <p>Marqué en el mapa las ciudades desde donde podía compararla. La primera respuesta fue que sí: <strong>Orión se ve desde todas.</strong> Mi abuela no había exagerado.</p>
+                </div>
+                <div class="om-texto" data-paso-om="11">
+                    <p>Los cielos cambian de un lugar a otro del planeta.</p>
+                </div>
+                <div class="om-texto" data-paso-om="12">
+                    <p>Pero algunas constelaciones, como Orión, <strong>se dejan ver desde casi cualquier punto</strong>, aunque cada lugar la vea a su manera.</p>
+                </div>
+                <div class="om-texto" data-paso-om="13">
+                    <p>Lo que todavía no sabía era si pasaba lo mismo con <strong>la contaminación lumínica</strong>.</p>
+                </div>
+                <div class="om-texto" data-paso-om="14">
+                    <p class="om-conector">¿Afectaba igual en todos lados, o cambiaba tanto como cambia el cielo? Fui a buscar los datos de estos países para averiguarlo.</p>
+                </div>
+            </div>
+
+            <!-- Invitación a tocar: aparece al terminar el recorrido guiado -->
+            <div class="om-invitacion">
+                <span class="om-invitacion-icono" aria-hidden="true">◎</span>
+                <span>Tocá cualquier ciudad para ver su cielo.</span>
+            </div>
+
+        </div>
+
+        <!-- 14 tramos: 1-6 texto de la abuela (frase por frase), 7 aparece
+             el mapa, 8-10 el foco guiado en cada una de las 3 formas de ver
+             Orión (sur/norte/ecuatorial), 11-14 transición hacia la grilla
+             (pines quedan tocables desde el 11) -->
+        <div class="om-disparador" data-paso-om="1"></div>
+        <div class="om-disparador" data-paso-om="2"></div>
+        <div class="om-disparador" data-paso-om="3"></div>
+        <div class="om-disparador" data-paso-om="4"></div>
+        <div class="om-disparador" data-paso-om="5"></div>
+        <div class="om-disparador" data-paso-om="6"></div>
+        <div class="om-disparador" data-paso-om="7"></div>
+        <div class="om-disparador" data-paso-om="8"></div>
+        <div class="om-disparador" data-paso-om="9"></div>
+        <div class="om-disparador" data-paso-om="10"></div>
+        <div class="om-disparador" data-paso-om="11"></div>
+        <div class="om-disparador" data-paso-om="12"></div>
+        <div class="om-disparador" data-paso-om="13"></div>
+        <div class="om-disparador" data-paso-om="14"></div>
 
     </section>
 
@@ -1209,18 +1301,9 @@
         </div>
     </section>
 
-    <!-- PARTE 3 — pinneada: acto 4 (cierre, empalma con la escena final) -->
-    <section id="escena-mundo-cierre" class="escena-mundo-cierre-pin">
-
-        <div class="pin-mundo-cierre" id="mundo-cierre-pin">
-            <div class="mundo-acto4-texto" id="mundo-acto4-texto"></div>
-        </div>
-
-        <div class="mundo-cierre-disparador" data-paso-cierre="1"></div>
-        <div class="mundo-cierre-disparador" data-paso-cierre="2"></div>
-        <div class="mundo-cierre-disparador" data-paso-cierre="3"></div>
-
-    </section>
+    <!-- La PARTE 3 (acto 4, cierre mundial) se sacó: repetía, con menos
+         fuerza, lo que dice enseguida escena-cierre.js. La grilla pasa
+         directo a la escena de cierre. -->
     </div>
 
     <!-- =============================================
@@ -1319,7 +1402,7 @@
                 <div class="frase-cierre" data-frase-cierre="continente"><p>No importa el continente.</p></div>
                 <div class="frase-cierre" data-frase-cierre="idioma"><p>No importa el idioma.</p></div>
                 <div class="frase-cierre" data-frase-cierre="cultura"><p>No importa la cultura.</p></div>
-                <div class="frase-cierre" data-frase-cierre="crece"><p>Donde crece la ciudad...</p></div>
+                <div class="frase-cierre" data-frase-cierre="crece"><p>Orión acompaña a todo el mundo,</p><p>pero, donde crece la ciudad...</p></div>
                 <div class="frase-cierre" data-frase-cierre="desaparece"><p>...desaparece el cielo.</p></div>
                 <div class="frase-cierre" data-frase-cierre="abuela"><p>Mi abuela tenía razón.</p></div>
                 <div class="frase-cierre" data-frase-cierre="orion-siempre"><p>Orión siempre estuvo ahí.</p></div>
@@ -1361,6 +1444,11 @@
     <script src="js/escena-transicion-fisica.js"></script>
     <script src="js/escena-cordoba-linea.js"></script>
     <script src="js/escena-orion-final.js"></script>
+    <!-- topojson: sólo lo usa js/escena-orion-mundo.js, para dibujar los
+         continentes del mapa. Si no carga, esa escena igual funciona (quedan
+         la esfera, los meridianos y los pines). -->
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <script src="js/escena-orion-mundo.js"></script>
 
     <script>
         window.Flourish = { disable_autoload: true };

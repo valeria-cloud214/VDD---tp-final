@@ -6,7 +6,10 @@
 
    PARTE 1 — pinneada (mismo mecanismo que escena-6a: pin de 100vh + N
    disparadores de 100vh + un actualizarPaso(paso) con comparaciones ">=").
-   Actos 1 (cambio de escala) y 2 (el mundo empieza a aparecer): 7 pasos.
+   Sólo el acto 2 (el mundo empieza a aparecer): 3 pasos. El acto 1 ("Lo que
+   descubrí en Argentina no era una excepción") se sacó — la escena arranca
+   directo acá y de acá pasa directo al "conector" de la abuela en
+   escena-orion-mundo.js.
 
    PARTE 2 — la grilla (acto 3), en SCROLL NORMAL, no pinneada. Los
    gráficos de Flourish traen su propio título/leyenda incrustado en el
@@ -16,8 +19,12 @@
    apenas entra en pantalla — si hay que scrollear para ver las 16, es lo
    esperado.
 
-   PARTE 3 — pinneada otra vez (mismo mecanismo que la parte 1): acto 4,
-   el cierre que empalma con la escena final existente.
+   PARTE 3 — ya no está: el cierre (acto 4, "no eran casos aislados... sin
+   importar el país, el idioma, el continente") se sacó porque repetía, con
+   menos fuerza, lo que dice enseguida escena-cierre.js ("No importa el
+   continente. No importa el idioma. No importa la cultura."). El bloque de
+   código de abajo queda de forma inocua: si no encuentra su contenedor en
+   el HTML, no hace nada.
 
    Todos los textos, ciudades, overlays y destacados salen de
    js/datos-mundo.js.
@@ -96,20 +103,15 @@ document.addEventListener("DOMContentLoaded", () => {
             return el;
         });
 
-        const beatsActo1 = crearBeats(document.getElementById("mundo-acto1-texto"), NARRATIVA_MUNDO.acto1, "mundo-linea-acto1", "data-linea-m1");
         const beatsActo2 = crearBeats(document.getElementById("mundo-acto2-texto"), NARRATIVA_MUNDO.acto2, "mundo-frase-acto2", "data-frase-m2");
 
-        const acto1 = document.getElementById("mundo-acto1");
         const acto2 = document.getElementById("mundo-acto2");
         const disparadores = document.querySelectorAll(".mundo-intro-disparador");
-        const FRASE_ACTO2_POR_PASO = { 6: 1, 7: 2 };
+        const FRASE_ACTO2_POR_PASO = { 2: 1, 3: 2 };
 
         function actualizarPaso(paso) {
-            if (acto1) acto1.classList.toggle("mundo-visible", paso >= 1 && paso <= 4);
-            beatsActo1.forEach((beat, i) => beat.classList.toggle("activo-m", paso >= i + 1));
-
-            if (acto2) acto2.classList.toggle("mundo-visible", paso >= 5 && paso <= 7);
-            const nombresVisibles = paso === 5 ? 4 : paso === 6 ? 8 : paso >= 7 ? nombresEl.length : 0;
+            if (acto2) acto2.classList.toggle("mundo-visible", paso >= 1 && paso <= 3);
+            const nombresVisibles = paso === 1 ? 4 : paso === 2 ? 8 : paso >= 3 ? nombresEl.length : 0;
             nombresEl.forEach((el, i) => el.classList.toggle("mundo-nombre-activo", i < nombresVisibles));
             const fraseActiva = FRASE_ACTO2_POR_PASO[paso] || null;
             beatsActo2.forEach((beat, i) => beat.classList.toggle("activo-m", fraseActiva !== null && i + 1 === fraseActiva));
