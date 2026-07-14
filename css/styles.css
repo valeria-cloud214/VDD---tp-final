@@ -2872,7 +2872,7 @@
        /* sticky (100vh) + 6 disparadores cortos del pensamiento (60vh c/u,
           ver .om-disparador-rapido: el ritmo acá tiene que ser más rápido)
           + 8 disparadores normales del mapa (100vh c/u) */
-       height: 1260vh;
+       height: 1500vh;
        background-color: #020208;
    }
 
@@ -3433,22 +3433,48 @@
       Sección normal (no pinneada, no sticky): crece con el contenido, así
       cada gráfico tiene su tamaño real en vez de pelear por un cupo de
       100vh. */
-   .escena-mundo-grilla {
-       position: relative;
-       width: 100%;
-       background-color: #050508;
-       padding: 70px 40px 90px;
-   }
 
-   .mundo-grilla-contenido {
-       width: 100%;
-       max-width: 1300px;
-       margin: 0 auto;
-       display: flex;
-       flex-direction: column;
-       align-items: center;
-       gap: 16px;
-   }
+    .escena-mundo-grilla {
+        position: relative;
+        width: 100%;
+        background:
+            radial-gradient(1.5px 1.5px at 8% 12%, rgba(245,247,255,.4), transparent),
+            radial-gradient(1.5px 1.5px at 82% 8%, rgba(245,247,255,.32), transparent),
+            radial-gradient(1px 1px at 45% 6%, rgba(245,247,255,.28), transparent),
+            radial-gradient(1px 1px at 65% 18%, rgba(245,247,255,.25), transparent),
+            radial-gradient(1.5px 1.5px at 20% 22%, rgba(245,247,255,.35), transparent),
+            radial-gradient(1px 1px at 92% 20%, rgba(245,247,255,.25), transparent),
+            radial-gradient(1.5px 1.5px at 30% 4%, rgba(245,247,255,.3), transparent),
+            radial-gradient(1px 1px at 55% 14%, rgba(245,247,255,.22), transparent),
+            #050508;
+        background-repeat: no-repeat;
+        padding: 70px 40px 90px;
+    }
+
+    .escena-mundo-grilla::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 260px;
+        background: linear-gradient(to bottom, #0d1024 0%, transparent 100%);
+        pointer-events: none;
+        z-index: 5;
+    }
+
+    .mundo-grilla-contenido {
+        position: relative;
+        z-index: 6; /* por encima de .escena-mundo-grilla::before (z-index 5) — 
+                       sin esto, ese degradé (pensado sólo para suavizar el 
+                       color de fondo) terminaba tapando y oscureciendo todo 
+                       el contenido real (guía, intro, primera fila) */
+        width: 100%;
+        max-width: 1300px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
 
    .mundo-intro-grilla {
        font-size: 1rem;
@@ -3470,35 +3496,40 @@
       ya está a la vista (con la primera alcanza para entender qué se está
       mirando). Al ser scroll normal ya no compite por espacio pinneado:
       basta con un simple fade. */
-   .mundo-guia {
-       max-width: 520px;
-       text-align: center;
-       background: rgba(8, 10, 16, 0.6);
-       border: 1px solid rgba(255, 255, 255, 0.08);
-       border-radius: var(--radio-tarjeta, 10px);
-       padding: 14px 22px;
-       opacity: 0;
-       transform: translateY(-10px);
-       transition: opacity 1.1s ease, transform 1.1s ease;
-   }
 
-   .mundo-guia.mundo-visible {
-       opacity: 1;
-       transform: translateY(0);
-   }
-
-   .mundo-guia h3 {
-       color: var(--acento);
-       font-size: 1rem;
-       margin-bottom: 4px;
-   }
-
-   .mundo-guia p {
-       color: #cbd5e1;
-       font-size: 0.85rem;
-       line-height: 1.5;
-   }
-
+    .mundo-guia {
+        max-width: 520px;
+        text-align: center;
+        background: rgba(8, 10, 16, 0.85); /* mismo criterio que .texto-luz/.ct-detalle, más opaco que el original 0.6 */
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        border-radius: var(--radio-tarjeta, 10px);
+        padding: 16px 24px;
+        box-shadow: 0 12px 34px rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 1.1s ease, transform 1.1s ease;
+    }
+    
+    .mundo-guia.mundo-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .mundo-guia h3 {
+        color: var(--acento);
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    
+    .mundo-guia p {
+        color: #cbd5e1;
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+   
    /* La grilla: cada fila es una frase (que ocupa todo el ancho, ver
       .mundo-narrativa-fila) seguida de sus 4 ciudades — sin wrappers
       extra: el "grid-column: 1 / -1" de la frase alcanza para forzar su
@@ -3569,21 +3600,56 @@
        transform: translateY(0) scale(1);
    }
 
-   .cargando-grafico {
-       position: absolute;
-       inset: 0;
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       color: #fffcf6;
-       font-family: 'Nunito', sans-serif;
-       font-size: 0.8rem;
-       text-align: center;
-       padding: 10px;
-       background: #0f172a;
-       z-index: 2;
-   }
+    /* Estado de reposo: antes no existía, por eso las celdas se mostraban de
+    una — ahora nacen ocultas y el JS las revela fila por fila al entrar en
+    pantalla (ver iniciarGrilla() en escena-mundo.js). */
+    .celda-grafico-mundo {
+        opacity: 0;
+        transform: translateY(40px) scale(0.97);
+        transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .celda-grafico-mundo.mundo-visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 
+    /* Sentinela invisible: un div de 1px que dispara el observer un poco ANTES
+    de que la fila real entre en pantalla, sin ocupar lugar visualmente. */
+    .mundo-fila-centinela {
+        grid-column: 1 / -1;
+        height: 1px;
+    }
+
+    .cargando-grafico {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: rgba(226, 232, 240, 0.7);
+        font-family: 'Nunito', sans-serif;
+        font-size: 0.78rem;
+        text-align: center;
+        padding: 10px;
+        background: #0f172a;
+        z-index: 2;
+    }
+    .cargando-grafico::before {
+        content: "";
+        width: 22px;
+        height: 22px;
+        border: 2px solid rgba(56, 189, 248, 0.25);
+        border-top-color: var(--acento, #38bdf8);
+        border-radius: 50%;
+        animation: cargando-spin 0.8s linear infinite;
+    }
+    @keyframes cargando-spin {
+        to { transform: rotate(360deg); }
+    }
+
+    
    .celda-grafico-mundo.grafico-listo .cargando-grafico {
        display: none;
    }
@@ -3651,22 +3717,49 @@
       que acá SÍ hace falta declarar la altura total a mano — tiene que
       coincidir con DURACION_SCRUB_VH en escena-cierre.js.
       ========================================================================== */
+    .escena-cierre-final {
+        position: relative;
+        width: 100%;
+        height: 1800vh; /* = DURACION_SCRUB_VH en escena-cierre.js */
+        /* Sin margin-top negativo ni visibility:hidden: a diferencia de
+           ruta/luz, esta escena viene después de la GRILLA, que es scroll
+           normal (no pinneada) — no hay "hueco muerto" que cerrar acá. Restarle
+           100vh hacía que el pin se activara 100vh antes de tiempo, tapando
+           la última fila de gráficos antes de que el usuario llegara a verla. */
+    }
+    .escena-cierre-final.cierre-en-escena {
+        visibility: visible;
+    }
+    
+    .pin-cierre {
+        position: sticky;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+        background-color: #000;
+    }
+    
+    /* Velo: tapa TODA la ilustración (casa, cielo, frases) hasta que la sección
+       ya quedó firme en su lugar arriba de todo — así la casa nunca aparece de
+       golpe, ni el texto "No importa el continente" arranca a mitad de un
+       corte crudo. Negro puro porque tanto el final de la grilla (#050508) como
+       el fondo del cierre (#000) ya son casi negros — el velo sólo evita el
+       instante exacto del salto. */
+    .cierre-velo {
+        position: absolute;
+        inset: 0;
+        background: #000;
+        opacity: 1;
+        transition: opacity 1.3s ease-out;
+        pointer-events: none;
+        z-index: 20;
+    }
+    .escena-cierre-final.cierre-revelado .cierre-velo {
+        opacity: 0;
+    }
    
-   .escena-cierre-final {
-       position: relative;
-       width: 100%;
-       height: 1800vh; /* = DURACION_SCRUB_VH en escena-cierre.js */
-   }
-   
-   .pin-cierre {
-       position: sticky;
-       top: 0;
-       left: 0;
-       width: 100%;
-       height: 100vh;
-       overflow: hidden;
-       background-color: #000;
-   }
    
    #svg-cierre {
        position: absolute;
@@ -3843,3 +3936,242 @@
            bottom: 6%;
        }
    }
+
+
+    .pin-orion-mundo.om-despedida .om-mapa-contenedor {
+    opacity: 0;
+    transform: scale(0.92);
+    }
+    .pin-orion-mundo.om-despedida .om-pie,
+    .pin-orion-mundo.om-despedida .om-invitacion {
+        opacity: 0 !important;
+        pointer-events: none;
+    }
+
+    .om-frase-final {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 12%;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 1.8s ease 0.6s; /* delay: arranca cuando el mapa ya casi terminó de irse */
+    }
+    .pin-orion-mundo.om-despedida .om-frase-final {
+        opacity: 1;
+    }
+    .om-frase-final p {
+        font-family: var(--font-heading, 'Nunito', sans-serif);
+        font-weight: 600;
+        font-size: 2rem;
+        line-height: 1.55;
+        color: #ffffff;
+        text-align: center;
+        letter-spacing: 0.01em;
+        text-shadow:
+            0 0 10px rgba(0, 0, 0, 0.9),
+            0 0 26px rgba(0, 0, 0, 0.8),
+            0 4px 18px rgba(0, 0, 0, 0.75);
+    }
+    @media (max-width: 760px) {
+        .om-frase-final p { font-size: 1.4rem; }
+    }
+
+    .om-disparador-final {
+        height: 60vh;
+    }
+
+    /* ==========================================================================
+   CRÉDITOS
+   Escena de cierre "administrativa": scroll normal, sin pin. El fondo con
+   estrellas se arma con radial-gradients (mismo truco que .escena-mundo-
+   grilla, ver arriba), así no hace falta JS sólo para esto. Cada bloque
+   nace apagado y se enciende con un fade simple al entrar en pantalla (ver
+   escena-creditos.js) — deliberadamente más calmo que el resto del sitio,
+   nada se mueve solo.
+   ========================================================================== */
+
+   .escena-creditos {
+        position: relative;
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 140px 24px;
+        overflow: hidden;
+        background: linear-gradient(180deg, #0c1020 0%, #080a18 40%, #020208 100%);
+
+        /* SOLAPE: mismo truco que .escena-scroll-ruta / .escena-luz-lumínica —
+        sube la sección 100vh para que, cuando el sticky del cierre se
+        suelta, créditos ya esté ahí mismo esperando, en vez de arrancar de
+        cero un tramo más abajo. Se mantiene oculta (visibility) hasta que
+        casi terminó de "acoplarse", para no taparle el mensaje final de la
+        escena de cierre mientras el usuario todavía lo está leyendo. */
+        margin-top: -100vh;
+        visibility: hidden;
+    }
+    .escena-creditos.creditos-en-escena {
+        visibility: visible;
+    }
+
+    /* Velo: continuación directa del negro casi puro con el que termina la
+    escena de cierre. Arranca opaco tapando TODO créditos (fondo, estrellas y
+    texto incluidos) — así nunca se ve un corte crudo — y se disuelve recién
+    cuando la sección ya quedó firme en su lugar, revelando el cielo de
+    créditos ahí mismo. */
+    .creditos-velo {
+        position: absolute;
+        inset: 0;
+        background: #020208;
+        opacity: 1;
+        transition: opacity 1.4s ease-out;
+        pointer-events: none;
+        z-index: 5;
+    }
+    .escena-creditos.creditos-revelado .creditos-velo {
+        opacity: 0;
+    }
+
+    /* Vía Láctea: misma banda diagonal difusa que capa-via-lactea-cierre,
+    recreada acá en CSS puro (no depende del interruptor de la escena
+    anterior, así siempre se ve igual sin importar cómo la haya dejado el
+    usuario). Un solo elemento rotado, no estrellas sueltas — es sólo la
+    nube de fondo, discreta. */
+    .escena-creditos::after {
+        content: "";
+        position: absolute;
+        top: 8%;
+        left: -10%;
+        width: 130%;
+        height: 220px;
+        background: radial-gradient(ellipse 100% 100% at 50% 50%, rgba(207, 217, 255, 0.07), transparent 70%);
+        transform: rotate(-18deg);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    /* Estrellas: mismo color y rango de opacidad que .estrella real del sitio
+    (#f5f7ff, 0.4–1), con más densidad y tamaños mezclados para que se lea
+    como cielo real y no como puntitos sueltos parejos. */
+    .escena-creditos::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-image:
+            radial-gradient(1.6px 1.6px at 8% 12%, #f5f7ff 60%, transparent),
+            radial-gradient(1.2px 1.2px at 18% 28%, #f5f7ff 60%, transparent),
+            radial-gradient(2px 2px at 30% 8%, #f5f7ff 60%, transparent),
+            radial-gradient(1.3px 1.3px at 42% 35%, #f5f7ff 60%, transparent),
+            radial-gradient(1.6px 1.6px at 55% 15%, #f5f7ff 60%, transparent),
+            radial-gradient(1.1px 1.1px at 68% 30%, #f5f7ff 60%, transparent),
+            radial-gradient(2px 2px at 78% 10%, #f5f7ff 60%, transparent),
+            radial-gradient(1.4px 1.4px at 90% 25%, #f5f7ff 60%, transparent),
+            radial-gradient(1.6px 1.6px at 5% 55%, #f5f7ff 60%, transparent),
+            radial-gradient(1.2px 1.2px at 22% 70%, #f5f7ff 60%, transparent),
+            radial-gradient(2px 2px at 35% 60%, #f5f7ff 60%, transparent),
+            radial-gradient(1.3px 1.3px at 48% 80%, #f5f7ff 60%, transparent),
+            radial-gradient(1.6px 1.6px at 62% 65%, #f5f7ff 60%, transparent),
+            radial-gradient(1.1px 1.1px at 75% 85%, #f5f7ff 60%, transparent),
+            radial-gradient(2px 2px at 88% 60%, #f5f7ff 60%, transparent),
+            radial-gradient(1.4px 1.4px at 96% 78%, #f5f7ff 60%, transparent),
+            radial-gradient(1.6px 1.6px at 12% 92%, #f5f7ff 60%, transparent),
+            radial-gradient(1.2px 1.2px at 40% 95%, #f5f7ff 60%, transparent),
+            radial-gradient(1.8px 1.8px at 65% 95%, #f5f7ff 60%, transparent),
+            radial-gradient(1.3px 1.3px at 85% 92%, #f5f7ff 60%, transparent);
+        opacity: 0.9;
+    }
+
+    .creditos-contenido {
+        position: relative;
+        z-index: 1; /* por encima de ::before (estrellas) y ::after (vía láctea) */
+        width: 100%;
+        max-width: 640px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 56px;
+        text-align: center;
+    }
+
+    .creditos-bloque {
+        opacity: 0;
+        transform: translateY(18px);
+        transition: opacity 1s ease, transform 1s ease;
+    }
+    .creditos-bloque.creditos-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .creditos-titulo {
+        font-family: var(--font-heading, 'Quicksand', sans-serif);
+        font-size: 2rem;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .creditos-subtitulo {
+        margin-top: 8px;
+        font-size: 1rem;
+        color: #94a3b8;
+    }
+
+    .creditos-institucional {
+        font-size: 0.9rem;
+        line-height: 1.6;
+        color: #94a3b8;
+    }
+
+    .creditos-kicker {
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--acento, #38bdf8);
+        margin-bottom: 14px;
+    }
+
+    .creditos-autoras {
+        font-size: 1.15rem;
+        color: #f8fafc;
+    }
+
+    .creditos-fuentes {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .creditos-fuentes a {
+        font-size: 0.92rem;
+        color: #cbd5e1;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+        padding-bottom: 1px;
+        transition: color 0.3s ease, border-color 0.3s ease;
+    }
+    .creditos-fuentes a:hover,
+    .creditos-fuentes a:focus-visible {
+        color: var(--acento, #38bdf8);
+        border-color: var(--acento, #38bdf8);
+    }
+
+    .creditos-cierre p {
+        font-family: var(--font-heading, 'Quicksand', sans-serif);
+        font-style: italic;
+        font-size: 1.1rem;
+        color: #e2e8f0;
+    }
+
+    @media (max-width: 600px) {
+        .creditos-contenido { gap: 42px; }
+        .creditos-titulo { font-size: 1.5rem; }
+        .creditos-autoras { font-size: 1rem; }
+    }

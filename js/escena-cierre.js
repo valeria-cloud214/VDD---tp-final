@@ -28,7 +28,42 @@
    no maneja la vieja conclusión de la grilla) e index.html/styles.css.
    ========================================================================== */
 
+
+
 document.addEventListener("DOMContentLoaded", () => {
+    // ======================================================================
+    // SOLAPE Y VELO — mismo mecanismo que .ruta-en-escena/.ruta-revelada en
+    // escena-ruta.js y .creditos-en-escena/.creditos-revelado en
+    // escena-creditos.js: dos umbrales, dos propósitos.
+    //   - cierre-en-escena (rect.top<=30, más laxo): hace visible la
+    //     sección recién cuando ya está a punto de acoplarse arriba de
+    //     todo, para que no se le vea asomar sobre los últimos gráficos.
+    //   - cierre-revelado (rect.top<=4, más ajustado): recién ahí se
+    //     disuelve el velo negro, revelando la ilustración en el mismo
+    //     lugar.
+    // ======================================================================
+    (function velarEntrada() {
+        const seccion = document.getElementById("escena-cierre");
+        if (!seccion) return;
+
+        function actualizar() {
+            const rect = seccion.getBoundingClientRect();
+            seccion.classList.toggle("cierre-en-escena", rect.top <= 30);
+            seccion.classList.toggle("cierre-revelado", rect.top <= 4);
+        }
+
+        window.addEventListener("scroll", actualizar, { passive: true });
+        window.addEventListener("resize", actualizar);
+        actualizar();
+    })();
+
+    if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
+        console.warn("GSAP/ScrollTrigger no están disponibles: la escena de cierre no se inicializa.");
+        return;
+    }
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ... el resto del archivo sigue exactamente igual
 
     if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
         console.warn("GSAP/ScrollTrigger no están disponibles: la escena de cierre no se inicializa.");

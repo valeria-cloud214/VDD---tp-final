@@ -159,18 +159,63 @@ document.addEventListener("DOMContentLoaded", () => {
         // Guía: mostrarla de entrada ya que no hay captions para observar
         if (guia) guia.classList.add("mundo-visible");
 
-        // Mostrar todas las celdas y cargar gráficos
-        filasDOM.forEach((fila) => {
-            fila.celdas.forEach(c => c.classList.add("mundo-visible"));
+        // Revelado progresivo: cada fila (frase + sus 4 celdas) nace oculta
+        // y se enciende recién cuando entra en pantalla — con un pequeño
+        // desfasaje entre celdas para que se sienta una cascada, no un
+        // bloque entero apareciendo de golpe. Se dispara desde un centinela
+        // propio (en vez de observar la fila real) para poder adelantar el
+        // momento en el que arranca la animación.
+        // Revelado + carga fila por fila: sólo se piden los 4 iframes de Flourish
+        // de la fila que está por entrar en pantalla, en vez de los 16 juntos. Esto
+        // no es sólo estético — reduce la carga de red real, que era la causa
+        // principal de la lentitud (16 iframes simultáneos compitiendo por ancho
+        // de banda).
+        const observadorFilas = new IntersectionObserver((entradas) => {
+            entradas.forEach(entrada => {
+                if (!entrada.isIntersecting) return;
+                const i = Number(entrada.target.dataset.filaIndex);
+                const fila = filasDOM[i];
+                if (!fila || fila.revelada) return;
+                fila.revelada = true;
+
+                if (fila.caption) fila.caption.classList.add("mundo-visible");
+
+                fila.celdas.forEach((c, idx) => {
+                    setTimeout(() => {
+                        c.classList.add("mundo-visible");
+                        cargarCelda(c);
+
+                        // Red de seguridad: si el evento "load" del iframe nunca
+                        // dispara (bloqueadores, red lenta, iframe de terceros que
+                        // no siempre lo emite bien), forzamos "listo" a los 6s para
+                        // que el cartel de carga no quede pegado para siempre.
+                        setTimeout(() => c.classList.add("grafico-listo"), 6000);
+                    }, idx * 150);
+                });
+            });
+        }, { root: null, rootMargin: "-10% 0px -15% 0px", threshold: 0 });
+
+        filasDOM.forEach((fila, i) => {
+            fila.celdas[0].dataset.filaIndex = i;
+            observadorFilas.observe(fila.celdas[0]);
         });
 
-        // Cargar Flourish con retraso para asegurar que el script ya está listo
-        setTimeout(() => {
-            filasDOM.forEach((fila) => {
-                fila.celdas.forEach(cargarCelda);
-            });
-        }, 800);
+        // Ocultar "Cargando gráfico" en cuanto el iframe real termine de cargar
+        // (la red de seguridad de arriba es el respaldo si esto no dispara).
+        document.querySelectorAll(".celda-grafico-mundo").forEach(celda => {
+            const checkIframe = setInterval(() => {
+                const iframe = celda.querySelector("iframe");
+                if (iframe) {
+                    clearInterval(checkIframe);
+                    iframe.addEventListener("load", () => celda.classList.add("grafico-listo"));
+                    if (iframe.contentDocument && iframe.contentDocument.readyState === "complete") {
+                        celda.classList.add("grafico-listo");
+                    }
+                }
+            }, 200);
+        });
 
+        
         // Ocultar "Cargando gráfico" cuando el iframe termina de cargar
         document.querySelectorAll(".celda-grafico-mundo").forEach(celda => {
             const checkIframe = setInterval(() => {

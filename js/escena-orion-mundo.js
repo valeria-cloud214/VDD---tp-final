@@ -358,6 +358,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         actualizarBloquePensamiento(paso);
+
+        pin.classList.toggle("om-despedida", paso >= 15);
+        if (paso >= 15 && ciudadAbierta) cerrarPanel();
     }
 
     const observador = new IntersectionObserver((entradas) => {

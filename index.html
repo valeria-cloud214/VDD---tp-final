@@ -1313,6 +1313,10 @@
                 <span>Tocá cualquier ciudad para ver su cielo.</span>
             </div>
 
+            <div class="om-frase-final" id="om-frase-final">
+                <p>Esto fue lo que encontré.</p>
+            </div>
+
         </div>
 
         <!-- 14 tramos: 1-6 el pensamiento de la abuela (más cortos —
@@ -1335,6 +1339,11 @@
         <div class="om-disparador" data-paso-om="12"></div>
         <div class="om-disparador" data-paso-om="13"></div>
         <div class="om-disparador" data-paso-om="14"></div>
+        <div class="om-disparador om-disparador-final" data-paso-om="15"></div>
+
+        
+
+
 
     </section>
 
@@ -1372,6 +1381,7 @@
         ============================================= -->
     <section id="escena-cierre" class="escena-cierre-final zona-cuento">
 
+        <div class="cierre-velo" id="cierre-velo"></div>
         <div class="pin-cierre" id="pin-cierre">
 
             <svg id="svg-cierre" viewBox="0 0 1400 1600" preserveAspectRatio="none" aria-hidden="true">
@@ -1482,6 +1492,76 @@
 
     </section>
 
+    <!-- =============================================
+        CRÉDITOS
+        Escena aparte, en scroll normal (sin pin ni GSAP): a propósito más
+        simple que el resto del sitio — acá ya terminó la historia, esto es
+        la información "administrativa" (autoras, fuentes), no otro beat
+        narrativo. Mismo lenguaje visual (fondo oscuro + estrellitas via
+        CSS, sin necesitar JS para generarlas) para que no se sienta como
+        una página aparte, pero deliberadamente más calma: nada se mueve
+        solo, todo aparece con un fade simple al hacer scroll.
+        ============================================= -->
+    <section id="escena-creditos" class="escena-creditos">
+        <div class="creditos-velo" id="creditos-velo"></div>
+        <div class="creditos-contenido">
+
+            <div class="creditos-bloque" data-creditos-bloque>
+                <h2 class="creditos-titulo">Las constelaciones de mi infancia</h2>
+                <p class="creditos-subtitulo">Un proyecto de visualización de datos</p>
+            </div>
+
+            <!-- Descomentar y completar si la cátedra pide mencionar la
+                    materia/institución — no es un dato que podamos decidir
+                    nosotros, así que queda afuera por defecto.
+            <div class="creditos-bloque" data-creditos-bloque>
+                <p class="creditos-institucional">Trabajo final — [Nombre de la materia]<br>[Institución], 2025</p>
+            </div>
+            -->
+
+            <div class="creditos-bloque" data-creditos-bloque>
+                <h3 class="creditos-kicker">Realizado por</h3>
+                <p class="creditos-autoras">Ariana Blanco · Candela Guinzburg · Valeria Pessolano</p>
+            </div>
+
+            <div class="creditos-bloque" data-creditos-bloque>
+                <h3 class="creditos-kicker">Fuentes</h3>
+                <ul class="creditos-fuentes">
+                    <li>
+                        <a href="https://lightpollutionmap.app/es/?lat=1.778363&lng=9.843750&zoom=3&opacity=50" target="_blank" rel="noopener noreferrer">
+                            Light Pollution Map — mapa mundial de contaminación lumínica
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://lightpollutionmap.app/es/?lat=-34.613100&lng=-58.377200&zoom=2" target="_blank" rel="noopener noreferrer">
+                            Light Pollution Map — Buenos Aires
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://app.globeatnight.org/map" target="_blank" rel="noopener noreferrer">
+                            Globe at Night — mapa de observaciones ciudadanas
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://globeatnight.org/gan-mn/" target="_blank" rel="noopener noreferrer">
+                            Globe at Night — magnitud límite y guía de medición
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.britannica.com/topic/Mount-Wilson-Observatory" target="_blank" rel="noopener noreferrer">
+                            Encyclopaedia Britannica — Mount Wilson Observatory
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="creditos-bloque creditos-cierre" data-creditos-bloque>
+                <p>Gracias por acompañar a Jorge en este viaje.</p>
+            </div>
+
+        </div>
+    </section>
+
     </main>
 
     <script src="https://d3js.org/d3.v6.js"></script>
@@ -1510,5 +1590,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="js/escena-luz.js"></script>
     <script src="js/escena-cierre.js"></script>
+    <script src="js/escena-creditos.js"></script>
 </body>
 </html>
