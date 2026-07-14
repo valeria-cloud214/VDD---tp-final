@@ -247,9 +247,7 @@
    /* Cada beat (párrafo de Jorge, frase de la ráfaga o texto del corte)
       ocupa TODO el recuadro fijo de arriba (inset: 0, no sólo se apoya
       abajo) y sólo se ve el que tiene .activo — si aparece uno, el
-      anterior se apaga siempre, nunca quedan dos superpuestos. Sin tarjeta
-      de fondo: el texto flota directo sobre la foto (el text-shadow de
-      abajo es lo que lo mantiene legible sin el cuadro oscuro). */
+      anterior se apaga siempre, nunca quedan dos superpuestos. */
    .beat-flotante {
        position: absolute;
        inset: 0;
@@ -264,6 +262,14 @@
        transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
        pointer-events: none;
        padding: 24px 38px;
+       /* Fondo fijo (mismo rectángulo, mismo tono, en los 3 capítulos de la
+          escena) para que el texto no dependa sólo del text-shadow sobre
+          fotos que cambian de claridad — sin llegar a tarjeta opaca como
+          .tarjeta-texto, para que la foto de fondo se siga viendo. */
+       background: rgba(6, 8, 14, 0.5);
+       -webkit-backdrop-filter: blur(6px);
+       backdrop-filter: blur(6px);
+       border-radius: var(--radio-tarjeta, 16px);
    }
 
    .beat-flotante.activo {
@@ -3909,7 +3915,7 @@
 
    .mensaje-final-grande {
        font-family: var(--font-heading, 'Quicksand', sans-serif);
-       font-size: 1.6rem;
+       font-size: 2.1rem;
        line-height: 1.6;
        margin-bottom: 16px;
    }
@@ -4001,7 +4007,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 140px 24px;
+        /* Sin padding inferior a propósito: esta es la última sección de la
+        página, así que su altura total (padding + contenido) es lo que
+        determina el scroll máximo. Con padding simétrico, el alto podía
+        superar 100vh y, al no haber nada debajo para seguir scrolleando, el
+        título quedaba empujado fuera de vista arriba antes de poder ver el
+        cierre ("Gracias...") abajo — la pantalla nunca se veía completa. */
+        padding: 64px 24px 0;
         overflow: hidden;
         background: linear-gradient(180deg, #0c1020 0%, #080a18 40%, #020208 100%);
 

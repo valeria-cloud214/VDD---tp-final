@@ -372,14 +372,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // --- FASE 1: 5 frases cortas, directamente sobre la ilustración ----
         // (la casa ya está visible desde que arranca la escena: no hay
-        // ningún velo negro de por medio). Cada frase termina de
-        // desvanecerse ANTES de que arranque la siguiente, con margen.
+        // ningún velo negro de por medio).
+        // Las primeras 3 ("No importa el continente/idioma/cultura") ya NO
+        // se tapan entre sí: cada una que entra empuja a las anteriores
+        // hacia arriba (misma altura medida en runtime, así se ajusta solo
+        // si cambia el font-size — ver la media query de .frase-cierre p),
+        // así que al terminar la secuencia se leen las tres juntas en
+        // pantalla, en vez de perderse una a la otra. Recién cuando arranca
+        // "crece" se desvanecen las tres juntas. El resto de la fase sigue
+        // igual que antes: fade-in, fade-out, una por vez.
+        const ALTURA_FRASE_APILADA = (frases.continente ? frases.continente.offsetHeight : 60) + 10;
+
         tl.to(frases.continente, { opacity: 1, duration: 0.7 }, 0)
-          .to(frases.continente, { opacity: 0, duration: 0.7 }, 1.6)
+          .to(frases.continente, { y: -ALTURA_FRASE_APILADA, duration: 0.6 }, 2.6)
           .to(frases.idioma, { opacity: 1, duration: 0.7 }, 2.6)
-          .to(frases.idioma, { opacity: 0, duration: 0.7 }, 4.2)
+          .to(frases.continente, { y: -ALTURA_FRASE_APILADA * 2, duration: 0.6 }, 5.2)
+          .to(frases.idioma, { y: -ALTURA_FRASE_APILADA, duration: 0.6 }, 5.2)
           .to(frases.cultura, { opacity: 1, duration: 0.7 }, 5.2)
-          .to(frases.cultura, { opacity: 0, duration: 0.7 }, 6.8)
+          .to([frases.continente, frases.idioma, frases.cultura], { opacity: 0, duration: 0.7 }, 6.8)
           .to(frases.crece, { opacity: 1, duration: 0.7 }, 8.0)
           .to(frases.crece, { opacity: 0, duration: 0.7 }, 9.6) // pausa breve antes de la conclusión
           .to(frases.desaparece, { opacity: 1, duration: 0.8 }, 11.0)
@@ -452,7 +462,15 @@ document.addEventListener("DOMContentLoaded", () => {
               // función, y dejarlo visible/clickeable invita a tocarlo de
               // nuevo y "deshacer" el momento que se acaba de revelar.
               .to(panel, { opacity: 0, duration: 0.6, pointerEvents: "none" }, 2.3)
-              .call(() => programarMensajeFinal(), null, "+=0.6");
+              // El mensaje final arranca apenas termina de aparecer el resto
+              // de las estrellas (el tween de arriba en 1.15s+1.5s de
+              // duración) — posición absoluta en vez de "+=" relativo a la
+              // tween anterior, para que no dependa de cuánto dura el resto
+              // de la secuencia (vía láctea, panel). Antes arrancaba recién
+              // ~0.85s después de eso: suficiente demora como para que el
+              // usuario, sin ninguna señal de que algo más iba a pasar,
+              // siguiera scrolleando y se lo perdiera por completo.
+              .call(() => programarMensajeFinal(), null, 2.7);
         }
 
         function prenderLuces() {
