@@ -33,21 +33,23 @@ document.addEventListener("DOMContentLoaded", () => {
                                     // versión de escena-cielos.js
 
     // Mismos nombres, offsets y colores que ESTRELLAS_ORION en
-    // js/escena-cielos.js — sólo cambia dónde queda el centro.
+    // js/escena-cielos.js — sólo cambia dónde queda el centro. Orientación
+    // hemisferio sur: Rigel arriba-izquierda, Betelgeuse abajo-derecha,
+    // cinturón diagonal de abajo-izquierda a arriba-derecha.
     const ESTRELLAS_ORION = [
-        { dx: -88, y: 460 + DESPLAZAMIENTO_Y, r: 6, color: "#cfe3ff" },   // Rigel
-        { dx: -70, y: 295 + DESPLAZAMIENTO_Y, r: 5.4, color: "#ffb37a" }, // Betelgeuse
-        { dx: 80, y: 280 + DESPLAZAMIENTO_Y, r: 4, color: "#eaf1ff" },    // Bellatrix
-        { dx: 0, y: 366 + DESPLAZAMIENTO_Y, r: 3.6, color: "#ffffff" },   // Alnilam
-        { dx: 36, y: 374 + DESPLAZAMIENTO_Y, r: 3.5, color: "#ffffff" },  // Alnitak
-        { dx: 88, y: 462 + DESPLAZAMIENTO_Y, r: 4.2, color: "#cfe3ff" },  // Saiph
-        { dx: -32, y: 358 + DESPLAZAMIENTO_Y, r: 3.4, color: "#ffffff" }  // Mintaka
+        { dx: -88, y: 282 + DESPLAZAMIENTO_Y, r: 6, color: "#cfe3ff" },   // Rigel
+        { dx: 70, y: 447 + DESPLAZAMIENTO_Y, r: 5.4, color: "#ffb37a" }, // Betelgeuse
+        { dx: -80, y: 462 + DESPLAZAMIENTO_Y, r: 4, color: "#eaf1ff" },    // Bellatrix
+        { dx: 0, y: 376 + DESPLAZAMIENTO_Y, r: 3.6, color: "#ffffff" },   // Alnilam
+        { dx: 36, y: 368 + DESPLAZAMIENTO_Y, r: 3.5, color: "#ffffff" },  // Alnitak
+        { dx: 88, y: 280 + DESPLAZAMIENTO_Y, r: 4.2, color: "#cfe3ff" },  // Saiph
+        { dx: -32, y: 384 + DESPLAZAMIENTO_Y, r: 3.4, color: "#ffffff" }  // Mintaka
     ];
 
     // Pares por índice sobre ESTRELLAS_ORION (mismo trazado que en
-    // escena-cielos.js): Betelgeuse-Mintaka, Bellatrix-Alnitak,
-    // Mintaka-Alnilam, Alnilam-Alnitak, Mintaka-Rigel, Alnitak-Saiph.
-    const LINEAS_ORION = [[1, 6], [2, 4], [6, 3], [3, 4], [6, 0], [4, 5]];
+    // escena-cielos.js), sin cruces: Rigel-Mintaka, Bellatrix-Mintaka,
+    // Mintaka-Alnilam, Alnilam-Alnitak, Alnitak-Saiph, Alnitak-Betelgeuse.
+    const LINEAS_ORION = [[0, 6], [2, 6], [6, 3], [3, 4], [4, 5], [4, 1]];
 
     const punto = (i) => [CENTRO_ORION_X + ESTRELLAS_ORION[i].dx, ESTRELLAS_ORION[i].y];
 

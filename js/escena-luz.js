@@ -33,6 +33,37 @@ document.addEventListener("DOMContentLoaded", () => {
     const svg = document.getElementById("svg-luz");
     if (!svg) return; // La escena no está en esta página.
 
+    // ======================================================================
+    // 0. SOLAPE Y VELO — misma técnica que .ruta-en-escena/.ruta-revelada
+    //    en js/escena-ruta.js, aplicada acá entre la escena de la farola y
+    //    esta.
+    // ======================================================================
+    // Esta escena está subida 100vh (ver .escena-luz-lumínica en styles.css)
+    // para que su sticky quede pinneado EXACTAMENTE en el mismo instante en
+    // que se suelta el de la escena de la farola — sin scroll muerto de por
+    // medio. Dos umbrales, dos propósitos:
+    //   - luz-en-escena (rect.top<=30, más laxo): hace visible la escena
+    //     recién cuando ya está a punto de pinnearse, para que no se le vea
+    //     asomar una franja de color por abajo durante el encandilamiento.
+    //   - luz-revelada (rect.top<=4, más ajustado): recién ahí se disuelve
+    //     el velo cálido (.luz-destello), así el blanco/cálido de la escena
+    //     anterior nunca se corta y la ciudad aparece en el mismo lugar.
+    (function velarEntrada() {
+        const seccion = document.getElementById("escena-luz");
+        const pin = document.querySelector(".pin-luz");
+        if (!seccion || !pin) return;
+
+        function actualizar() {
+            const rect = seccion.getBoundingClientRect();
+            seccion.classList.toggle("luz-en-escena", rect.top <= 30);
+            pin.classList.toggle("luz-revelada", rect.top <= 4);
+        }
+
+        window.addEventListener("scroll", actualizar, { passive: true });
+        window.addEventListener("resize", actualizar);
+        actualizar();
+    })();
+
     const NS = "http://www.w3.org/2000/svg";
 
     /** Crea un elemento SVG con atributos, sin depender de innerHTML. */
@@ -72,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // 0-1600): así, cuando el paso 7 achica la cámara para mostrar todo
         // el recorrido de una vez, el cielo sigue lleno de estrellas en vez
         // de dejar bordes vacíos a los costados de una ciudad "flotando".
-        estrellas: { cantidad: 550, xMin: -3200, xMax: 5000, yMin: -3150, yMax: -420 },
+        estrellas: { cantidad: 780, xMin: -3200, xMax: 5000, yMin: -3150, yMax: -420 },
         atmosfera: { yTope: -400, yBase: 260 },
         espacioTopeY: -3200,       // borde superior del campo de estrellas
         // Traslación/escala de la cámara (#mundo) por paso narrativo.
@@ -359,7 +390,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Ventanas y faroles: cuantos más "encendidos" cuanto mayor el nivel,
         // pero cada uno prende en un umbral distinto (su "seed") para que el
         // apagado/encendido se vea orgánico y no sincronizado.
-        const ratioEncendido = 0.16 + t * 0.8; // 16% → 96% de elementos encendidos
+        const ratioEncendido = 0.16 + t * 0.83; // 16% → 99% de elementos encendidos
         document.querySelectorAll("#capa-ventanas .ventana").forEach(v => {
             const seed = parseFloat(v.getAttribute("data-seed"));
             v.style.opacity = seed < ratioEncendido ? 0.95 : 0.06;
@@ -373,11 +404,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const ratioRayos = 0.25 + t * 0.75;
         rayos.forEach(r => {
             const seed = parseFloat(r.el.getAttribute("data-seed"));
-            r.el.style.opacity = seed < ratioRayos ? 0.18 + t * 0.4 : 0;
+            r.el.style.opacity = seed < ratioRayos ? 0.18 + t * 0.46 : 0;
         });
 
         // Resplandor de contaminación: el halo cálido que sube desde la ciudad.
-        capaResplandor.style.opacity = (t * 0.85).toFixed(3);
+        // Techo más alto que antes (0.85 → 0.97): con el nivel al máximo, la
+        // saturación cálida se siente más intensa, más "quemada".
+        capaResplandor.style.opacity = (t * 0.97).toFixed(3);
 
         // Cúpula de skyglow: la niebla azul-grisácea que representa la luz ya
         // dispersada en la atmósfera (ver capa-domo-luminico-forma en el SVG).
@@ -392,8 +425,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 capaDomoLuminico.style.display = "none";
             } else {
                 capaDomoLuminico.style.display = "";
-                capaDomoLuminico.style.opacity = (t * 0.9).toFixed(3);
-                capaDomoLuminico.setAttribute("ry", (40 + t * 430).toFixed(1));
+                // Techo de opacidad más alto (0.9 → 1) y un domo algo más
+                // grande en el extremo saturado (430 → 460), para que el
+                // nivel máximo se sienta claramente más saturado que antes.
+                capaDomoLuminico.style.opacity = (t * 1).toFixed(3);
+                capaDomoLuminico.setAttribute("ry", (40 + t * 460).toFixed(1));
                 if (blurDomoLuminico) blurDomoLuminico.setAttribute("stdDeviation", (10 + t * 50).toFixed(1));
             }
         }
@@ -414,7 +450,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // casi todas se pierden contra el resplandor (pero nunca al 0 exacto).
     let revealEstrellas = 0;
     function aplicarOpacidadEstrellas(t) {
-        const factorContaminacion = 1 - t * 0.9; // mínimo 0.10
+        // Piso más bajo que antes (0.10 → 0.06): con la luz al máximo, el
+        // cielo queda todavía más lavado, reforzando el contraste contra el
+        // extremo sin contaminación (donde ya se ven las 780 estrellas).
+        const factorContaminacion = 1 - t * 0.94; // mínimo 0.06
         gsap.set(capaEstrellas, { opacity: revealEstrellas * factorContaminacion });
     }
 

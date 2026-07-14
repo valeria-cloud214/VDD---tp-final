@@ -95,16 +95,18 @@ document.addEventListener("DOMContentLoaded", () => {
     // Orión en coordenadas normalizadas (centro 0,0; radio ~1): se reescala
     // al radio de cada círculo, así la misma constelación entra igual en el
     // punto chico de la línea de tiempo y en el círculo grande.
+    // Orientación hemisferio sur: Rigel arriba-izquierda, Betelgeuse
+    // abajo-derecha, cinturón diagonal de abajo-izquierda a arriba-derecha.
     const ORION_NORM = [
-        { dx: -0.44, dy: 0.47, r: 1.5 },  // Rigel
-        { dx: -0.35, dy: -0.35, r: 1.35 },// Betelgeuse
-        { dx: 0.40, dy: -0.43, r: 1 },    // Bellatrix
-        { dx: 0.00, dy: -0.02, r: 0.9 },  // Alnilam
-        { dx: 0.18, dy: 0.02, r: 0.9 },   // Alnitak
-        { dx: 0.44, dy: 0.48, r: 1.05 },  // Saiph
-        { dx: -0.16, dy: -0.07, r: 0.85 } // Mintaka
+        { dx: -0.44, dy: -0.47, r: 1.5 }, // Rigel
+        { dx: 0.35, dy: 0.35, r: 1.35 },  // Betelgeuse
+        { dx: -0.40, dy: 0.43, r: 1 },    // Bellatrix
+        { dx: 0.00, dy: 0.02, r: 0.9 },   // Alnilam
+        { dx: 0.18, dy: -0.02, r: 0.9 },  // Alnitak
+        { dx: 0.44, dy: -0.48, r: 1.05 }, // Saiph
+        { dx: -0.16, dy: 0.07, r: 0.85 }  // Mintaka
     ];
-    const ORION_LINEAS = [[1, 6], [2, 4], [6, 3], [3, 4], [6, 0], [4, 5]];
+    const ORION_LINEAS = [[0, 6], [2, 6], [6, 3], [3, 4], [4, 5], [4, 1]];
 
     // Dónde y qué tan grande va Orión, en fracción del radio del círculo que
     // la contiene — así vale igual para el punto chico y para el expandido.

@@ -360,27 +360,39 @@ document.addEventListener("DOMContentLoaded", () => {
     // estira con el ancho de pantalla, como una constelación real); lo único
     // que cambia es dónde queda su centro, que siempre se recalcula al medio
     // exacto del ancho disponible (CENTRO_ORION).
+    //
+    // Orientación: vista desde el hemisferio sur (Buenos Aires, Firmat,
+    // Junín), mirando al norte — Orión se ve dada vuelta respecto de la
+    // "postal" clásica de los atlas del hemisferio norte. Rigel (azulada)
+    // arriba a la izquierda, como la punta de la figura; Betelgeuse (roja)
+    // abajo a la derecha, como su base; el Cinturón (Tres Marías) cruza el
+    // centro en diagonal, de abajo a la izquierda hacia arriba a la derecha.
     const CENTRO_ORION = ANCHO_MUNDO / 2;
     const ESTRELLAS_ORION = [
-        { nombre: "Rigel", x: CENTRO_ORION - 88, y: 460, r: 6, color: "#cfe3ff", mag: 0.13, dato: "La estrella más brillante de Orión, unas 120.000 veces más luminosa que el Sol." },
-        { nombre: "Betelgeuse", x: CENTRO_ORION - 70, y: 295, r: 5.4, color: "#ffb37a", mag: 0.42, dato: "Una supergigante roja: cuando termine su vida va a explotar como supernova." },
-        { nombre: "Bellatrix", x: CENTRO_ORION + 80, y: 280, r: 4, color: "#eaf1ff", mag: 1.64, dato: "El hombro izquierdo del cazador, según la mitología griega." },
-        { nombre: "Alnilam", x: CENTRO_ORION, y: 366, r: 3.6, color: "#ffffff", mag: 1.69, dato: "La estrella central del cinturón, aunque en realidad es la más lejana de las tres." },
-        { nombre: "Alnitak", x: CENTRO_ORION + 36, y: 374, r: 3.5, color: "#ffffff", mag: 1.88, dato: "Cierra el Cinturón de Orión, justo al lado de la Nebulosa de la Llama." },
-        { nombre: "Saiph", x: CENTRO_ORION + 88, y: 462, r: 4.2, color: "#cfe3ff", mag: 2.09, dato: "El otro pie del cazador: casi tan caliente como Rigel, pero mucho más lejos." },
-        { nombre: "Mintaka", x: CENTRO_ORION - 32, y: 358, r: 3.4, color: "#ffffff", mag: 2.25, dato: "La primera de las tres estrellas del Cinturón de Orión." }
+        { nombre: "Rigel", x: CENTRO_ORION - 88, y: 282, r: 6, color: "#cfe3ff", mag: 0.13, dato: "La estrella más brillante de Orión, unas 120.000 veces más luminosa que el Sol." },
+        { nombre: "Betelgeuse", x: CENTRO_ORION + 70, y: 447, r: 5.4, color: "#ffb37a", mag: 0.42, dato: "Una supergigante roja: cuando termine su vida va a explotar como supernova." },
+        { nombre: "Bellatrix", x: CENTRO_ORION - 80, y: 462, r: 4, color: "#eaf1ff", mag: 1.64, dato: "El hombro izquierdo del cazador, según la mitología griega." },
+        { nombre: "Alnilam", x: CENTRO_ORION, y: 376, r: 3.6, color: "#ffffff", mag: 1.69, dato: "La estrella central del cinturón, aunque en realidad es la más lejana de las tres." },
+        { nombre: "Alnitak", x: CENTRO_ORION + 36, y: 368, r: 3.5, color: "#ffffff", mag: 1.88, dato: "Cierra el Cinturón de Orión, justo al lado de la Nebulosa de la Llama." },
+        { nombre: "Saiph", x: CENTRO_ORION + 88, y: 280, r: 4.2, color: "#cfe3ff", mag: 2.09, dato: "El otro pie del cazador: casi tan caliente como Rigel, pero mucho más lejos." },
+        { nombre: "Mintaka", x: CENTRO_ORION - 32, y: 384, r: 3.4, color: "#ffffff", mag: 2.25, dato: "La primera de las tres estrellas del Cinturón de Orión." }
     ];
 
     // Líneas que arman la figura (por coordenadas, no por índice, para que se
     // lean solas sin depender del orden del array de arriba). Mismos offsets
     // desde CENTRO_ORION que usa cada estrella en ESTRELLAS_ORION.
+    //
+    // Sin cruces: cada lado converge en el extremo del cinturón más cercano
+    // (Rigel y Bellatrix, del lado izquierdo, van a Mintaka; Saiph y
+    // Betelgeuse, del lado derecho, van a Alnitak) — así arma el "moño"
+    // clásico en vez de dos líneas cruzándose por el medio.
     const LINEAS_ORION = [
-        [CENTRO_ORION - 70, 295, CENTRO_ORION - 32, 358], // Betelgeuse → Mintaka
-        [CENTRO_ORION + 80, 280, CENTRO_ORION + 36, 374], // Bellatrix → Alnitak
-        [CENTRO_ORION - 32, 358, CENTRO_ORION, 366],      // Cinturón: Mintaka → Alnilam
-        [CENTRO_ORION, 366, CENTRO_ORION + 36, 374],      // Cinturón: Alnilam → Alnitak
-        [CENTRO_ORION - 32, 358, CENTRO_ORION - 88, 460], // Mintaka → Rigel
-        [CENTRO_ORION + 36, 374, CENTRO_ORION + 88, 462]  // Alnitak → Saiph
+        [CENTRO_ORION - 88, 282, CENTRO_ORION - 32, 384], // Rigel → Mintaka
+        [CENTRO_ORION - 80, 462, CENTRO_ORION - 32, 384], // Bellatrix → Mintaka
+        [CENTRO_ORION - 32, 384, CENTRO_ORION, 376],      // Cinturón: Mintaka → Alnilam
+        [CENTRO_ORION, 376, CENTRO_ORION + 36, 368],      // Cinturón: Alnilam → Alnitak
+        [CENTRO_ORION + 36, 368, CENTRO_ORION + 88, 280], // Alnitak → Saiph
+        [CENTRO_ORION + 36, 368, CENTRO_ORION + 70, 447]  // Alnitak → Betelgeuse
     ];
 
     (function generarOrion() {

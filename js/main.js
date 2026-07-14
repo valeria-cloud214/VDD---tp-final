@@ -1,27 +1,46 @@
 document.addEventListener("DOMContentLoaded", () => {
     
     // ==========================================
-    // LÓGICA ESCENA 2 (Fotos con crossfade real, 6 fotos / 6 párrafos)
+    // ESCENA UNIFICADA: Jorge + ráfaga + corte
     // ==========================================
+    // Los 3 capítulos viven en un solo contenedor sticky
+    // (#contenedor-capitulos). data-capitulo ahí es lo que decide, por CSS,
+    // qué grupo de fotos está visible. El texto es UN SOLO sistema
+    // (.beat-flotante) compartido por los 3 capítulos: activarBeat() apaga
+    // siempre cualquier otro beat antes de prender el nuevo, así nunca
+    // quedan dos textos superpuestos ni un salto en blanco entre capítulos.
+    const contenedorCapitulos = document.getElementById("contenedor-capitulos");
+    const todosLosBeats = document.querySelectorAll(".beat-flotante");
+
+    function fijarCapitulo(nuevo) {
+        if (contenedorCapitulos && contenedorCapitulos.dataset.capitulo !== nuevo) {
+            contenedorCapitulos.dataset.capitulo = nuevo;
+        }
+    }
+
+    function activarBeat(elemento) {
+        if (!elemento) return;
+        todosLosBeats.forEach(beat => beat.classList.toggle("activo", beat === elemento));
+    }
+
+    // Mismo rootMargin para los 3 capítulos: si cada uno tuviera el suyo,
+    // el punto exacto donde se apaga el último párrafo de un capítulo podía
+    // no coincidir con el punto donde se prende el primero del siguiente
+    // (por eso el corte entre "Emprendimos el viaje..." y el párrafo previo
+    // de Orión se sentía discontinuo). Con el mismo margen para los 3, la
+    // transición entre capítulos es siempre pareja.
+    const MARGEN_BEAT = { root: null, rootMargin: "-10% 0px -50% 0px", threshold: 0 };
+
+    // ------------------------------------------
+    // CAPÍTULO JORGE (fotos con crossfade real, 6 fotos / 6 párrafos)
+    // ------------------------------------------
     // "transition: background-image" no anima en ningún navegador, así que
-    // el corte entre fotos era siempre seco. Antes esto se resolvía con 2
-    // capas que se cruzaban (una subía opacidad mientras la otra bajaba),
-    // pero si esas dos transiciones no arrancaban en el MISMO frame exacto
-    // (algo que el navegador no garantiza), la suma de opacidades caía por
-    // debajo de 1 por un instante y se veía un flash negro del fondo del
-    // contenedor.
-    //
-    // Ahora son 2 capas con roles distintos, no simétricos:
+    // el corte entre fotos era siempre seco. Se resuelve con 2 capas con
+    // roles distintos, no simétricos:
     // - "base": SIEMPRE a opacidad 1, sin transición. Muestra la foto
     //   actual. Es la que impide que se vea negro debajo, pase lo que pase.
     // - "saliente": muestra la foto ANTERIOR y se desvanece de 1 a 0,
-    //   revelando la base de abajo. Si esta transición se traba o arranca
-    //   tarde, lo único que pasa es que se ve la foto vieja un toque más -
-    //   nunca un hueco negro.
-    //
-    // 6 fotos (se sacaron la 4 y la 7 de las 8 originales) y ahora cada
-    // párrafo acompaña a una sola foto — mapeo 1 a 1, ya no hace falta
-    // repartir un párrafo entre 2 pasos.
+    //   revelando la base de abajo.
     const capaBase = document.getElementById("fondo-jorge-base");
     const capaSaliente = document.getElementById("fondo-jorge-saliente");
     const disparadoresE2 = document.querySelectorAll(".disparador");
@@ -29,133 +48,115 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (capaBase) capaBase.classList.add("foto1");
 
-    const opcionesE2 = {
-        root: null,
-        rootMargin: "-10% 0px -50% 0px", // más ajustado que antes, ritmo parecido al de la ráfaga de escena 3
-        threshold: 0
-    };
+    function crossfade(base, saliente, claseNueva) {
+        if (!base || !saliente || base.classList.contains(claseNueva)) return;
+        // 1) la foto que se estaba viendo (la de la base, hasta ahora) pasa
+        //    a la capa saliente, de una, a opacidad 1 y sin transición —
+        //    todavía se sigue viendo igual.
+        saliente.style.transition = "none";
+        saliente.className = `fondo-dinamico fondo-capa-saliente ${base.className.replace(/fondo-dinamico|fondo-capa-base/g, "").trim()}`;
+        saliente.style.opacity = "1";
+
+        // 2) la base se actualiza a la foto nueva instantáneamente. Como la
+        //    base no tiene transición, ese cambio no se ve: lo que se sigue
+        //    viendo es la capa saliente, que todavía tapa todo.
+        base.className = `fondo-dinamico fondo-capa-base ${claseNueva}`;
+
+        // Fuerza un reflow para que el navegador registre el estado de
+        // arriba antes de animar.
+        void saliente.offsetWidth;
+
+        // 3) recién ahora la capa saliente se desvanece, revelando la base
+        //    (ya con la foto nueva) de abajo.
+        saliente.style.transition = "";
+        saliente.style.opacity = "0";
+    }
 
     const observadorE2 = new IntersectionObserver((entradas) => {
         entradas.forEach(entrada => {
             if (entrada.isIntersecting) {
+                fijarCapitulo("jorge");
                 const paso = Number(entrada.target.getAttribute("data-foto"));
-                const claseFoto = `foto${paso}`;
-
-                if (capaBase && capaSaliente && !capaBase.classList.contains(claseFoto)) {
-                    // 1) la foto que se estaba viendo (la de la base, hasta
-                    //    ahora) pasa a la capa saliente, de una, a opacidad 1
-                    //    y sin transición — todavía se sigue viendo igual.
-                    capaSaliente.style.transition = "none";
-                    capaSaliente.className = `fondo-dinamico fondo-capa-saliente ${capaBase.className.replace(/fondo-dinamico|fondo-capa-base/g, "").trim()}`;
-                    capaSaliente.style.opacity = "1";
-
-                    // 2) la base se actualiza a la foto nueva instantáneamente.
-                    //    Como la base no tiene transición, ese cambio no se
-                    //    ve: lo que se sigue viendo es la capa saliente, que
-                    //    todavía está tapándola por completo.
-                    capaBase.className = `fondo-dinamico fondo-capa-base ${claseFoto}`;
-
-                    // Fuerza un reflow para que el navegador registre el
-                    // estado de arriba antes de animar.
-                    void capaSaliente.offsetWidth;
-
-                    // 3) recién ahora la capa saliente se desvanece,
-                    //    revelando la base (ya con la foto nueva) de abajo.
-                    capaSaliente.style.transition = "";
-                    capaSaliente.style.opacity = "0";
-                }
-
-                const parrafoActivo = String(paso);
-                parrafos.forEach(parrafo => {
-                    parrafo.classList.toggle("activo", parrafo.getAttribute("data-parrafo") === parrafoActivo);
-                });
+                crossfade(capaBase, capaSaliente, `foto${paso}`);
+                activarBeat(document.querySelector(`.parrafo-historia[data-parrafo="${paso}"]`));
             }
         });
-    }, opcionesE2);
+    }, MARGEN_BEAT);
 
     disparadoresE2.forEach(d => observadorE2.observe(d));
 
-
-
-    // ==========================================
-    // LÓGICA ESCENA 3 (Ráfaga / Animación rápida)
-    // ==========================================
+    // ------------------------------------------
+    // CAPÍTULO RÁFAGA (viaje en auto, animación rápida)
+    // ------------------------------------------
     const fondoViaje = document.getElementById("fondo-viaje");
     const disparadoresE3 = document.querySelectorAll(".disparador-rafaga");
-    const beatsRafaga = document.querySelectorAll(".rafaga-beat");
 
-    // Foto inicial por defecto para la escena 3
+    // Foto inicial por defecto (el texto del primer beat se activa solo,
+    // vía el observer de abajo, recién cuando el scroll entra de verdad a
+    // este capítulo — no antes).
     if (fondoViaje) fondoViaje.className = "fondo-dinamico e2-foto1";
-    if (beatsRafaga[0]) beatsRafaga[0].classList.add("activo");
-
-    const opcionesE3 = {
-        root: null,
-        rootMargin: "-5% 0px -45% 0px", // Configuración ajustada para ráfagas rápidas
-        threshold: 0
-    };
 
     const observadorE3 = new IntersectionObserver((entradas) => {
         entradas.forEach(entrada => {
             if (entrada.isIntersecting) {
+                fijarCapitulo("rafaga");
                 const paso = entrada.target.getAttribute("data-foto");
 
-                // Cambia la foto velozmente...
+                // Cambia la foto velozmente (transición de 0.2s, ver CSS)...
                 fondoViaje.className = "fondo-dinamico";
                 fondoViaje.classList.add(`e2-foto${paso}`);
 
-                // ...y ahora la frase cambia junto con ella (antes el texto
-                // quedaba fijo mientras pasaban las 5 fotos).
-                beatsRafaga.forEach(beat => {
-                    beat.classList.toggle("activo", beat.getAttribute("data-frase-rafaga") === paso);
-                });
+                // ...y la frase cambia junto con ella.
+                activarBeat(document.querySelector(`.rafaga-beat[data-frase-rafaga="${paso}"]`));
             }
         });
-    }, opcionesE3);
+    }, MARGEN_BEAT);
 
     disparadoresE3.forEach(d => observadorE3.observe(d));
 
-// ==========================================
-    // LÓGICA ESCENA 4 (Reparada)
-    // ==========================================
-    const disparadoresE4 = document.querySelectorAll(".disparador-corte");
-    const pasosCorte = document.querySelectorAll(".paso-corte");
-    const pasoRecibido = document.querySelector('.paso-corte[data-paso="2"]');
+    // ------------------------------------------
+    // CAPÍTULO CORTE (Buenos Aires al día siguiente)
+    // ------------------------------------------
+    // Mismo mecanismo de crossfade que Jorge: foto gris (1a/1b) → foto vacía
+    // (2a/2b/3). Orión y el destello final (halo + blanco) sólo aparecen a
+    // partir del último disparador (el largo, sin dividir) — ver
+    // actualizarDestello() en js/escena-orion-final.js, que lee el scroll
+    // frame a frame dentro de ese mismo tramo y ahí mismo reparte sus 2
+    // beats de texto (orion-a / orion-b) a la mitad del recorrido.
+    const capaCorteBase = document.getElementById("fondo-corte-base");
+    const capaCorteSaliente = document.getElementById("fondo-corte-saliente");
+    const disparadoresCorte = document.querySelectorAll(".disparador-corte");
+    const grupoCorte = document.getElementById("grupo-corte");
 
-    const opcionesE4 = {
-        root: null,
-        rootMargin: "-15% 0px -15% 0px", // Margen equilibrado para evitar saltos bruscos
-        threshold: 0
+    if (capaCorteBase) capaCorteBase.classList.add("foto-gris");
+
+    const TEXTO_POR_CORTE = {
+        "1a": '.texto-impacto[data-corte-texto="1a"]',
+        "1b": '.texto-impacto[data-corte-texto="1b"]',
+        "2a": '.texto-impacto[data-corte-texto="astronomo-a"]',
+        "2b": '.texto-impacto[data-corte-texto="astronomo-b"]',
+        // El paso "3" arranca en orion-a; orion-b lo toma js/escena-orion-final.js
+        // más adelante en el mismo tramo, por scroll continuo.
+        "3": '.texto-impacto[data-corte-texto="orion-a"]'
     };
 
-    // A partir del disparador 3 (mismo "paso" visual: la foto de él
-    // recibiéndose no cambia ni se duplica) empieza la secuencia de Orión:
-    // 3 = Orión y el texto nuevo aparecen, 4 = empieza a encandilar,
-    // 5 = blanco pleno. El blanco NO se corta acá: la escena de la ruta
-    // arranca con su propio velo blanco (ver .ruta-destello en styles.css),
-    // así que al cruzar el límite entre las dos escenas la pantalla sigue
-    // en blanco y ese blanco se disuelve revelando la ruta ahí mismo — sin
-    // pantalla vacía en el medio.
-    const PASO_VISUAL_POR_CORTE = { 1: "1", 2: "2", 3: "2", 4: "2", 5: "2" };
-
-    const observadorE4 = new IntersectionObserver((entradas) => {
+    const observadorCorte = new IntersectionObserver((entradas) => {
         entradas.forEach(entrada => {
             if (entrada.isIntersecting) {
-                const corteActual = entrada.target.getAttribute("data-corte");
-                const pasoVisual = PASO_VISUAL_POR_CORTE[corteActual] || corteActual;
+                fijarCapitulo("corte");
+                const corte = entrada.target.getAttribute("data-corte");
+                const claseFoto = (corte === "1a" || corte === "1b") ? "foto-gris" : "foto-vacia";
 
-                pasosCorte.forEach(paso => {
-                    paso.classList.toggle("activo-corte", paso.getAttribute("data-paso") === pasoVisual);
-                });
+                crossfade(capaCorteBase, capaCorteSaliente, claseFoto);
+                activarBeat(document.querySelector(TEXTO_POR_CORTE[corte]));
 
-                if (pasoRecibido) {
-                    pasoRecibido.classList.toggle("co-orion-aparece", corteActual === "3");
-                    pasoRecibido.classList.toggle("co-encandila", corteActual === "4" || corteActual === "5");
-                }
+                // Orión sólo aparece a partir de acá — nunca antes.
+                if (grupoCorte) grupoCorte.classList.toggle("co-orion-aparece", corte === "3");
             }
         });
-    }, opcionesE4);
+    }, MARGEN_BEAT);
 
-    disparadoresE4.forEach(d => observadorE4.observe(d));
+    disparadoresCorte.forEach(d => observadorCorte.observe(d));
 
     // La Escena 5 (ruta con el auto) ahora la maneja js/escena-ruta.js,
     // sincronizada directo con el scroll en vez de por disparadores.

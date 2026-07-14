@@ -221,4 +221,61 @@ document.addEventListener("DOMContentLoaded", () => {
 
     disparadores.forEach(d => observadorPasos.observe(d));
 
+    // ======================================================================
+    // 4. ENCANDILAMIENTO FINAL — atado al scroll, frame a frame (misma
+    //    técnica que el destello de Orión más adelante en el sitio, ver
+    //    actualizarDestello() en js/escena-orion-final.js).
+    //
+    //    La farola ya se encendió (paso 12, arriba). Sobre el último
+    //    disparador (el 13, 100vh) el halo crece hasta encandilar toda la
+    //    pantalla — el texto final ya se está apagando solo (deja de estar
+    //    en FRASE_POR_PASO al llegar acá, así que su propia transición de
+    //    opacidad lo retira). La escena "luz" arranca con su propio velo
+    //    blanco (ver .luz-destello en styles.css) que se disuelve apenas
+    //    esa escena queda pinneada, así la ciudad aparece en el mismo lugar
+    //    exacto donde termina el blanco — sin ningún corte de imagen.
+    // ======================================================================
+    (function encandilamientoFinal() {
+        const tramo = document.querySelector('.tf-disparador[data-paso-tf="13"]');
+        const haloChico = document.getElementById("tf-halo-chico");
+        const haloGrande = document.getElementById("tf-halo-grande");
+        const encandilamiento = document.getElementById("tf-encandilamiento");
+        if (!tramo || !encandilamiento) return;
+
+        function actualizarEncandilamiento() {
+            const rect = tramo.getBoundingClientRect();
+            const altura = tramo.offsetHeight;
+            let progreso = altura > 0 ? (-rect.top) / altura : 0;
+            progreso = Math.min(1, Math.max(0, progreso));
+
+            // El halo se enciende de golpe al principio de este tramo y
+            // sigue creciendo hasta encandilar todo — se siente como una
+            // luz que se dispara, no como un círculo que se infla parejo.
+            const crecimiento = Math.pow(progreso, 2.2);
+            if (haloChico) haloChico.style.transform = `scale(${1 + crecimiento * 4})`;
+            if (haloGrande) haloGrande.style.transform = `scale(${1 + crecimiento * 6})`;
+
+            // El blanco entra recién pasado un cuarto del tramo (para que se
+            // alcance a leer/leer-terminar la frase final) y llega a
+            // opacidad 1 bastante antes del final del tramo — ese resto es
+            // el mismo "respiro" en blanco que usa el resto del sitio antes
+            // de relevar a la escena siguiente.
+            encandilamiento.style.opacity = Math.min(1, Math.max(0, (progreso - 0.25) / 0.6));
+        }
+
+        let esperandoFrame = false;
+        window.addEventListener("scroll", () => {
+            if (!esperandoFrame) {
+                esperandoFrame = true;
+                requestAnimationFrame(() => {
+                    actualizarEncandilamiento();
+                    esperandoFrame = false;
+                });
+            }
+        }, { passive: true });
+        window.addEventListener("resize", actualizarEncandilamiento);
+
+        actualizarEncandilamiento(); // estado inicial, por si ya está a la vista al cargar
+    })();
+
 });

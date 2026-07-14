@@ -16,175 +16,157 @@
             </div>
         </section>
 
-       <section id="escena-2" class="escena-scroll-largo">
-            
-            <div class="contenedor-fijo-split">
-                
-                <div class="bloque-imagen">
-                    <!-- 3 capas para el crossfade (ver js/main.js):
-                         - "base" siempre está a opacidad 1 con la foto ACTUAL, sin
-                           transición — es la que garantiza que nunca haya un hueco
-                           negro debajo.
-                         - "saliente" muestra la foto ANTERIOR y se desvanece de 1 a 0,
-                           revelando la base de abajo.
-                         Así el cambio de foto anima de verdad ("transition:
-                         background-image" no anima en ningún navegador) y no depende
-                         de que dos transiciones arranquen exactamente en el mismo
-                         frame. -->
+       <section id="escena-2" class="escena-scroll-capitulos">
+
+            <div class="contenedor-fijo-capitulos" id="contenedor-capitulos" data-capitulo="jorge">
+
+                <!-- Fotos del capítulo de Jorge (las 6 fotos con él).
+                     Crossfade real en 2 capas (ver js/main.js):
+                     - "base" siempre está a opacidad 1 con la foto ACTUAL, sin
+                       transición — es la que garantiza que nunca haya un hueco
+                       negro debajo.
+                     - "saliente" muestra la foto ANTERIOR y se desvanece de 1 a 0,
+                       revelando la base de abajo.
+                     Acá NO va Orión superpuesto: la constelación se guarda
+                     para el final, en el capítulo "corte" de más abajo. -->
+                <div class="fondo-grupo-jorge" id="grupo-jorge">
                     <div class="fondo-dinamico fondo-capa-base" id="fondo-jorge-base"></div>
                     <div class="fondo-dinamico fondo-capa-saliente" id="fondo-jorge-saliente"></div>
-
-                    <!-- Orión, siempre visible, dibujado con la misma técnica que
-                         js/escena-cielos.js (halo + punto + líneas finas) en vez de
-                         venir pintado en la foto. Coordenadas ajustables al principio
-                         de js/escena-jorge-cuarto.js. -->
-                    <svg id="svg-orion-overlay" viewBox="0 0 1366 768" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-                        <g id="capa-orion-overlay"></g>
-                    </svg>
                 </div>
-                
-                <div class="bloque-texto">
-                    
-                    <div class="parrafo-historia" data-parrafo="1">
-                        <p>Me presento, soy Jorge. Podría decir muchas cosas sobre mí, pero hay una sola que me define: <strong>a mi vida la marcaron las estrellas</strong>.</p>
+
+                <!-- Fotos del capítulo de la ráfaga (viaje en auto de noche).
+                     Transición rápida (0.2s, ver styles.css) para que se sienta
+                     como una sucesión de flashes — a propósito distinta del
+                     crossfade lento del capítulo de Jorge. Sólo visible mientras
+                     data-capitulo="rafaga" en el contenedor. -->
+                <div class="fondo-grupo-rafaga" id="grupo-rafaga">
+                    <div class="fondo-dinamico" id="fondo-viaje"></div>
+                </div>
+
+                <!-- Fotos del capítulo "corte" (Buenos Aires al día siguiente):
+                     misma técnica de crossfade que Jorge, gris → vacía.
+                     Orión + el destello final aparecen ACÁ ADENTRO, sólo sobre
+                     el final (ver js/escena-orion-final.js), nunca antes. -->
+                <div class="fondo-grupo-corte" id="grupo-corte">
+                    <div class="fondo-dinamico fondo-capa-base" id="fondo-corte-base"></div>
+                    <div class="fondo-dinamico fondo-capa-saliente" id="fondo-corte-saliente"></div>
+
+                    <svg id="svg-orion-final" viewBox="0 0 1050 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                        <defs>
+                            <radialGradient id="of-grad-halo" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
+                                <stop offset="45%" stop-color="#fff6e0" stop-opacity="0.85" />
+                                <stop offset="100%" stop-color="#fff6e0" stop-opacity="0" />
+                            </radialGradient>
+                        </defs>
+                        <!-- Halo que crece hasta encandilar todo (ver CSS) -->
+                        <g id="of-halo-grupo">
+                            <circle cx="645" cy="150" r="42" fill="url(#of-grad-halo)" />
+                        </g>
+                        <!-- Orión, chica y pegada arriba a la derecha — sólo
+                             aparece en este momento del relato, no antes. -->
+                        <g id="of-orion"></g>
+                    </svg>
+
+                    <!-- Blanco total: cubre TODA la pantalla, texto incluido -->
+                    <div class="of-blanco" id="of-blanco"></div>
+                </div>
+
+                <!-- Texto flotante, sin tarjeta de fondo, siempre abajo a la
+                     derecha. Un solo beat visible a la vez, en TODA la
+                     escena (Jorge + ráfaga + corte comparten el mismo lugar
+                     y el mismo mecanismo de "activo" — ver js/main.js). -->
+                <div class="texto-flotante">
+
+                    <div class="parrafo-historia beat-flotante activo" data-parrafo="1">
+                        <p>Me presento, soy Jorge. Podría decir muchas cosas sobre mí, pero hay una sola que me define: a mi vida la marcaron las estrellas.</p>
                     </div>
-                    <div class="parrafo-historia" data-parrafo="2">
-                        <p>Nací en una pequeña localidad del interior. Me crié con mi amada abuela; ella fue quien me inculcó <strong>este amor por las historias que cuentan los cielos</strong>.</p>
+                    <div class="parrafo-historia beat-flotante" data-parrafo="2">
+                        <p>Nací en una pequeña localidad del interior. Me crié con mi amada abuela; ella fue quien me inculcó este amor por las historias que cuentan los cielos.</p>
                     </div>
-                    <div class="parrafo-historia" data-parrafo="3">
-                        <p>Todas las noches mirábamos por la ventana y me revelaba <strong>los secretos de alguna constelación</strong>.</p>
+                    <div class="parrafo-historia beat-flotante" data-parrafo="3">
+                        <p>Todas las noches mirábamos por la ventana y me revelaba los secretos de alguna constelación.</p>
                     </div>
-                    <div class="parrafo-historia" data-parrafo="4">
-                        <p>Un día, mis papás me dijeron que por cuestiones de la vida nos mudábamos a Buenos Aires. <strong>Yo estaba destruido</strong>; no quería alejarme de ella.</p>
+                    <div class="parrafo-historia beat-flotante" data-parrafo="4">
+                        <p>Un día, mis papás me dijeron que por cuestiones de la vida nos mudábamos a Buenos Aires. Yo estaba destruido; no quería alejarme de ella.</p>
                     </div>
-                    <div class="parrafo-historia" data-parrafo="5">
-                        <p>La última noche, mi abuela me abrazó y me dijo que cuando la extrañara, <strong>mirara a Orión</strong>.</p>
+                    <div class="parrafo-historia beat-flotante" data-parrafo="5">
+                        <p>La última noche, mi abuela me abrazó y me dijo que cuando la extrañara, mirara a Orión.</p>
                     </div>
-                    <div class="parrafo-historia" data-parrafo="6">
-                        <p>Que no importaba dónde estuviera, <strong>Orión siempre iba a estar ahí para mí, al igual que su amor</strong>.</p>
+                    <div class="parrafo-historia beat-flotante" data-parrafo="6">
+                        <p>Que no importaba dónde estuviera, Orión siempre iba a estar ahí para mí, al igual que su amor.</p>
+                    </div>
+
+                    <div class="rafaga-beat beat-flotante" data-frase-rafaga="1">
+                        <p>Emprendimos el viaje en la oscuridad de la noche.</p>
+                    </div>
+                    <div class="rafaga-beat beat-flotante" data-frase-rafaga="2">
+                        <p>Durante horas pegué la frente contra el vidrio frío del auto, mirando hacia arriba.</p>
+                    </div>
+                    <div class="rafaga-beat beat-flotante" data-frase-rafaga="3">
+                        <p>Y efectivamente, ahí estaba Orión, acompañandome en el camino tal como me lo había prometido mi abuela.</p>
+                    </div>
+                    <div class="rafaga-beat beat-flotante" data-frase-rafaga="4">
+                        <p>Durante todo el viaje me quedé mirándola fijamente.</p>
+                    </div>
+                    <div class="rafaga-beat beat-flotante" data-frase-rafaga="5">
+                        <p>Hasta que el cielo empezó a aclararse y el amanecer ocultó las estrellas.</p>
+                    </div>
+
+                    <div class="texto-impacto beat-flotante" data-corte-texto="1a">
+                        <p>Esa primera noche en Buenos Aires busqué el cielo con desesperación, no se veía igual. El fondo ya no era de un negro intenso, sino un gris borroso.</p>
+                    </div>
+                    <div class="texto-impacto beat-flotante" data-corte-texto="1b">
+                        <p>Pero haciendo fuerza con los ojos, logré distinguirla. Costaba, pero Orión seguía ahí. Mi abuela no había mentido.</p>
+                    </div>
+                    <div class="texto-impacto beat-flotante" data-corte-texto="astronomo-a">
+                        <p>Con los años, el misterio no hizo más que crecer. Aquella pregunta de la infancia seguía flotando en el aire: ¿por qué los cielos de mi ciudad se habían vuelto tan borrosos y opacos?</p>
+                    </div>
+                    <div class="texto-impacto beat-flotante" data-corte-texto="astronomo-b">
+                        <p>Impulsado por esa curiosidad, convertí la obsesión en mi profesión y me recibí de astrónomo.</p>
+                    </div>
+                    <div class="texto-impacto beat-flotante" data-corte-texto="orion-a">
+                        <p>Dediqué toda mi vida a estudiar a dónde se iban las estrellas, a dónde se escondía Orión.</p>
+                    </div>
+                    <div class="texto-impacto beat-flotante" data-corte-texto="orion-b">
+                        <p>Por eso hoy les quiero mostrar los resultados de mi investigación:</p>
                     </div>
 
                 </div>
 
             </div>
 
-            <!-- 6 disparadores de foto (se sacaron la 4 y la 7 de las 8
-                 originales, quedaron: F1, F2, F3, F5, F6, F8). Ahora cada
-                 párrafo acompaña a UNA sola foto — mapeo 1 a 1 en
-                 js/main.js, ya no hace falta PARRAFO_POR_PASO. -->
+            <!-- 6 disparadores de foto del capítulo de Jorge (se sacaron la 4 y
+                 la 7 de las 8 originales, quedaron: F1, F2, F3, F5, F6, F8). Cada
+                 párrafo acompaña a UNA sola foto — mapeo 1 a 1 en js/main.js. -->
             <div class="disparador" data-foto="1"></div>
             <div class="disparador" data-foto="2"></div>
             <div class="disparador" data-foto="3"></div>
             <div class="disparador" data-foto="4"></div>
             <div class="disparador" data-foto="5"></div>
             <div class="disparador" data-foto="6"></div>
-            
-        </section>
 
-        <section id="escena-3" class="escena-scroll-rafaga">
-            
-            <div class="contenedor-fijo-split">
-                
-                <div class="bloque-imagen">
-                    <div class="fondo-dinamico" id="fondo-viaje"></div>
-                </div>
-                
-                <div class="bloque-texto">
-                    <div class="rafaga-beat" data-frase-rafaga="1">
-                        <p>Emprendimos el viaje <strong>en la oscuridad de la noche</strong>.</p>
-                    </div>
-                    <div class="rafaga-beat" data-frase-rafaga="2">
-                        <p>Durante horas pegué la frente contra el vidrio frío del auto, <strong>mirando hacia arriba</strong>.</p>
-                    </div>
-                    <div class="rafaga-beat" data-frase-rafaga="3">
-                        <p>Y efectivamente, ahí estaba Orión, <strong>acompañandome en el camino</strong> tal como me lo había prometido mi abuela.</p>
-                    </div>
-                    <div class="rafaga-beat" data-frase-rafaga="4">
-                        <p>Durante todo el viaje me quedé <strong>mirándola fijamente</strong>.</p>
-                    </div>
-                    <div class="rafaga-beat" data-frase-rafaga="5">
-                        <p>Hasta que el cielo empezó a aclararse y <strong>el amanecer ocultó las estrellas</strong>.</p>
-                    </div>
-                </div>
-
-            </div>
-
+            <!-- 5 disparadores de la ráfaga del viaje en auto -->
             <div class="disparador-rafaga" data-foto="1"></div>
             <div class="disparador-rafaga" data-foto="2"></div>
             <div class="disparador-rafaga" data-foto="3"></div>
             <div class="disparador-rafaga" data-foto="4"></div>
             <div class="disparador-rafaga" data-foto="5"></div>
-            
-        </section>
 
-        <section id="escena-4" class="escena-corte-profundo">
-            
-            <div class="paso-corte activo-corte" data-paso="1">
-                <div class="contenedor-fijo-split">
-                    <div class="bloque-imagen">
-                        <div class="fondo-corte foto-gris"></div>
-                    </div>
-                    <div class="bloque-texto">
-                        <div class="texto-impacto">
-                            <p>Esa primera noche en Buenos Aires busqué el cielo con desesperación. No se veía igual. <strong>El fondo ya no era de un negro intenso, sino un gris borroso.</strong> Pero haciendo fuerza con los ojos, logré distinguirla. Costaba, pero Orión seguía ahí. <strong>Mi abuela no había mentido.</strong></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Paso 2: la misma foto de él recibiéndose se queda quieta —
-                 no se duplica ni cambia de imagen. Lo que sí cambia, ya sin
-                 seguir scrolleando a un nuevo "paso" visual, es: (a) el
-                 texto del costado, que pasa del párrafo del astrónomo al de
-                 Orión en primera persona, y (b) Orión aparece pegada al
-                 borde de la imagen y termina encandilando la pantalla. Todo
-                 controlado por LÓGICA ESCENA 4 en main.js con los
-                 disparadores 3/4/5 de más abajo, que NO cambian de paso
-                 (siguen en el paso 2) — sólo agregan las clases
-                 .co-orion-aparece / .co-encandila. -->
-            <div class="paso-corte" data-paso="2">
-                <div class="contenedor-fijo-split">
-                    <div class="bloque-imagen bloque-entra-izq">
-                        <div class="fondo-corte foto-vacia"></div>
-
-                        <svg id="svg-orion-final" viewBox="0 0 1050 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-                            <defs>
-                                <radialGradient id="of-grad-halo" cx="50%" cy="50%" r="50%">
-                                    <stop offset="0%" stop-color="#ffffff" stop-opacity="1" />
-                                    <stop offset="45%" stop-color="#fff6e0" stop-opacity="0.85" />
-                                    <stop offset="100%" stop-color="#fff6e0" stop-opacity="0" />
-                                </radialGradient>
-                            </defs>
-
-                            <!-- Halo que crece hasta encandilar todo (ver CSS) -->
-                            <g id="of-halo-grupo">
-                                <circle cx="645" cy="150" r="42" fill="url(#of-grad-halo)" />
-                            </g>
-
-                            <!-- Orión, chica y pegada arriba a la derecha -->
-                            <g id="of-orion"></g>
-                        </svg>
-                    </div>
-                    <div class="bloque-texto bloque-entra-der">
-                        <div class="texto-impacto co-texto-astronomo">
-                            <p>Con los años, el misterio no hizo más que crecer. Aquella pregunta de la infancia seguía flotando en el aire: <strong>¿por qué los cielos de mi ciudad se habían vuelto tan borrosos y opacos?</strong> Impulsado por esa curiosidad, convertí la obsesión en mi profesión y <strong>me recibí de astrónomo.</strong></p>
-                        </div>
-                        <div class="texto-impacto co-texto-orion">
-                            <p> Dediqué toda mi vida a estudiar <strong>a dónde se iban las estrellas</strong>, a dónde se escondía Orión. <strong>Por eso hoy les quiero mostrar los resultados de mi investigación:</strong></p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Blanco total: cubre TODA la pantalla (no sólo la
-                     imagen), por eso va afuera de .contenedor-fijo-split -->
-                <div class="of-blanco"></div>
-            </div>
-
-            <div class="disparador-corte" data-corte="1"></div>
-            <div class="disparador-corte" data-corte="2"></div>
+            <!-- 5 disparadores del capítulo corte: 1a/1b = foto gris (2
+                 beats de texto), 2a/2b = foto vacía + texto del astrónomo (2
+                 beats), 3 (el largo, sin dividir) = aparece Orión y, atado
+                 directo al scroll frame a frame (ver
+                 js/escena-orion-final.js), crece el halo hasta el blanco —
+                 ese mismo tramo también reparte sus 2 beats de texto
+                 (orion-a / orion-b) a la mitad del recorrido, por scroll
+                 continuo, no por disparador nuevo. -->
+            <div class="disparador-corte" data-corte="1a"></div>
+            <div class="disparador-corte" data-corte="1b"></div>
+            <div class="disparador-corte" data-corte="2a"></div>
+            <div class="disparador-corte" data-corte="2b"></div>
             <div class="disparador-corte" data-corte="3"></div>
-            <div class="disparador-corte" data-corte="4"></div>
-            <div class="disparador-corte" data-corte="5"></div>
+
 
         </section>
     </div>
@@ -846,6 +828,16 @@
                 </div>
             </div>
 
+            <!-- Encandilamiento final: crece hasta tapar todo (farola, texto
+                 y fondo) sobre el último tramo de scroll — ver
+                 actualizarEncandilamiento() en js/escena-transicion-fisica.js.
+                 La escena "luz" arranca con su propio velo blanco (ver
+                 .luz-destello en styles.css), que se disuelve apenas su
+                 sticky queda pinneado — así la pantalla nunca deja de estar
+                 en blanco al cruzar de una escena a la otra, y la ciudad
+                 aparece justo ahí, en el mismo lugar. -->
+            <div class="tf-encandilamiento" id="tf-encandilamiento"></div>
+
         </div>
 
         <!-- DISPARADORES: 13 tramos de 100vh (se sumaron 4 para la infografía) -->
@@ -884,6 +876,15 @@
     <section id="escena-luz" class="escena-luz-lumínica">
 
         <div class="pin-luz">
+
+            <!-- Velo blanco: continuación directa del encandilamiento con el
+                 que termina la escena de la farola (ver .tf-encandilamiento).
+                 Arranca opaco — así, al cruzar el límite entre las dos
+                 escenas, la pantalla nunca deja de estar en blanco — y se
+                 disuelve apenas este sticky queda pinneado (la clase la
+                 agrega js/escena-luz.js), revelando la ciudad ahí mismo, sin
+                 pantalla vacía en el medio. -->
+            <div class="luz-destello" id="luz-destello"></div>
 
             <!-- El SVG tapa toda la pantalla (preserveAspectRatio="slice"),
                  como una ilustración a sangre, sin franjas ni bordes. -->
@@ -952,23 +953,28 @@
                     <!-- 2. ESTRELLAS DE FONDO (generadas por JS) -->
                     <g id="capa-estrellas"></g>
 
-                    <!-- 3. CONSTELACIÓN DE ORIÓN (guiño a la abuela de Jorge) -->
+                    <!-- 3. CONSTELACIÓN DE ORIÓN (guiño a la abuela de Jorge).
+                         Orientación hemisferio sur: Rigel arriba-izquierda,
+                         Betelgeuse abajo-derecha, cinturón diagonal de
+                         abajo-izquierda a arriba-derecha. Sin cruces: Rigel y
+                         Bellatrix convergen en Mintaka, Saiph y Betelgeuse
+                         convergen en Alnitak. -->
                     <g id="capa-constelacion-orion" stroke="#cfe0ff" stroke-opacity="0.35" stroke-width="1.2">
                         <!-- Líneas que unen las estrellas principales -->
-                        <line x1="710" y1="-1770" x2="760" y2="-1690" />
-                        <line x1="900" y1="-1790" x2="845" y2="-1660" />
-                        <line x1="760" y1="-1690" x2="800" y2="-1680" />
-                        <line x1="800" y1="-1680" x2="845" y2="-1660" />
-                        <line x1="760" y1="-1690" x2="690" y2="-1560" />
-                        <line x1="845" y1="-1660" x2="910" y2="-1560" />
+                        <line x1="690" y1="-1790" x2="760" y2="-1660" />
+                        <line x1="700" y1="-1560" x2="760" y2="-1660" />
+                        <line x1="760" y1="-1660" x2="800" y2="-1670" />
+                        <line x1="800" y1="-1670" x2="845" y2="-1690" />
+                        <line x1="845" y1="-1690" x2="910" y2="-1790" />
+                        <line x1="845" y1="-1690" x2="890" y2="-1580" />
                         <!-- Estrellas (hombros, cinturón, pies) -->
-                        <circle cx="710" cy="-1770" r="3.4" fill="#fff3e0" stroke="none" />
-                        <circle cx="900" cy="-1790" r="3.2" fill="#eaf1ff" stroke="none" />
-                        <circle cx="760" cy="-1690" r="2.2" fill="#ffffff" stroke="none" />
-                        <circle cx="800" cy="-1680" r="2.2" fill="#ffffff" stroke="none" />
-                        <circle cx="845" cy="-1660" r="2.2" fill="#ffffff" stroke="none" />
-                        <circle cx="690" cy="-1560" r="3" fill="#dce8ff" stroke="none" />
-                        <circle cx="910" cy="-1560" r="3" fill="#fff3e0" stroke="none" />
+                        <circle cx="890" cy="-1580" r="3.4" fill="#fff3e0" stroke="none" />
+                        <circle cx="700" cy="-1560" r="3.2" fill="#eaf1ff" stroke="none" />
+                        <circle cx="760" cy="-1660" r="2.2" fill="#ffffff" stroke="none" />
+                        <circle cx="800" cy="-1670" r="2.2" fill="#ffffff" stroke="none" />
+                        <circle cx="845" cy="-1690" r="2.2" fill="#ffffff" stroke="none" />
+                        <circle cx="690" cy="-1790" r="3" fill="#dce8ff" stroke="none" />
+                        <circle cx="910" cy="-1790" r="3" fill="#fff3e0" stroke="none" />
                     </g>
 
                     <!-- 4. ATMÓSFERA (banda azul translúcida). También ancha
@@ -1479,7 +1485,6 @@
     </main>
 
     <script src="https://d3js.org/d3.v6.js"></script>
-    <script src="js/escena-jorge-cuarto.js"></script>
     <script src="js/escena-ruta.js"></script>
     <script src="js/escena-cielos.js"></script>
     <script src="js/escena-transicion-datos.js"></script>

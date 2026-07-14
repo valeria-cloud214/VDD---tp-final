@@ -210,20 +210,24 @@ document.addEventListener("DOMContentLoaded", () => {
     })();
 
     // --- Orión: la misma constelación de toda la historia -------------------
+    // Orientación hemisferio sur: Rigel arriba-izquierda, Betelgeuse
+    // abajo-derecha, cinturón diagonal de abajo-izquierda a arriba-derecha.
     const ORION_CX = 720, ORION_CY = -770;
     const ORION_ESTRELLAS = [
-        { dx: -30, dy: -55, r: 5.2, color: "#ffb37a" },  // Betelgeuse
-        { dx: -12, dy: 65, r: 5.6, color: "#cfe3ff" },   // Rigel
-        { dx: 48, dy: -70, r: 3.8, color: "#eaf1ff" },   // Bellatrix
-        { dx: -10, dy: 8, r: 3.2, color: "#ffffff" },    // Mintaka
-        { dx: 12, dy: 14, r: 3.4, color: "#ffffff" },    // Alnilam
-        { dx: 34, dy: 20, r: 3.3, color: "#ffffff" },    // Alnitak
-        { dx: 56, dy: 78, r: 4, color: "#cfe3ff" }       // Saiph
+        { dx: 30, dy: 55, r: 5.2, color: "#ffb37a" },    // Betelgeuse
+        { dx: -12, dy: -65, r: 5.6, color: "#cfe3ff" },  // Rigel
+        { dx: -48, dy: 70, r: 3.8, color: "#eaf1ff" },   // Bellatrix
+        { dx: -10, dy: -8, r: 3.2, color: "#ffffff" },   // Mintaka
+        { dx: 12, dy: -14, r: 3.4, color: "#ffffff" },   // Alnilam
+        { dx: 34, dy: -20, r: 3.3, color: "#ffffff" },   // Alnitak
+        { dx: 56, dy: -78, r: 4, color: "#cfe3ff" }      // Saiph
     ];
     (function generarOrion() {
         const lineas = crearSVG("g", { stroke: "#cfe0ff", "stroke-opacity": "0.45", "stroke-width": "1.2" });
         const p = (i) => [ORION_CX + ORION_ESTRELLAS[i].dx, ORION_CY + ORION_ESTRELLAS[i].dy];
-        [[0, 3], [2, 5], [3, 4], [4, 5], [3, 1], [5, 6]].forEach(([a, b]) => {
+        // Sin cruces: Rigel-Mintaka, Bellatrix-Mintaka, Mintaka-Alnilam,
+        // Alnilam-Alnitak, Alnitak-Saiph, Alnitak-Betelgeuse.
+        [[1, 3], [2, 3], [3, 4], [4, 5], [5, 6], [5, 0]].forEach(([a, b]) => {
             const [x1, y1] = p(a), [x2, y2] = p(b);
             lineas.appendChild(crearSVG("line", { x1, y1, x2, y2 }));
         });
@@ -449,12 +453,16 @@ document.addEventListener("DOMContentLoaded", () => {
             const m2 = document.querySelector('[data-mensaje-final="2"]');
             const m3 = document.querySelector('[data-mensaje-final="3"]');
 
-            tlMensaje = gsap.timeline({ delay: 2.5 }) // silencio de contemplación primero
-                .to(m1, { opacity: 1, duration: 2 })
-                .to(m1, { opacity: 0, duration: 1.5 }, "+=3")
-                .to(m2, { opacity: 1, duration: 2 }, "+=0.6")
-                .to(m2, { opacity: 0, duration: 1.5 }, "+=3")
-                .to(m3, { opacity: 1, duration: 2.5 }, "+=1");
+            // Prácticamente sin demora inicial (apenas 1ms: arranca ni bien
+            // termina de aparecer la última estrella) y cada mensaje entra y
+            // sale más rápido que antes — siguen apareciendo de a uno, nunca
+            // dos a la vez.
+            tlMensaje = gsap.timeline({ delay: 0.0001 })
+                .to(m1, { opacity: 1, duration: 0.6 })
+                .to(m1, { opacity: 0, duration: 0.5 }, "+=1")
+                .to(m2, { opacity: 1, duration: 0.6 }, "+=0.2")
+                .to(m2, { opacity: 0, duration: 0.5 }, "+=1")
+                .to(m3, { opacity: 1, duration: 0.8 }, "+=0.3");
             // El mensaje 3 (el de cierre) se queda en pantalla: no se retira
             // solo — pero si el usuario vuelve a scrollear hacia arriba, sí
             // (ver reiniciarInterruptorCierre, más abajo).

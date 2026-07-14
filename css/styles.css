@@ -116,34 +116,46 @@
    }
    
    /* ==========================================================================
-      5. ESCENA 2
-      ========================================================================= */
-   
-   .escena-scroll-largo {
+      5. ESCENA 2 UNIFICADA — capítulo Jorge + ráfaga + corte, TODO en el
+      mismo contenedor sticky. Nunca se mueve ni "baja": pasa siempre en el
+      mismo lugar de la pantalla y lo único que cambia con el scroll es qué
+      grupo de fotos está visible (data-capitulo) y qué texto está activo.
+
+      Altura total = 100vh del sticky +
+        Jorge:  6×70vh = 420vh
+        ráfaga: 5×70vh = 350vh
+        corte:  70+70+70+70+190vh = 470vh
+        buffer: 20vh
+      100 + 420 + 350 + 470 + 20 = 1360vh. */
+
+   .escena-scroll-capitulos {
        position: relative;
-       height: 540vh; /* sticky (100vh) + 6 disparadores (70vh c/u, sin gap) + buffer chico */
+       height: 1360vh;
        width: 100%;
    }
-   
-   /* Contenedor que bloquea la pantalla completa */
-   .contenedor-fijo-split {
+
+   .contenedor-fijo-capitulos {
        position: sticky;
        top: 0;
        left: 0;
        width: 100%;
        height: 100vh;
-       display: flex; /* Alinea imagen y texto de costado */
        overflow: hidden;
        background-color: #050508;
    }
-   
-   /* BLOQUE IZQUIERDO: Ocupa 3/4 partes (75%) */
-   .bloque-imagen {
-       width: 75%;
-       height: 100%;
-       position: relative;
+
+   /* Viñeta permanente abajo a la derecha: como el texto ya no tiene
+      tarjeta de fondo, esto es lo que garantiza que se lea sobre
+      CUALQUIER foto, sin taparla. */
+   .contenedor-fijo-capitulos::after {
+       content: "";
+       position: absolute;
+       inset: 0;
+       background: linear-gradient(to top left, rgba(5, 6, 10, 0.82) 0%, rgba(5, 6, 10, 0.42) 30%, rgba(5, 6, 10, 0) 58%);
+       z-index: 3;
+       pointer-events: none;
    }
-   
+
    .fondo-dinamico {
        position: absolute;
        width: 100%;
@@ -152,49 +164,27 @@
        background-position: center;
        transition: background-image 0.8s ease-in-out;
    }
-   
-   /* BLOQUE DERECHO: Ocupa 1/4 parte (25%) */
-   .bloque-texto {
-       width: 25%;
-       height: 100%;
-       background-color: #0f172a; /* Fondo sólido oscuro para que se lea perfecto */
-       border-left: 2px solid var(--acento); /* Línea divisoria estelar */
-       position: relative;
-       display: flex;
-       align-items: center; /* Centra el texto verticalmente */
-       padding: 30px;
-   }
-   
-   /* Estilo base de los párrafos (Ocultos por defecto) */
-   .parrafo-historia {
+
+   /* Los 3 grupos de fotos (Jorge, ráfaga, corte) ocupan el 100% de la
+      pantalla y se turnan por opacidad según data-capitulo — sólo el que
+      corresponde queda visible, sin superposición. */
+   .fondo-grupo-jorge,
+   .fondo-grupo-rafaga,
+   .fondo-grupo-corte {
        position: absolute;
-       left: 30px;
-       right: 30px;
+       inset: 0;
+       z-index: 1;
        opacity: 0;
-       transform: translateY(20px); /* Ligero efecto de subida al aparecer */
-       transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
-       pointer-events: none;
-   }
-   
-   .parrafo-historia p {
-       font-size: 1.4rem;
-       line-height: 1.65;
-       color: #f8fafc;
+       transition: opacity 0.5s ease-in-out;
    }
 
-   .parrafo-historia strong {
-       color: var(--acento);
-       font-weight: 700;
-   }
-   
-   /* Clase activa: Hace aparecer el texto correspondiente */
-   .parrafo-historia.activo {
+   .contenedor-fijo-capitulos[data-capitulo="jorge"] .fondo-grupo-jorge,
+   .contenedor-fijo-capitulos[data-capitulo="rafaga"] .fondo-grupo-rafaga,
+   .contenedor-fijo-capitulos[data-capitulo="corte"] .fondo-grupo-corte {
        opacity: 1;
-       transform: translateY(0);
-       pointer-events: auto;
    }
-   
-   /* Las 6 fotos de la Escena 2 (se sacaron la F4E1 y la F7E1 de las 8
+
+   /* Las 6 fotos de Jorge (se sacaron la F4E1 y la F7E1 de las 8
       originales; los nombres de archivo no cambian, sólo la numeración de
       las clases que las usan). */
    .foto1 { background-image: url("../fotos/F1E1.png"); }
@@ -203,8 +193,8 @@
    .foto4 { background-image: url("../fotos/F5E1.png"); }
    .foto5 { background-image: url("../fotos/F6E1.png"); }
    .foto6 { background-image: url("../fotos/F8E1.png"); }
-   
-   /* Disparadores de scroll invisibles */
+
+   /* Disparadores de scroll invisibles del capítulo de Jorge */
    .disparador {
        height: 70vh; /* Más chico que antes: menos scroll "muerto" entre foto y foto */
        width: 100%;
@@ -213,17 +203,14 @@
    }
 
    /* ==========================================================================
-      5b. ESCENA 2 — Crossfade de fotos + Orión superpuesto (js/escena-jorge-cuarto.js)
+      5b. Crossfade de fotos (js/main.js)
       ==========================================================================
       "transition: background-image" en .fondo-dinamico no anima en NINGÚN
       navegador (el spec de CSS no permite interpolar background-image), así
       que el corte entre fotos era siempre seco. Acá hay 2 capas superpuestas
-      (.fondo-capa-a/b): la que no se ve recibe la foto siguiente y recién
-      ahí sube su opacidad — eso sí es un crossfade real (ver js/main.js).
-
-      Encima de las fotos va un Orión en SVG que queda SIEMPRE visible, con
-      la misma técnica que ya usa js/escena-cielos.js (halo + punto + líneas
-      finas, mismos colores) en vez de estar pintado en la foto. */
+      (.fondo-capa-base/saliente): la que no se ve recibe la foto siguiente y
+      recién ahí sube su opacidad — eso sí es un crossfade real. Lo usan
+      tanto el capítulo de Jorge como el capítulo corte (misma técnica). */
 
    /* Base: siempre opacidad 1, sin transición — nunca deja ver nada detrás. */
    .fondo-capa-base {
@@ -237,80 +224,88 @@
        transition: opacity .8s ease-in-out;
    }
 
-   #svg-orion-overlay {
+   /* ==========================================================================
+      5c. Texto flotante — con tarjeta de fondo, siempre abajo a la derecha.
+      Un solo panel para TODA la escena: Jorge, ráfaga y corte comparten el
+      mismo lugar y el mismo mecanismo de "activo" (ver js/main.js), así que
+      nunca hay dos textos superpuestos ni saltos entre capítulos. El
+      recuadro tiene un tamaño FIJO (no se agranda ni achica según el texto
+      de cada beat — antes, un beat corto quedaba "adentro" del área que
+      ocupaba el anterior más largo, mismo fondo, mismo lugar, y daba la
+      sensación de que el texto no cambiaba).
+      ========================================================================= */
+   .texto-flotante {
        position: absolute;
-       top: 0; left: 0;
-       width: 100%;
-       height: 100%;
-       pointer-events: none;
-       z-index: 3; /* siempre arriba de fondo-capa-base (1) y fondo-capa-saliente (2) */
+       z-index: 5;
+       right: 5%;
+       bottom: 9%;
+       width: 50%;
+       height: 230px;
+       text-align: center;
    }
 
-   /* Aparece suave al entrar a la escena y ya se queda así todo el
-      recorrido (no depende del paso de scroll) */
-   #capa-orion-overlay {
+   /* Cada beat (párrafo de Jorge, frase de la ráfaga o texto del corte)
+      ocupa TODO el recuadro fijo de arriba (inset: 0, no sólo se apoya
+      abajo) y sólo se ve el que tiene .activo — si aparece uno, el
+      anterior se apaga siempre, nunca quedan dos superpuestos. Sin tarjeta
+      de fondo: el texto flota directo sobre la foto (el text-shadow de
+      abajo es lo que lo mantiene legible sin el cuadro oscuro). */
+   .beat-flotante {
+       position: absolute;
+       inset: 0;
+       width: 100%;
+       height: 100%;
+       box-sizing: border-box;
+       display: flex;
+       align-items: center;
+       justify-content: center;
        opacity: 0;
-       animation: jc-orion-aparece 2.4s ease-in-out .3s forwards;
+       transform: translateY(20px);
+       transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+       pointer-events: none;
+       padding: 24px 38px;
    }
-   @keyframes jc-orion-aparece {
-       to { opacity: 1; }
+
+   .beat-flotante.activo {
+       opacity: 1;
+       transform: translateY(0);
+       pointer-events: auto;
+       z-index: 1;
+   }
+
+   .beat-flotante p {
+       font-size: 1.68rem; /* +20% sobre el 1.4rem original */
+       line-height: 1.6;
+       color: #f8fafc;
+       max-height: 100%;
+       overflow: hidden;
+       text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85), 0 1px 3px rgba(0, 0, 0, 0.9);
+   }
+
+   /* Ya no queda ninguna parte resaltada: strong se ve exactamente igual
+      que el resto del párrafo, en blanco y sin negrita. */
+   .beat-flotante strong {
+       color: inherit;
+       font-weight: inherit;
    }
 
    /* ==========================================================================
-      6. ESCENA 3
+      6. CAPÍTULO RÁFAGA (viaje en auto) — vive dentro de la misma escena
+      unificada de arriba; acá sólo quedan las fotos propias del capítulo.
       ========================================================================= */
-   
-   .escena-scroll-rafaga {
-       position: relative;
-       height: 470vh; /* sticky (100vh) + 5 disparadores-rafaga (70vh c/u) + buffer chico */
-       width: 100%;
-   }
-   
-   /* Reutilizamos el contenedor split (3/4 y 1/4) que ya definimos en la Escena 2 */
-   
-   /* Estilos específicos para las fotos de la Escena 3 */
+
+   /* Transición ultra rápida (0.2 segundos) para simular animación de una
+      única foto — a propósito distinta del crossfade lento de Jorge */
    #fondo-viaje {
-       /* Transición ultra rápida (0.2 segundos) para simular animación de una única foto */
-       transition: background-image 0.2s ease-in-out; 
+       transition: background-image 0.2s ease-in-out;
    }
-   
+
    .e2-foto1 { background-image: url("../fotos/E2F1.png"); }
    .e2-foto2 { background-image: url("../fotos/E2F2.png"); }
    .e2-foto3 { background-image: url("../fotos/E2F3.png"); }
    .e2-foto4 { background-image: url("../fotos/E2F4.png"); }
    .e2-foto5 { background-image: url("../fotos/E2F5.png"); }
-   
-   /* Cada frase vive en su propio beat, igual que .parrafo-historia en
-      escena-2: sólo se ve la que corresponde a la foto actual (ver
-      LÓGICA ESCENA 3 en main.js). Antes era un bloque fijo con las 2
-      oraciones completas siempre visibles a la vez. */
-   .rafaga-beat {
-       position: absolute;
-       left: 30px;
-       right: 30px;
-       opacity: 0;
-       transform: translateY(20px);
-       transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-       pointer-events: none;
-   }
 
-   .rafaga-beat.activo {
-       opacity: 1;
-       transform: translateY(0);
-       pointer-events: auto;
-   }
-
-   .rafaga-beat p {
-       font-size: 1.4rem;
-       line-height: 1.65;
-       color: #f8fafc;
-   }
-
-   .rafaga-beat strong {
-       color: var(--acento);
-       font-weight: 700;
-   }
-   
    /* Disparadores de ráfaga: un poco más largos que antes (eran 50vh) para
       que las fotos y el texto tarden un poco más en cambiar entre sí */
    .disparador-rafaga {
@@ -319,108 +314,77 @@
        position: relative;
        pointer-events: none;
    }
-   
+
    /* ==========================================================================
-      7. ESCENA 4
+      7. CAPÍTULO CORTE (Buenos Aires al día siguiente) — sigue directo
+      después de la ráfaga, en el mismo lugar de pantalla, mismo sticky.
+      Foto gris → foto vacía (mismo crossfade que Jorge) y, sólo sobre el
+      final, aparece Orión con su propio halo hasta encandilar la pantalla
+      (ver js/escena-orion-final.js, atado directo al scroll frame a frame).
       ========================================================================= */
-   
-   
-   .escena-corte-profundo {
-       position: relative;
-       /* CLAVE: el paso activo es sticky (100vh) y los disparadores van
-          debajo, en el flujo. Para que TODOS los disparadores lleguen a
-          dispararse mientras el paso sigue pinneado, la altura tiene que ser
-          exactamente 100vh + la suma de los disparadores. Si es menor, el
-          sticky se suelta antes de tiempo y los últimos disparadores llegan
-          cuando la escena ya scrolleó fuera de pantalla (era el bug del
-          destello: nunca se veía).
-          100vh (sticky) + 100 + 100 + 190 (disparadores) = 490vh. */
-       height: 490vh;
-       width: 100%;
-       background-color: #050508;
-       z-index: 5; /* Evita que se monte de forma extraña con la escena anterior */
-   }
-   
-   /* Los pasos ocupan toda la pantalla pero respetan el flujo del scroll */
-   .paso-corte {
-       position: absolute;
-       top: 0;
-       left: 0;
-       width: 100%;
-       height: 100vh;
-       opacity: 0;
-       visibility: hidden;
-       transition: opacity 0.4s ease-in-out; /* Suaviza el cambio entre las sub-escenas */
-   }
-   
-   /* Clase que activa cada parte del quiebre */
-   .paso-corte.activo-corte {
-       opacity: 1;
-       visibility: visible;
-       position: sticky;
-       top: 0;
-       z-index: 10;
-   }
-   
-   /* Fotos de fondo completas y perfectas sin deformación */
-   .fondo-corte {
-       position: absolute;
-       width: 100%;
-       height: 100%;
-       background-size: cover;
-       background-position: center;
-       background-repeat: no-repeat;
-   }
-   
+
    .foto-gris { background-image: url("../fotos/E3F1.png"); }
    .foto-vacia { background-image: url("../fotos/E3F2.png"); }
-   
-   /* --- EFECTO ENTRADA DE COSTADOS LIMPIO --- */
-   
-   /* La imagen de la segunda parte viene desde la izquierda */
-   .bloque-entra-izq {
-       transform: translateX(-100%);
-       transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+
+   #svg-orion-final {
+       position: absolute;
+       inset: 0;
+       width: 100%;
+       height: 100%;
+       display: block;
+       pointer-events: none;
+       z-index: 2; /* arriba de las fotos, debajo del texto */
    }
-   
-   /* El texto de la segunda parte viene desde la derecha */
-   .bloque-entra-der {
-       transform: translateX(100%);
-       transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-       border-left: 2px solid var(--acento); /* antes: 2px solid #ef4444 (rojo) — ahora el mismo acento que usa el resto del sitio */
+
+   #of-orion {
+       opacity: 0;
+       transition: opacity 1.4s ease-in-out;
    }
-   
-   /* Cuando la Parte B está activa, ambos bloques se deslizan a su posición original (0) */
-   .activo-corte .bloque-entra-izq { transform: translateX(0); }
-   .activo-corte .bloque-entra-der { transform: translateX(0); }
-   
-   /* Estilo de los textos */
-   .texto-impacto p {
-       font-size: 1.35rem;
-       line-height: 1.65;
-       color: #f8fafc;
+   .fondo-grupo-corte.co-orion-aparece #of-orion {
+       opacity: 1;
    }
-   .texto-impacto strong {
-       color: var(--acento); /* antes: #ef4444 (rojo) */
-       font-weight: 700;
+
+   /* Halo: NO tiene transición CSS a propósito. Lo maneja el scroll, frame a
+      frame (ver actualizarDestello() en js/escena-orion-final.js): el
+      destello avanza exactamente al ritmo de la rueda, así que nunca queda
+      a mitad de camino ni se adelanta al scroll. Los valores de acá abajo
+      son sólo el estado inicial (y el fallback si el JS no corre). */
+   #of-halo-grupo {
+       transform-box: fill-box;
+       transform-origin: center;
+       transform: scale(0.4);
+       opacity: 0;
    }
-   
+
+   /* Blanco total: cubre TODA la pantalla del capítulo corte, texto
+      incluido — por eso tiene el z-index más alto de la escena. */
+   .of-blanco {
+       position: absolute;
+       inset: 0;
+       width: 100%;
+       height: 100%;
+       background: #fffaf0;
+       opacity: 0;
+       z-index: 9;
+       pointer-events: none;
+   }
+
    .disparador-corte {
-       height: 100vh;
+       height: 70vh;
        width: 100%;
        position: relative;
        pointer-events: none;
    }
-   /* El tercero es el más largo: adentro de este tramo aparece Orión con su
-      texto y, sobre el final, ocurre el destello. El destello NO lo dispara
-      este div: va atado directamente al scroll, frame a frame (ver
-      js/escena-orion-final.js), así es perfectamente fluido y siempre
-      termina justo cuando la escena de la ruta toma la pantalla. */
+   /* El último (data-corte="3") es el más largo y queda sin dividir: adentro
+      de este tramo aparece Orión con sus 2 beats de texto (orion-a /
+      orion-b, repartidos por scroll continuo — ver
+      js/escena-orion-final.js) y, sobre el final, ocurre el destello,
+      atado directamente al scroll frame a frame, así es perfectamente
+      fluido y siempre termina justo cuando la escena de la ruta toma la
+      pantalla. */
    .disparador-corte[data-corte="3"] {
        height: 190vh;
    }
-   
-   
    
    /* ==========================================================================
       7. ESCENA 5 — Ruta con auto (ver js/escena-ruta.js). El resto de las
@@ -517,16 +481,17 @@
        height: 400vh;
        width: 100%;
 
-       /* SOLAPE: sin esto, entre que el paso pinneado de escena-4 se suelta y
-          esta escena llega a pinnearse hay exactamente 100vh (el alto del
-          pin) de scroll muerto — y como todo está blanco por el destello, es
-          una pantalla en blanco que hay que atravesar a rueda. Subiéndola
-          100vh, esta escena queda pinneada EXACTAMENTE en el mismo instante
-          en que la otra se suelta: el relevo es inmediato.
+       /* SOLAPE: sin esto, entre que el sticky de la escena unificada
+          (Jorge + ráfaga + corte) se suelta y esta escena llega a
+          pinnearse hay exactamente 100vh (el alto del pin) de scroll
+          muerto — y como todo está blanco por el destello del capítulo
+          corte, es una pantalla en blanco que hay que atravesar a rueda.
+          Subiéndola 100vh, esta escena queda pinneada EXACTAMENTE en el
+          mismo instante en que la otra se suelta: el relevo es inmediato.
           Mientras tanto se mantiene oculta (visibility) para que no se le vea
           asomar una franja blanca por abajo durante el destello. */
        margin-top: -100vh;
-       z-index: 6; /* por encima de .escena-corte-profundo (z-index 5) */
+       z-index: 6; /* por encima de .escena-scroll-capitulos (z-index del capítulo corte, ver más arriba) */
        visibility: hidden;
    }
    .escena-scroll-ruta.ruta-en-escena {
@@ -659,91 +624,6 @@
        position: relative;
        height: 650vh; /* 2 bloques sticky (100vh c/u) + 4 disparadores-viaje (100vh c/u) + buffer chico */
        width: 100%;
-   }
-
-   /* ==========================================================================
-      TRANSICIÓN — ORIÓN + ENCANDILAMIENTO (ver js/escena-orion-final.js y
-      LÓGICA ESCENA 4 en main.js)
-      Integrada DENTRO del paso 2 de escena-4 (misma foto de él
-      recibiéndose, sin duplicarla): el paso visual sigue siendo el 2 todo el
-      tiempo. Orión aparece con .co-orion-aparece (la agrega el observer de
-      main.js en el disparador 3), y el destello lo maneja el scroll frame a
-      frame desde js/escena-orion-final.js — por eso el halo y el blanco de
-      acá abajo no tienen transición CSS.
-      ========================================================================== */
-
-   #svg-orion-final {
-       position: absolute;
-       inset: 0;
-       width: 100%;
-       height: 100%;
-       display: block;
-       pointer-events: none;
-   }
-
-   #of-orion {
-       opacity: 0;
-       transition: opacity 1.4s ease-in-out;
-   }
-   .paso-corte[data-paso="2"].co-orion-aparece #of-orion {
-       opacity: 1;
-   }
-
-   /* Halo y blanco: NO tienen transición CSS a propósito. Los maneja el
-      scroll, frame a frame (ver actualizarDestello() en
-      js/escena-orion-final.js): el destello avanza exactamente al ritmo de
-      la rueda, así que nunca queda a mitad de camino ni se adelanta al
-      scroll — y siempre termina justo cuando la escena de la ruta releva la
-      pantalla. Los valores de acá abajo son sólo el estado inicial (y el
-      fallback si el JS no corre). */
-   #of-halo-grupo {
-       transform-box: fill-box;
-       transform-origin: center;
-       transform: scale(0.4);
-       opacity: 0;
-   }
-
-   /* Blanco total: cubre TODA la pantalla del paso (no sólo la imagen), por
-      eso va afuera de .contenedor-fijo-split, como hermano directo dentro de
-      .paso-corte. */
-   .of-blanco {
-       position: absolute;
-       inset: 0;
-       width: 100%;
-       height: 100%;
-       background: #fffaf0;
-       opacity: 0;
-       pointer-events: none;
-   }
-
-   /* Texto: el párrafo del astronomo y el de Orión ocupan el mismo lugar
-      dentro de .bloque-texto — el de Orión arranca invisible y absoluto, y
-      se cruzan en fade cuando aparece la constelación. */
-   .co-texto-astronomo {
-       transition: opacity 0.8s ease-in-out;
-   }
-   .co-texto-orion {
-       position: absolute;
-       /* Mismo margen que el resto de los textos del sitio (.parrafo-historia,
-          .rafaga-beat y el padding de .bloque-texto): al ser absoluto, "inset: 0"
-          se saltaba el padding del contenedor y el texto quedaba pegado a los
-          bordes. */
-       left: 30px;
-       right: 30px;
-       top: 0;
-       bottom: 0;
-       display: flex;
-       align-items: center; /* mismo centrado que .bloque-texto, ver arriba */
-       opacity: 0;
-       transition: opacity 0.8s ease-in-out;
-       pointer-events: none;
-   }
-   .paso-corte[data-paso="2"].co-orion-aparece .co-texto-astronomo {
-       opacity: 0;
-   }
-   .paso-corte[data-paso="2"].co-orion-aparece .co-texto-orion {
-       opacity: 1;
-       pointer-events: auto;
    }
 
    .contenedor-fijo-viaje {
@@ -1966,11 +1846,17 @@
        opacity: 1;
    }
 
-   /* Apagada por defecto: nada de halo hasta que la escena la "encienda" */
+   /* Apagada por defecto: nada de halo hasta que la escena la "encienda".
+      transform-box/transform-origin: para que el crecimiento del último
+      tramo (ver actualizarEncandilamiento() en
+      js/escena-transicion-fisica.js) escale desde el propio centro del
+      halo, no desde el origen del SVG. */
    #tf-halo-chico,
    #tf-halo-grande {
        opacity: 0;
        transition: opacity 3s ease;
+       transform-box: fill-box;
+       transform-origin: center;
    }
    #tf-bulbo {
        fill: #544a3a;
@@ -1985,6 +1871,22 @@
    }
    .pin-transicion-fisica.tf-farol-encendido #tf-bulbo {
        fill: #ffdca0;
+   }
+
+   /* Encandilamiento final: NO tiene transición CSS a propósito — lo maneja
+      el scroll, frame a frame (ver actualizarEncandilamiento() en
+      js/escena-transicion-fisica.js), igual que el destello de Orión en la
+      escena anterior del sitio. Tapa TODO (farola, texto y fondo), por eso
+      tiene el z-index más alto de la escena. */
+   .tf-encandilamiento {
+       position: absolute;
+       inset: 0;
+       width: 100%;
+       height: 100%;
+       background: #ffdca0;
+       opacity: 0;
+       z-index: 6;
+       pointer-events: none;
    }
 
    /* Mini-gráfico: en esta escena es EL protagonista — la pequeña
@@ -2286,8 +2188,26 @@
        width: 100%;
        height: 1200vh; /* 1100vh de recorrido animado (cámara + tramo interactivo) + 100vh de colchón para el telón final */
        background-color: #03040a;
+
+       /* SOLAPE: sin esto, entre que el sticky de la escena de la farola se
+          suelta y esta escena llega a pinnearse hay exactamente 100vh (el
+          alto del pin) de scroll muerto — y como todo está encandilado en
+          cálido, es una pantalla de color que hay que atravesar a rueda en
+          vez de quedarse fija ahí. Subiéndola 100vh, esta escena queda
+          pinneada EXACTAMENTE en el mismo instante en que la otra se
+          suelta: el relevo es inmediato, sin scroll de por medio (misma
+          técnica que usa .escena-scroll-ruta con la escena anterior, ver
+          más abajo). Mientras tanto se mantiene oculta (visibility) para
+          que no se le vea asomar una franja de color por abajo durante el
+          encandilamiento. */
+       margin-top: -100vh;
+       z-index: 7; /* por encima de .tf-encandilamiento (z-index 6) */
+       visibility: hidden;
    }
-   
+   .escena-luz-lumínica.luz-en-escena {
+       visibility: visible;
+   }
+
    .pin-luz {
        position: sticky;
        top: 0;
@@ -2304,6 +2224,26 @@
        width: 100%;
        height: 100%;
        display: block;
+   }
+
+   /* Velo cálido: continuación directa del encandilamiento con el que
+      termina la escena de la farola (ver .tf-encandilamiento). Arranca
+      opaco y se disuelve apenas .pin-luz queda pinneado (clase agregada
+      por js/escena-luz.js), revelando la ciudad en el mismo lugar. */
+   .luz-destello {
+       position: absolute;
+       inset: 0;
+       width: 100%;
+       height: 100%;
+       background: #ffdca0;
+       opacity: 1;
+       transition: opacity 0.9s ease-out 0.2s;
+       pointer-events: none;
+       z-index: 20;
+   }
+   .pin-luz.luz-revelada .luz-destello {
+       opacity: 0;
+       pointer-events: none;
    }
    
    /* Espaciador invisible entre la ilustración pegajosa y el disparador del
