@@ -340,7 +340,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const LIMITE_CIUDAD = { bsas: 4.1, firmat: 5.4, junin: 6.3 };
     // En Junín la penalización es 0: bajo el cielo más oscuro de los tres,
     // lo que se ve es directamente la magnitud real de la estrella.
-    const PENALIZACION_CIUDAD = { bsas: 3.5, firmat: 3.4, junin: 0 };
+    const PENALIZACION_CIUDAD = { bsas: 0, firmat: 3.2, junin: 3.5 };
 
     function magnitudPercibida(magReal, ciudad) {
         return magReal + PENALIZACION_CIUDAD[ciudad];
@@ -531,7 +531,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // se muestra es la percibida DESDE ESTE LUGAR, no un dato de
                 // libro: por eso cambia si se hoverea la misma estrella en
                 // otra ciudad.
-                tooltip.innerHTML = `<strong>${nombre}</strong><span class="magnitud">Pérdida de visibilidad: ${magMostrada}</span><p>${dato}</p><p class="nota-visibilidad">${nota}</p>`;
+                tooltip.innerHTML = `<strong>${nombre}</strong><span class="magnitud">Magnitud aparente desde acá: ${magMostrada}</span><p>${dato}</p><p class="nota-visibilidad">${nota}</p>`;
                 tooltip.classList.add("visible");
                 posicionar(e);
             });
