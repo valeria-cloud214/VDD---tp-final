@@ -531,7 +531,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // se muestra es la percibida DESDE ESTE LUGAR, no un dato de
                 // libro: por eso cambia si se hoverea la misma estrella en
                 // otra ciudad.
-                tooltip.innerHTML = `<strong>${nombre}</strong><span class="magnitud">Magnitud aparente desde acá: ${magMostrada}</span><p>${dato}</p><p class="nota-visibilidad">${nota}</p>`;
+                tooltip.innerHTML = `<strong>${nombre}</strong><span class="magnitud">Pérdida de visibilidad: ${magMostrada}</span><p>${dato}</p><p class="nota-visibilidad">${nota}</p>`;
                 tooltip.classList.add("visible");
                 posicionar(e);
             });
